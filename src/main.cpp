@@ -2,16 +2,12 @@
    to be built under GCC.
 */
 #include "mbed.h"
+#include "Kernel.h"
 
-DigitalOut myled(LED1);
+int main() {
 
-int main() 
-{
-    while(1) 
-    {
-        myled = 1;
-        wait(0.2);
-        myled = 0;
-        wait(0.2);
-    }
+    // Kernel creates modules, and receives and dispatches events between them
+    Kernel* kernel = new Kernel(); 
+
 }
+
