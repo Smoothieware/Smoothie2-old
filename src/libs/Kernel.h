@@ -31,6 +31,7 @@ class StepTicker;
 class Adc;
 class PublicData;
 class TemperatureControlPool;
+class Blinker;
 
 class Kernel {
     public:
@@ -54,6 +55,8 @@ class Kernel {
         Conveyor*         conveyor;
         Pauser*           pauser;
         TemperatureControlPool* temperature_control_pool;
+
+        Blinker*          blinker;
 
         int debug;
         SlowTicker*       slow_ticker;

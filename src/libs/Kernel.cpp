@@ -9,6 +9,7 @@
 #include "Module.h"
 #include "StreamOutputPool.h"
 #include "SerialConsole.h"
+#include "Blinker.h"
 #include <malloc.h>
 #include <array>
 #include "mbed.h"
@@ -26,6 +27,9 @@ Kernel::Kernel(){
     this->serial = new SerialConsole(P2_0, P2_1, 9600);
     this->add_module( this->serial );
 
+    // The Blinker module blinks a GPIO pin for testing purposes
+    this->blinker = new Blinker();
+    this->add_module( this->blinker );
 }
 
 // Add a module to Kernel. We don't actually hold a list of modules we just call its on_module_loaded

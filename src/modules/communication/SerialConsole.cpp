@@ -41,6 +41,7 @@ void SerialConsole::on_module_loaded() {
 void SerialConsole::on_serial_char_received(){
     while(this->serial->readable()){
         char received = this->serial->getc();
+        this->printf("%c test\n");
         // convert CR to NL (for host OSs that don't send NL)
         if( received == '\r' ){ received = '\n'; }
         this->buffer.push_back(received);
@@ -59,6 +60,7 @@ void SerialConsole::on_main_loop(void * argument){
                 struct SerialMessage message;
                 message.message = received;
                 message.stream = this;
+                this->printf("Test1\n");
                 THEKERNEL->call_event(ON_CONSOLE_LINE_RECEIVED, &message );
                 return;
             }else{
