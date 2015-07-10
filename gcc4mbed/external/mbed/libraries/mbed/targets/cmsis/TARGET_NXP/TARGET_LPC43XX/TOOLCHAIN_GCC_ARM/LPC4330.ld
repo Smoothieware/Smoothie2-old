@@ -9,7 +9,7 @@ MEMORY
   RAM_AHB0 (rwx) : ORIGIN = 0x20000000, LENGTH = 32K
   RAM_AHB1 (rwx) : ORIGIN = 0x20008000, LENGTH = 32K
 
-  SPIFI (rx) : ORIGIN = 0x14000000, LENGTH = 32M
+  SPIFI (rx) : ORIGIN = 0x1A000000, LENGTH = 32M
 }
 
 /* Linker script to place sections and symbol values. Should be used together
