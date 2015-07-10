@@ -18,3 +18,6 @@ NO_FLOAT_SCANF  := 1
 NO_FLOAT_PRINTF := 1
 
 include $(GCC4MBED_DIR)/build/gcc4mbed.mk
+
+flash:
+	lpc21isp LPC4330_M4/Smoothie2.hex /dev/ttyUSB0 9600 14746
