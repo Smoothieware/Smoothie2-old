@@ -35,8 +35,10 @@ void Blinker::on_console_line_received(void *line){
         Pin* pin = (new Pin())->from_string(shift_parameter(possible_command))->as_output();
        
         // Blink 
-        while(1){
-            new_message.stream->printf("Blinking %d %d\n\r", pin->port_number, pin->pin);
+        int i = 0;
+        while(i < 5){
+            i++;
+            new_message.stream->printf("Blinking\n\r");
             pin->set( true );
             wait(0.2);
             pin->set( false );

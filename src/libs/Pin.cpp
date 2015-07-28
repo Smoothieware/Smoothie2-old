@@ -6,17 +6,18 @@
 #include "InterruptIn.h"
 #include "PinNames.h"
 #include "port_api.h"
+#include "mbed.h"
 
 Pin::Pin(){
     this->inverting= false;
     this->valid= false;
-    this->pin= 32;
-    this->port= nullptr;
 }
 
 // Make a new pin object from a string
 Pin* Pin::from_string(std::string value){
-    LPC_GPIO_T* gpios[8] ={LPC_GPIO0,LPC_GPIO1,LPC_GPIO2,LPC_GPIO3,LPC_GPIO4,LPC_GPIO5,LPC_GPIO6,LPC_GPIO7};
+    // Port and pin for when we find them
+    int port_number;
+    int pin;
 
     // cs is the current position in the string
     const char* cs = value.c_str();
@@ -25,22 +26,38 @@ Pin* Pin::from_string(std::string value){
     valid= true;
 
     // grab first integer as port. pointer to first non-digit goes in cn
-    this->port_number = strtol(cs, &cn, 10);
+    port_number = strtol(cs, &cn, 10);
     // if cn > cs then strtol read at least one digit
     if ((cn > cs) && (port_number <= 7)){
-        // translate port index into something useful
-        this->port = gpios[(unsigned int) this->port_number];
         // if the char after the first integer is a . then we should expect a pin index next
         if (*cn == '.'){
             // move pointer to first digit (hopefully) of pin index
             cs = ++cn;
-
+            
             // grab pin index.
-            this->pin = strtol(cs, &cn, 10);
+            pin = strtol(cs, &cn, 10);
+ 
+            // Get a mBed port
+            PortName port;
+            switch(port_number){
+                case 0 : port = Port0;
+                case 1 : port = Port1;
+                case 2 : port = Port2;
+                case 3 : port = Port3;
+                case 4 : port = Port4;
+                case 5 : port = Port5;
+                case 6 : port = Port6;
+                case 7 : port = Port7;
+            }
+            
+            // Get a mBed pin from the port and pin number 
+            PinName pin_name = port_pin( port, pin ); 
+
+            // Set our mbed DigitalInOut pin
+            this->mbed_pin = new DigitalInOut(pin_name);
 
             // if strtol read some numbers, cn will point to the first non-digit
             if ((cn > cs) && (pin < 32)){
-                this->port->MASK[this->pin] = 0;
 
                 // now check for modifiers:-
                 // ! = invert pin
@@ -75,17 +92,15 @@ Pin* Pin::from_string(std::string value){
                                 return this;
                     }
                 }
+   
                 return this;
             }
         }
     }
 
     // from_string failed. TODO: some sort of error
-    valid= false;
-    port_number = 0;
-    port = gpios[0];
-    pin = 32;
-    inverting = false;
+    this->valid= false;
+    this->inverting = false;
     return this;
 }
 
@@ -93,6 +108,7 @@ Pin* Pin::from_string(std::string value){
 Pin* Pin::as_open_drain(){
     if (!this->valid) return this;
     pull_none(); // no pull up by default
+    this->mbed_pin->mode(OpenDrain);
     return this;
 }
 
@@ -106,21 +122,21 @@ Pin* Pin::as_repeater(){
 // Configure this pin as no pullup or pulldown
 Pin* Pin::pull_none(){
 	if (!this->valid) return this;
-	// Set the two bits for this pin as 10
+        this->mbed_pin->mode(PullNone);
 	return this;
 }
 
 // Configure this pin as a pullup
 Pin* Pin::pull_up(){
     if (!this->valid) return this;
-    // Set the two bits for this pin as 00
+    this->mbed_pin->mode(PullUp);
     return this;
 }
 
 // Configure this pin as a pulldown
 Pin* Pin::pull_down(){
     if (!this->valid) return this;
-    // Set the two bits for this pin as 11
+    this->mbed_pin->mode(PullDown);
     return this;
 }
 
@@ -133,7 +149,7 @@ mbed::PwmOut* Pin::hardware_pwm()
 mbed::InterruptIn* Pin::interrupt_pin()
 {
     if(!this->valid) return nullptr;
-
+/*
     // set as input
     as_input();
 
@@ -145,4 +161,6 @@ mbed::InterruptIn* Pin::interrupt_pin()
         this->valid= false;
         return nullptr;
     }
+*/
+    return nullptr;
 }

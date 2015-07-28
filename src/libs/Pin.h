@@ -13,6 +13,8 @@ namespace mbed {
     class InterruptIn;
 }
 
+#include "mbed.h"
+
 class Pin {
     public:
         Pin();
@@ -24,18 +26,19 @@ class Pin {
         }
 
         inline bool equals(const Pin& other) const {
-            return (this->pin == other.pin) && (this->port == other.port);
+            //return (this->pin == other.pin) && (this->port == other.port);
+            return false;
         }
 
         inline Pin* as_output(){
             if (this->valid)
-                this->port->DIR[this->pin] = 1;
+                this->mbed_pin->output(); 
             return this;
         }
 
         inline Pin* as_input(){
             if (this->valid)
-                this->port->DIR[this->pin] = 0;
+                this->mbed_pin->input();
             return this;
         }
 
@@ -51,16 +54,17 @@ class Pin {
 
         inline bool get(){
             if (!this->valid) return false;
-            return this->inverting ^ ( this->port->PIN[this->pin]);
+            return this->inverting ^ ( (bool)this->mbed_pin->read() );
         }
 
         inline void set(bool value)
         {
             if (!this->valid) return;
-            if ( this->inverting ^ value )
-                this->port->SET[this->pin] = 1;
-            else
-                this->port->CLR[this->pin] = 1;
+            if ( this->inverting ^ value ){
+                this->mbed_pin->write(1);
+            }else{
+                this->mbed_pin->write(0);
+            }
         }
 
         mbed::PwmOut *hardware_pwm();
@@ -68,10 +72,8 @@ class Pin {
         mbed::InterruptIn *interrupt_pin();
 
         // these should be private, and use getters
-        LPC_GPIO_T* port;
+        DigitalInOut* mbed_pin;
 
-        uint8_t pin;
-        char port_number;
         struct {
             bool inverting:1;
             bool valid:1;
