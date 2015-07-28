@@ -1,4 +1,8 @@
 #include "Blinker.h"
+#include "Pin.h"
+
+#include "mbed.h"
+
 #include <string>
 #include <stdarg.h>
 using std::string;
@@ -25,9 +29,21 @@ void Blinker::on_console_line_received(void *line){
     string possible_command = new_message.message;
     string cmd = shift_parameter(possible_command);
 
+    // If this is a blink command
     if( cmd == "blink" ){
-        new_message.stream->printf("Blinking\n");
+        // Extract the pin name parameter
+        Pin* pin = (new Pin())->from_string(shift_parameter(possible_command))->as_output();
+       
+        // Blink 
+        while(1){
+            new_message.stream->printf("Blinking %d %d\n\r", pin->port_number, pin->pin);
+            pin->set( true );
+            wait(0.2);
+            pin->set( false );
+            wait(0.2);
+        } 
+
     }
 
-    new_message.stream->printf("OK\n");
+    new_message.stream->printf("OK\n\r");
 }
