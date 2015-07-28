@@ -32,13 +32,14 @@ void Blinker::on_console_line_received(void *line){
     // If this is a blink command
     if( cmd == "blink" ){
         // Extract the pin name parameter
-        Pin* pin = (new Pin())->from_string(shift_parameter(possible_command))->as_output();
+        string pin_name = shift_parameter(possible_command); 
+        Pin* pin = (new Pin())->from_string(pin_name)->as_output();
        
         // Blink 
         int i = 0;
         while(i < 5){
             i++;
-            new_message.stream->printf("Blinking\n\r");
+            new_message.stream->printf("Blinking valid:%d pin_name:'%s' mbed_pin:%p \n", pin->valid, pin_name.c_str(), pin->mbed_pin);
             pin->set( true );
             wait(0.2);
             pin->set( false );
