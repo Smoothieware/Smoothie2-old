@@ -27,8 +27,8 @@ SlowTicker::SlowTicker(){
 
 // Set the base frequency we use for all sub-frequencies
 void SlowTicker::set_frequency( int frequency ){
-    this->interval = 1 / frequency;   // SystemCoreClock/4 = Timer increments in a second
-    this->ticker->attach_us(this, &SlowTicker::tick, this->interval * 1000000); 
+    this->interval = (float)1 / frequency;   // SystemCoreClock/4 = Timer increments in a second
+    this->ticker->attach_us(this, &SlowTicker::tick,(int)( this->interval * (float)1000000) ); 
 }
 
 // The actual interrupt being called by the timer, this is where work is done
@@ -37,7 +37,7 @@ void SlowTicker::tick(){
     // Call all hooks that need to be called ( bresenham )
     for (Hook* hook : this->hooks){
         hook->countdown -= this->interval;
-        if (hook->countdown < 0)
+        if (hook->countdown < (float)0)
         {
             hook->countdown += hook->interval;
             hook->call();
