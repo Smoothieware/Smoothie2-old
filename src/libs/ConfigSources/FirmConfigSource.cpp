@@ -14,6 +14,7 @@
 
 using namespace std;
 #include <string>
+#include <vector>
 
 // we use objdump in the Makefile to import your config.default file into the compiled code
 // Since the two symbols below are derived from the filename, we need to change them if the filename changes
@@ -28,7 +29,14 @@ FirmConfigSource::FirmConfigSource(const char* name){
 // Transfer all values found in the file to the passed cache
 void FirmConfigSource::transfer_values_to_cache( ConfigCache* cache ){
 
-/*    char* p = &_binary_config_default_start;
+    /*
+    std::vector<std::string> file = {"Hello", "World"};
+    for( string line : file ){
+        process_line_from_ascii_config(line, cache);
+    }
+    */
+
+    char* p = &_binary_config_default_start;
     // For each line
     while( p < &_binary_config_default_end ){
         // find eol
@@ -41,7 +49,6 @@ void FirmConfigSource::transfer_values_to_cache( ConfigCache* cache ){
         p= eol;
         process_line_from_ascii_config(line, cache);
     }
-*/
     
 }
 

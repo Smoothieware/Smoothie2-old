@@ -74,6 +74,7 @@ OBJECTS := $(filter-out $(EXCL_OBJECTS),$(OBJECTS))
 
 # Add in the GCC4MBED stubs which allow hooking in the MRI debug monitor.
 OBJECTS += $(OUTDIR)/gcc4mbed.o
+OBJECTS += $(OUTDIR)/configdefault.o
 
 # Add in device specific object file(s).
 OBJECTS += $(DEVICE_OBJECTS)
@@ -311,10 +312,11 @@ $(DEBUG_DIR)/%.o : $(MBED_LIB_SRC_ROOT)/%.S
 	$(Q) $(GCC) $(ASM_FLAGS) $(MBED_INCLUDES) -c $< -o $@
 
 $(RELEASE_DIR)/%.o : $(MBED_LIB_SRC_ROOT)/%.S
+	$(Q) $(GCC) $(ASM_FLAGS) $(MBED_INCLUDES) -c $< -o $@
+	$(RELEASE_DIR)/configdefault.o : $(MBED_LIB_SRC_ROOT)/config.default
 	@echo Assembling $<
 	$(Q) $(MKDIR) $(call convert-slash,$(dir $@)) $(QUIET)
-	$(Q) $(GCC) $(ASM_FLAGS) $(MBED_INCLUDES) -c $< -o $@
-
+	$(Q) $(OBJCOPY) -I binary -O elf32-littlearm -B arm --readonly-text --rename-section .data=.rodata.configdefault $< -o $@
 
 #########################################################################
 # High level rule for cleaning out all official mbed libraries.
