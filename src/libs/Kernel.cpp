@@ -9,6 +9,7 @@
 #include "Module.h"
 #include "StreamOutputPool.h"
 #include "SerialConsole.h"
+#include "SlowTicker.h"
 #include "Blinker.h"
 #include <malloc.h>
 #include <array>
@@ -26,6 +27,9 @@ Kernel::Kernel(){
     // Create the default UART Serial Console interface
     this->serial = new SerialConsole(P2_0, P2_1, 9600);
     this->add_module( this->serial );
+
+    // For slow repeteative tasks
+    this->add_module( this->slow_ticker = new SlowTicker());
 
     // The Blinker module blinks a GPIO pin for testing purposes
     this->blinker = new Blinker();

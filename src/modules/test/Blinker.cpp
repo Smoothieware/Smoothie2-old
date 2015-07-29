@@ -6,6 +6,7 @@
 #include <string>
 #include <stdarg.h>
 using std::string;
+#include <vector>
 #include "SerialMessage.h"
 #include "StreamOutput.h"
 #include "Kernel.h"
@@ -16,6 +17,8 @@ Blinker::Blinker(){
 
 void Blinker::on_module_loaded(){
     this->register_for_event(ON_CONSOLE_LINE_RECEIVED);
+    this->ticker = new Ticker();
+    this->flag = false;
 }
 
 void Blinker::on_console_line_received(void *line){
@@ -34,19 +37,22 @@ void Blinker::on_console_line_received(void *line){
         // Extract the pin name parameter
         string pin_name = shift_parameter(possible_command); 
         Pin* pin = (new Pin())->from_string(pin_name)->as_output();
-       
-        // Blink 
-        int i = 0;
-        while(i < 5){
-            i++;
-            new_message.stream->printf("Blinking valid:%d pin_name:'%s' mbed_pin:%p \n", pin->valid, pin_name.c_str(), pin->mbed_pin);
-            pin->set( true );
-            wait(0.2);
-            pin->set( false );
-            wait(0.2);
-        } 
+    
+        // Add the pin to the vector
+        this->pins.push_back(pin);   
+
+        // Set the ticker
+        this->ticker->attach_us(this, &Blinker::tick, 50000); 
 
     }
 
     new_message.stream->printf("OK\n\r");
+}
+
+void Blinker::tick(){
+    this->flag = !this->flag;
+    for( Pin* pin : this->pins ){
+        pin->set(this->flag);
+    }
+
 }
