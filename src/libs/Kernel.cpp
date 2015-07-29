@@ -12,6 +12,11 @@
 #include "SlowTicker.h"
 #include "Blinker.h"
 #include "GcodeDispatch.h"
+#include "modules/robot/Planner.h"
+#include "modules/robot/Robot.h"
+#include "modules/robot/Stepper.h"
+#include "modules/robot/Conveyor.h"
+#include "libs/StepTicker.h"
 #include "Config.h"
 #include <malloc.h>
 #include <array>
@@ -39,12 +44,20 @@ Kernel::Kernel(){
     // For slow repeteative tasks
     this->add_module( this->slow_ticker = new SlowTicker());
 
+    // For step generation
+    this->step_ticker = new StepTicker();
+
     // The Blinker module blinks a GPIO pin for testing purposes
     this->blinker = new Blinker();
     this->add_module( this->blinker );
 
     // Core modules
     this->add_module( new GcodeDispatch() );
+    this->add_module( this->robot          = new Robot()         );
+    this->add_module( this->stepper        = new Stepper()       );
+    this->add_module( this->conveyor       = new Conveyor()      );
+    // TOADDBACK this->add_module( this->pauser         = new Pauser()        );
+    this->planner   = new Planner();
 
 }
 

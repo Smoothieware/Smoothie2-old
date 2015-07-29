@@ -11,3 +11,8 @@ switch.second.input_on_command                  M116             #
 switch.second.input_off_command                 M117             #
 switch.second.output_pin                        1.2              #
 switch.second.output_type                       pwm             # pwm output settable with S parameter in the input_on_comand
+
+alpha_step_pin    2.8!
+beta_step_pin     2.9!
+
+base_stepping_frequency 5000

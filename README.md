@@ -41,7 +41,10 @@ Things that are broken during the port and should be added back as things progre
 * In Switch.cpp : Commented out all of the set_low_on_debug stuff
 * In SlowTicker.h and Hook.h : Using doubles instead of ints for intervals/frequencies and counting down. Done to accomodate mBed, but dirty costly hack
 * In SlowTicker.h : Assuming it's fine to use mBed for this, we can remove a lot of code and just rely fully on mBed
-
+* In RingBuffer.h : Remove the _irq() functions
+* In Robot.cpp : Removing all of the publicdataaccess stuff
+* In StepTicker.cpp : Almost everything removed for now
+* In StepperMotor.cpp : Removing all of the set_low_on_debug stuff
 
 Things changed from Smoothie1 : 
 
@@ -55,3 +58,7 @@ Planned refactors : 
 * Queue refactor ( see wiki )
 * Adding MTP and removing MSD for USB
 * Full rewrite based on a RTOS
+
+Minor things to do :
+
+* Change the function names in StepTicker.cpp, I kept all the old IRQ function names ( dirty )

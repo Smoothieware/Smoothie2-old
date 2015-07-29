@@ -39,9 +39,9 @@ template<class kind, int length>  int RingBuffer<kind, length>::capacity(){
 }
 
 template<class kind, int length>  int RingBuffer<kind, length>::size(){
-        __disable_irq();
+        // TOADDBACK __disable_irq();
         int i = head - tail + ((tail > head)?length:0);
-        __enable_irq();
+        // TOADDBACK __enable_irq();
         return i;
 }
 

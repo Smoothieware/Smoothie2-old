@@ -21,8 +21,8 @@ using std::string;
 #include "Pin.h"
 #include "StepperMotor.h"
 #include "Gcode.h"
-#include "PublicDataRequest.h"
-#include "RobotPublicAccess.h"
+// TOADDBACK #include "PublicDataRequest.h"
+// TOADDBACK #include "RobotPublicAccess.h"
 #include "arm_solutions/BaseSolution.h"
 #include "arm_solutions/CartesianSolution.h"
 #include "arm_solutions/RotatableCartesianSolution.h"
@@ -280,6 +280,7 @@ void Robot::on_halt(void *arg)
 
 void Robot::on_get_public_data(void *argument)
 {
+    /* TOADDBACK 
     PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
 
     if(!pdr->starts_with(robot_checksum)) return;
@@ -299,11 +300,12 @@ void Robot::on_get_public_data(void *argument)
         pdr->set_data_ptr(&return_data);
         pdr->set_taken();
     }
+    */
 }
 
 void Robot::on_set_public_data(void *argument)
 {
-    PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
+/* TOADDBACK    PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
 
     if(!pdr->starts_with(robot_checksum)) return;
 
@@ -328,6 +330,7 @@ void Robot::on_set_public_data(void *argument)
 
         pdr->set_taken();
     }
+    */
 }
 
 //A GCode has been received
@@ -346,7 +349,7 @@ void Robot::on_gcode_received(void *argument)
             case 2:  this->motion_mode = MOTION_MODE_CW_ARC; gcode->mark_as_taken();  break;
             case 3:  this->motion_mode = MOTION_MODE_CCW_ARC; gcode->mark_as_taken();  break;
             case 4: {
-                uint32_t delay_ms= 0;
+                int delay_ms= 0;
                 if (gcode->has_letter('P')) {
                     delay_ms= gcode->get_int('P');
                 }
@@ -356,9 +359,13 @@ void Robot::on_gcode_received(void *argument)
                 if (delay_ms > 0){
                     // drain queue
                     THEKERNEL->conveyor->wait_for_empty_queue();
-                    // wait for specified time
+                    /* // wait for specified time
                     uint32_t start= us_ticker_read(); // mbed call
                     while ((us_ticker_read() - start) < delay_ms*1000) {
+                    } */
+                    Timer t;
+                    t.start();
+                    while(t.read_ms() < delay_ms){
                         THEKERNEL->call_event(ON_IDLE, this);
                     }
                 }

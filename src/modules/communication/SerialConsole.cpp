@@ -59,6 +59,7 @@ void SerialConsole::on_main_loop(void * argument){
                 struct SerialMessage message;
                 message.message = received;
                 message.stream = this;
+                this->printf("Received line\n");
                 THEKERNEL->call_event(ON_CONSOLE_LINE_RECEIVED, &message );
                 return;
             }else{
