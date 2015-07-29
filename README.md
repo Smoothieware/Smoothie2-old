@@ -40,9 +40,18 @@ Things that are broken during the port and should be added back as things progre
 * In GcodeDispatch.cpp : Commented out all of the public access stuff
 * In Switch.cpp : Commented out all of the set_low_on_debug stuff
 * In SlowTicker.h and Hook.h : Using doubles instead of ints for intervals/frequencies and counting down. Done to accomodate mBed, but dirty costly hack
+* In SlowTicker.h : Assuming it's fine to use mBed for this, we can remove a lot of code and just rely fully on mBed
 
 
 Things changed from Smoothie1 : 
 
 * Pin now uses mBed instead of registers
 * SlowTicker now uses mBed instead of registers
+
+Planned refactors : 
+
+* Remove the checksum system for config options
+* Try to read config directly from SD card without cache ( as smoothie used to do ) now that we have SDIO
+* Queue refactor ( see wiki )
+* Adding MTP and removing MSD for USB
+* Full rewrite based on a RTOS
