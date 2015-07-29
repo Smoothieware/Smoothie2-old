@@ -11,6 +11,7 @@
 #include "SerialConsole.h"
 #include "SlowTicker.h"
 #include "Blinker.h"
+#include "Config.h"
 #include <malloc.h>
 #include <array>
 #include "mbed.h"
@@ -27,6 +28,12 @@ Kernel::Kernel(){
     // Create the default UART Serial Console interface
     this->serial = new SerialConsole(P2_0, P2_1, 9600);
     this->add_module( this->serial );
+
+    // Config next, but does not load cache yet
+    this->config = new Config();
+    
+    // Pre-load the config cache, do after setting up serial so we can report errors to serial
+    this->config->config_cache_load();
 
     // For slow repeteative tasks
     this->add_module( this->slow_ticker = new SlowTicker());

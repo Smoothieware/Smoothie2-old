@@ -52,6 +52,25 @@ void Blinker::on_console_line_received(void *line){
 
     }
 
+    // Command to set a pin
+    if( cmd == "set" ){
+        // Extract the pin name parameter
+        string pin_name = shift_parameter(possible_command); 
+        Pin* pin = (new Pin())->from_string(pin_name)->as_output();
+        pin->set(true); 
+        delete pin;
+    }
+
+    // Command to set a pin
+    if( cmd == "get" ){
+        // Extract the pin name parameter
+        string pin_name = shift_parameter(possible_command); 
+        Pin* pin = (new Pin())->from_string(pin_name)->as_output();
+        new_message.stream->printf("Value: %d\n\r", pin->get());
+        delete pin;
+    }
+
+
     new_message.stream->printf("OK\n\r");
 }
 
