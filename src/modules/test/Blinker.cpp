@@ -19,6 +19,7 @@ void Blinker::on_module_loaded(){
     this->register_for_event(ON_CONSOLE_LINE_RECEIVED);
     this->ticker = new Ticker();
     this->flag = false;
+    this->period = 50000;
 }
 
 void Blinker::on_console_line_received(void *line){
@@ -39,10 +40,15 @@ void Blinker::on_console_line_received(void *line){
         Pin* pin = (new Pin())->from_string(pin_name)->as_output();
     
         // Add the pin to the vector
-        this->pins.push_back(pin);   
+        this->pins.push_back(pin); 
+
+        string possible_period = shift_parameter(possible_command);
+        if( possible_period.size() > 0 ){
+            this->period = atoi( possible_period.c_str() );
+        }
 
         // Set the ticker
-        this->ticker->attach_us(this, &Blinker::tick, 50000); 
+        this->ticker->attach_us(this, &Blinker::tick, this->period); 
 
     }
 

@@ -15,6 +15,7 @@ class Blinker : public Module {
         Ticker* ticker;
         std::vector<Pin*> pins;
         bool flag;
+        int period;
 };
 
 #endif
