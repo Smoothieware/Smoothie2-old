@@ -12,6 +12,8 @@ using std::string;
 #include "Kernel.h"
 #include "utils.h"
 
+#define stoi(x) atoi(x.c_str())
+
 Blinker::Blinker(){
 }
 
@@ -56,7 +58,27 @@ void Blinker::on_console_line_received(void *line){
     if( cmd == "set" ){
         // Extract the pin name parameter
         string pin_name = shift_parameter(possible_command); 
-        Pin* pin = (new Pin())->from_string(pin_name)->as_output();
+        string possible_direction = shift_parameter(possible_command); 
+        Pin* pin = (new Pin())->from_string(pin_name);
+        if(possible_direction[0] == 'i') {
+            pin->as_input();
+        }else{
+            pin->as_output();
+        }
+
+        if (!this->pins.empty())
+        {
+            for (unsigned int i=0;i<this->pins.size();i++)
+            {
+                if(pin->equals(*this->pins[i]))
+                {
+                    // erase the pin, replace and pop is faster since we don't care about order
+                    this->pins[i] = this->pins.back();
+                    this->pins.pop_back();
+                }
+            }
+        }
+
         pin->set(true); 
         delete pin;
     }
@@ -68,6 +90,43 @@ void Blinker::on_console_line_received(void *line){
         Pin* pin = (new Pin())->from_string(pin_name)->as_output();
         new_message.stream->printf("Value: %d\n\r", pin->get());
         delete pin;
+    }
+
+    // Command to read and write spi
+    if( cmd == "spi" ){
+        // Extract the pin name parameter
+        string port = shift_parameter(possible_command);
+        string data = shift_parameter(possible_command);
+        string possible_frequency = shift_parameter(possible_command);
+        SPI* spi = NULL;
+        Pin* cs = new Pin();
+        int r = 0;
+
+        if(port == "0") {
+            spi = new SPI(P3_7, P3_6, P3_3);
+            cs->from_string("3.8");
+        }else if(port == "1") {
+            spi = new SPI(P1_4, P1_3, PF_4);
+            cs->from_string("1.5");
+        }
+
+        if(spi != NULL){
+            int freq = 100000;
+            if(possible_frequency.size()>0){
+                freq = stoi(possible_frequency);
+            }
+            cs->set(1);
+            spi->format(8,3);
+            spi->frequency(freq);
+            cs->set(0);
+            r = spi->write(stoi(data));
+            cs->set(1);
+            new_message.stream->printf("Value: 0x%x (%d)\n\r", r, r);
+        }else{
+            new_message.stream->printf("Port %s not found", port.c_str());
+        }
+
+        delete spi;
     }
 
 
