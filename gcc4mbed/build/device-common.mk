@@ -200,6 +200,9 @@ $(OUTDIR)/%.o : $(SRC)/%.S makefile
 	$(Q) $(MKDIR) $(call convert-slash,$(dir $@)) $(QUIET)
 	$(Q) $(GCC) $(ASM_FLAGS) $(MBED_INCLUDES) -c $< -o $@
 
+$(OUTDIR)/configdefault.o : $(SRC)/config.default
+	@echo Packing $<
+	$(Q) $(OBJCOPY) -I binary -O elf32-littlearm -B arm --readonly-text --rename-section .data=.rodata.configdefault $< $@
 
 ###############################################################################
 # Library mbed.a
@@ -312,11 +315,9 @@ $(DEBUG_DIR)/%.o : $(MBED_LIB_SRC_ROOT)/%.S
 	$(Q) $(GCC) $(ASM_FLAGS) $(MBED_INCLUDES) -c $< -o $@
 
 $(RELEASE_DIR)/%.o : $(MBED_LIB_SRC_ROOT)/%.S
-	$(Q) $(GCC) $(ASM_FLAGS) $(MBED_INCLUDES) -c $< -o $@
-	$(RELEASE_DIR)/configdefault.o : $(MBED_LIB_SRC_ROOT)/config.default
 	@echo Assembling $<
 	$(Q) $(MKDIR) $(call convert-slash,$(dir $@)) $(QUIET)
-	$(Q) $(OBJCOPY) -I binary -O elf32-littlearm -B arm --readonly-text --rename-section .data=.rodata.configdefault $< -o $@
+	$(Q) $(GCC) $(ASM_FLAGS) $(MBED_INCLUDES) -c $< -o $@
 
 #########################################################################
 # High level rule for cleaning out all official mbed libraries.
