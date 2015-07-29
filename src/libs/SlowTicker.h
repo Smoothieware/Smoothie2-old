@@ -30,7 +30,7 @@ class SlowTicker : public Module{
         // TODO replace this with std::function()
         template<typename T> Hook* attach( uint32_t frequency, T *optr, uint32_t ( T::*fptr )( uint32_t ) ){
             Hook* hook = new Hook();
-            hook->interval = floorf((SystemCoreClock/4)/frequency);
+            hook->interval = 1/frequency;
             hook->attach(optr, fptr);
             hook->countdown = hook->interval;
 
@@ -45,7 +45,7 @@ class SlowTicker : public Module{
             return hook;
         }
 
-    private:
+    // TOADDBACK: private:
         vector<Hook*> hooks;
         double max_frequency;
         double interval;

@@ -20,7 +20,7 @@ using namespace std;
 SlowTicker* global_slow_ticker;
 
 SlowTicker::SlowTicker(){
-    max_frequency = 0;
+    this->max_frequency = 0;
     global_slow_ticker = this;
     this->ticker = new Ticker();
 }

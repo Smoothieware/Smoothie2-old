@@ -11,6 +11,7 @@
 #include "SerialConsole.h"
 #include "SlowTicker.h"
 #include "Blinker.h"
+#include "GcodeDispatch.h"
 #include "Config.h"
 #include <malloc.h>
 #include <array>
@@ -41,6 +42,10 @@ Kernel::Kernel(){
     // The Blinker module blinks a GPIO pin for testing purposes
     this->blinker = new Blinker();
     this->add_module( this->blinker );
+
+    // Core modules
+    this->add_module( new GcodeDispatch() );
+
 }
 
 // Add a module to Kernel. We don't actually hold a list of modules we just call its on_module_loaded

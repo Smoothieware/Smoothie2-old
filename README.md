@@ -30,4 +30,19 @@ And finally compile the code
 
     make
 
+# TODO : 
 
+Things that are broken during the port and should be added back as things progress ( some things might be missing here. I try to use the TOADDBACK label when commenting things so search for that too ) : 
+
+* In Switch.cpp : Dependence to Conveyor.h, and emptying of the queue in on_gcode_received
+* In Switch.cpp : Commented out all of the public access stuff
+* In GcodeDispatch.cpp : Removed dependency to Pauser.h, Conveyor.h
+* In GcodeDispatch.cpp : Commented out all of the public access stuff
+* In Switch.cpp : Commented out all of the set_low_on_debug stuff
+* In SlowTicker.h and Hook.h : Using doubles instead of ints for intervals/frequencies and counting down. Done to accomodate mBed, but dirty costly hack
+
+
+Things changed from Smoothie1 : 
+
+* Pin now uses mBed instead of registers
+* SlowTicker now uses mBed instead of registers
