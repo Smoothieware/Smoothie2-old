@@ -14,15 +14,15 @@
 #include <string>
 using std::string;
 
-#include "Planner.h"
-#include "Conveyor.h"
+//#include "Planner.h"
+//#include "Conveyor.h"
 #include "Robot.h"
 #include "nuts_bolts.h"
 #include "Pin.h"
 #include "StepperMotor.h"
 #include "Gcode.h"
-#include "PublicDataRequest.h"
-#include "RobotPublicAccess.h"
+//#include "PublicDataRequest.h"
+//#include "RobotPublicAccess.h"
 #include "arm_solutions/BaseSolution.h"
 #include "arm_solutions/CartesianSolution.h"
 #include "arm_solutions/RotatableCartesianSolution.h"
@@ -30,7 +30,7 @@ using std::string;
 #include "arm_solutions/RotatableDeltaSolution.h"
 #include "arm_solutions/HBotSolution.h"
 #include "arm_solutions/MorganSCARASolution.h"
-#include "StepTicker.h"
+//#include "StepTicker.h"
 #include "checksumm.h"
 #include "utils.h"
 #include "ConfigValue.h"
@@ -182,6 +182,7 @@ void Robot::on_config_reload(void *argument)
     }
 
 
+    
     this->feed_rate           = THEKERNEL->config->value(default_feed_rate_checksum   )->by_default(  100.0F)->as_number();
     this->seek_rate           = THEKERNEL->config->value(default_seek_rate_checksum   )->by_default(  100.0F)->as_number();
     this->mm_per_line_segment = THEKERNEL->config->value(mm_per_line_segment_checksum )->by_default(    0.0F)->as_number();
@@ -203,21 +204,23 @@ void Robot::on_config_reload(void *argument)
     Pin gamma_dir_pin;
     Pin gamma_en_pin;
 
-    alpha_step_pin.from_string( THEKERNEL->config->value(alpha_step_pin_checksum )->by_default("2.0"  )->as_string())->as_output();
-    alpha_dir_pin.from_string(  THEKERNEL->config->value(alpha_dir_pin_checksum  )->by_default("0.5"  )->as_string())->as_output();
-    alpha_en_pin.from_string(   THEKERNEL->config->value(alpha_en_pin_checksum   )->by_default("0.4"  )->as_string())->as_output();
-    beta_step_pin.from_string(  THEKERNEL->config->value(beta_step_pin_checksum  )->by_default("2.1"  )->as_string())->as_output();
-    beta_dir_pin.from_string(   THEKERNEL->config->value(beta_dir_pin_checksum   )->by_default("0.11" )->as_string())->as_output();
-    beta_en_pin.from_string(    THEKERNEL->config->value(beta_en_pin_checksum    )->by_default("0.10" )->as_string())->as_output();
-    gamma_step_pin.from_string( THEKERNEL->config->value(gamma_step_pin_checksum )->by_default("2.2"  )->as_string())->as_output();
-    gamma_dir_pin.from_string(  THEKERNEL->config->value(gamma_dir_pin_checksum  )->by_default("0.20" )->as_string())->as_output();
-    gamma_en_pin.from_string(   THEKERNEL->config->value(gamma_en_pin_checksum   )->by_default("0.19" )->as_string())->as_output();
+    alpha_step_pin.from_string( THEKERNEL->config->value(alpha_step_pin_checksum )->by_default("nc"  )->as_string())->as_output();
+    alpha_dir_pin.from_string(  THEKERNEL->config->value(alpha_dir_pin_checksum  )->by_default("nc"  )->as_string())->as_output();
+    alpha_en_pin.from_string(   THEKERNEL->config->value(alpha_en_pin_checksum   )->by_default("nc"  )->as_string())->as_output();
+    beta_step_pin.from_string(  THEKERNEL->config->value(beta_step_pin_checksum  )->by_default("nc"  )->as_string())->as_output();
+    beta_dir_pin.from_string(   THEKERNEL->config->value(beta_dir_pin_checksum   )->by_default("nc" )->as_string())->as_output();
+    beta_en_pin.from_string(    THEKERNEL->config->value(beta_en_pin_checksum    )->by_default("nc" )->as_string())->as_output();
+    gamma_step_pin.from_string( THEKERNEL->config->value(gamma_step_pin_checksum )->by_default("nc"  )->as_string())->as_output();
+    gamma_dir_pin.from_string(  THEKERNEL->config->value(gamma_dir_pin_checksum  )->by_default("nc" )->as_string())->as_output();
+    gamma_en_pin.from_string(   THEKERNEL->config->value(gamma_en_pin_checksum   )->by_default("nc" )->as_string())->as_output();
+
 
     float steps_per_mm[3] = {
         THEKERNEL->config->value(alpha_steps_per_mm_checksum)->by_default(  80.0F)->as_number(),
         THEKERNEL->config->value(beta_steps_per_mm_checksum )->by_default(  80.0F)->as_number(),
         THEKERNEL->config->value(gamma_steps_per_mm_checksum)->by_default(2560.0F)->as_number(),
     };
+
 
     // TODO: delete or detect old steppermotors
     // Make our 3 StepperMotors
@@ -238,7 +241,6 @@ void Robot::on_config_reload(void *argument)
     actuators.push_back(alpha_stepper_motor);
     actuators.push_back(beta_stepper_motor);
     actuators.push_back(gamma_stepper_motor);
-
 
     // initialise actuator positions to current cartesian position (X0 Y0 Z0)
     // so the first move can be correct if homing is not performed
@@ -280,7 +282,7 @@ void Robot::on_halt(void *arg)
 
 void Robot::on_get_public_data(void *argument)
 {
-    PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
+    /* TOADDBACK PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
 
     if(!pdr->starts_with(robot_checksum)) return;
 
@@ -298,12 +300,12 @@ void Robot::on_get_public_data(void *argument)
 
         pdr->set_data_ptr(&return_data);
         pdr->set_taken();
-    }
+    } */
 }
 
 void Robot::on_set_public_data(void *argument)
 {
-    PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
+/* TOADDBACK    PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
 
     if(!pdr->starts_with(robot_checksum)) return;
 
@@ -328,6 +330,7 @@ void Robot::on_set_public_data(void *argument)
 
         pdr->set_taken();
     }
+    */
 }
 
 //A GCode has been received
@@ -355,12 +358,12 @@ void Robot::on_gcode_received(void *argument)
                 }
                 if (delay_ms > 0){
                     // drain queue
-                    THEKERNEL->conveyor->wait_for_empty_queue();
+                    // TOADDBACK THEKERNEL->conveyor->wait_for_empty_queue();
                     // wait for specified time
-                    uint32_t start= us_ticker_read(); // mbed call
+                    /* TOADDBACK uint32_t start= us_ticker_read(); // mbed call
                     while ((us_ticker_read() - start) < delay_ms*1000) {
                         THEKERNEL->call_event(ON_IDLE, this);
-                    }
+                    } */
                 }
                 gcode->mark_as_taken();
             } 
@@ -472,14 +475,14 @@ void Robot::on_gcode_received(void *argument)
                     // enforce minimum
                     if (acc < 1.0F)
                         acc = 1.0F;
-                    THEKERNEL->planner->acceleration = acc;
+                    // TOADDBACK THEKERNEL->planner->acceleration = acc;
                 }
                 if (gcode->has_letter('Z')) {
                     float acc = gcode->get_value('Z'); // mm/s^2
                     // enforce positive
                     if (acc < 0.0F)
                         acc = 0.0F;
-                    THEKERNEL->planner->z_acceleration = acc;
+                    // TOADDBACK THEKERNEL->planner->z_acceleration = acc;
                 }
                 break;
 
@@ -490,21 +493,21 @@ void Robot::on_gcode_received(void *argument)
                     // enforce minimum
                     if (jd < 0.0F)
                         jd = 0.0F;
-                    THEKERNEL->planner->junction_deviation = jd;
+                    // TOADDBACK THEKERNEL->planner->junction_deviation = jd;
                 }
                 if (gcode->has_letter('Z')) {
                     float jd = gcode->get_value('Z');
                     // enforce minimum, -1 disables it and uses regular junction deviation
                     if (jd < -1.0F)
                         jd = -1.0F;
-                    THEKERNEL->planner->z_junction_deviation = jd;
+                    // TOADDBACK THEKERNEL->planner->z_junction_deviation = jd;
                 }
                 if (gcode->has_letter('S')) {
                     float mps = gcode->get_value('S');
                     // enforce minimum
                     if (mps < 0.0F)
                         mps = 0.0F;
-                    THEKERNEL->planner->minimum_planner_speed = mps;
+                    // TOADDBACK THEKERNEL->planner->minimum_planner_speed = mps;
                 }
                 if (gcode->has_letter('Y')) {
                     alpha_stepper_motor->default_minimum_actuator_rate = gcode->get_value('Y');
@@ -528,17 +531,17 @@ void Robot::on_gcode_received(void *argument)
 
             case 400: // wait until all moves are done up to this point
                 gcode->mark_as_taken();
-                THEKERNEL->conveyor->wait_for_empty_queue();
+                // TOADDBACK THEKERNEL->conveyor->wait_for_empty_queue();
                 break;
 
             case 500: // M500 saves some volatile settings to config override file
             case 503: { // M503 just prints the settings
-                gcode->stream->printf(";Steps per unit:\nM92 X%1.5f Y%1.5f Z%1.5f\n", actuators[0]->steps_per_mm, actuators[1]->steps_per_mm, actuators[2]->steps_per_mm);
-                gcode->stream->printf(";Acceleration mm/sec^2:\nM204 S%1.5f Z%1.5f\n", THEKERNEL->planner->acceleration, THEKERNEL->planner->z_acceleration);
-                gcode->stream->printf(";X- Junction Deviation, Z- Z junction deviation, S - Minimum Planner speed mm/sec:\nM205 X%1.5f Z%1.5f S%1.5f\n", THEKERNEL->planner->junction_deviation, THEKERNEL->planner->z_junction_deviation, THEKERNEL->planner->minimum_planner_speed);
-                gcode->stream->printf(";Max feedrates in mm/sec, XYZ cartesian, ABC actuator:\nM203 X%1.5f Y%1.5f Z%1.5f A%1.5f B%1.5f C%1.5f\n",
-                                      this->max_speeds[X_AXIS], this->max_speeds[Y_AXIS], this->max_speeds[Z_AXIS],
-                                      alpha_stepper_motor->get_max_rate(), beta_stepper_motor->get_max_rate(), gamma_stepper_motor->get_max_rate());
+                // TOADDBACK gcode->stream->printf(";Steps per unit:\nM92 X%1.5f Y%1.5f Z%1.5f\n", actuators[0]->steps_per_mm, actuators[1]->steps_per_mm, actuators[2]->steps_per_mm);
+                // TOADDBACK gcode->stream->printf(";Acceleration mm/sec^2:\nM204 S%1.5f Z%1.5f\n", THEKERNEL->planner->acceleration, THEKERNEL->planner->z_acceleration);
+                // TOADDBACK gcode->stream->printf(";X- Junction Deviation, Z- Z junction deviation, S - Minimum Planner speed mm/sec:\nM205 X%1.5f Z%1.5f S%1.5f\n", THEKERNEL->planner->junction_deviation, THEKERNEL->planner->z_junction_deviation, THEKERNEL->planner->minimum_planner_speed);
+                // TOADDBACK gcode->stream->printf(";Max feedrates in mm/sec, XYZ cartesian, ABC actuator:\nM203 X%1.5f Y%1.5f Z%1.5f A%1.5f B%1.5f C%1.5f\n",
+                //                      this->max_speeds[X_AXIS], this->max_speeds[Y_AXIS], this->max_speeds[Z_AXIS],
+                //                      alpha_stepper_motor->get_max_rate(), beta_stepper_motor->get_max_rate(), gamma_stepper_motor->get_max_rate());
 
                 // get or save any arm solution specific optional values
                 BaseSolution::arm_options_t options;
@@ -634,7 +637,7 @@ void Robot::on_gcode_received(void *argument)
 void Robot::distance_in_gcode_is_known(Gcode *gcode)
 {
     //If the queue is empty, execute immediatly, otherwise attach to the last added block
-    THEKERNEL->conveyor->append_gcode(gcode);
+    // TOADDBACK THEKERNEL->conveyor->append_gcode(gcode);
 }
 
 // reset the position for all axis (used in homing for delta as last_milestone may be bogus)
@@ -733,7 +736,8 @@ void Robot::append_milestone( float target[], float rate_mm_s )
     }
 
     // Append the block to the planner
-    THEKERNEL->planner->append_block( actuator_pos, rate_mm_s, millimeters_of_travel, unit_vec );
+    // TOADDBACK THEKERNEL->planner->append_block( actuator_pos, rate_mm_s, millimeters_of_travel, unit_vec );
+    THEKERNEL->streams->printf("Appending block %f\n", millimeters_of_travel); 
 
     // Update the last_milestone to the current target for the next time we use last_milestone, use the requested target not the adjusted one
     memcpy(this->last_milestone, target, sizeof(this->last_milestone)); // this->last_milestone[] = target[];
@@ -803,7 +807,7 @@ void Robot::append_line(Gcode *gcode, float target[], float rate_mm_s )
     this->append_milestone(target, rate_mm_s);
 
     // if adding these blocks didn't start executing, do that now
-    THEKERNEL->conveyor->ensure_running();
+    // TOADDBACK THEKERNEL->conveyor->ensure_running();
 }
 
 

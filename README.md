@@ -41,7 +41,8 @@ Things that are broken during the port and should be added back as things progre
 * In Switch.cpp : Commented out all of the set_low_on_debug stuff
 * In SlowTicker.h and Hook.h : Using doubles instead of ints for intervals/frequencies and counting down. Done to accomodate mBed, but dirty costly hack
 * In SlowTicker.h : Assuming it's fine to use mBed for this, we can remove a lot of code and just rely fully on mBed
-
+* In StepperMotor.cpp : Removed link to StepTicker.h
+* In Robot.cpp : A lot of stuff
 
 Things changed from Smoothie1 : 
 
