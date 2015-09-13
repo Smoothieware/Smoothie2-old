@@ -27,7 +27,7 @@ Kernel::Kernel(){
     this->streams = new StreamOutputPool();
 
     // Create the default UART Serial Console interface
-    this->serial = new SerialConsole(P2_0, P2_1, 9600);
+    this->serial = new SerialConsole(P3_4, P3_5, 9600);
     this->add_module( this->serial );
 
     // Config next, but does not load cache yet
