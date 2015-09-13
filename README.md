@@ -43,6 +43,7 @@ Things that are broken during the port and should be added back as things progre
 * In SlowTicker.h : Assuming it's fine to use mBed for this, we can remove a lot of code and just rely fully on mBed
 * In StepperMotor.cpp : Removed link to StepTicker.h
 * In Robot.cpp : A lot of stuff
+* In RingBuffer.h : Removed the irq stuff
 
 Things changed from Smoothie1 : 
 

@@ -14,8 +14,8 @@
 #include <string>
 using std::string;
 
-//#include "Planner.h"
-//#include "Conveyor.h"
+#include "Planner.h"
+#include "Conveyor.h"
 #include "Robot.h"
 #include "nuts_bolts.h"
 #include "Pin.h"
@@ -358,7 +358,7 @@ void Robot::on_gcode_received(void *argument)
                 }
                 if (delay_ms > 0){
                     // drain queue
-                    // TOADDBACK THEKERNEL->conveyor->wait_for_empty_queue();
+                    THEKERNEL->conveyor->wait_for_empty_queue();
                     // wait for specified time
                     /* TOADDBACK uint32_t start= us_ticker_read(); // mbed call
                     while ((us_ticker_read() - start) < delay_ms*1000) {
@@ -637,7 +637,7 @@ void Robot::on_gcode_received(void *argument)
 void Robot::distance_in_gcode_is_known(Gcode *gcode)
 {
     //If the queue is empty, execute immediatly, otherwise attach to the last added block
-    // TOADDBACK THEKERNEL->conveyor->append_gcode(gcode);
+    THEKERNEL->conveyor->append_gcode(gcode);
 }
 
 // reset the position for all axis (used in homing for delta as last_milestone may be bogus)
@@ -736,7 +736,7 @@ void Robot::append_milestone( float target[], float rate_mm_s )
     }
 
     // Append the block to the planner
-    // TOADDBACK THEKERNEL->planner->append_block( actuator_pos, rate_mm_s, millimeters_of_travel, unit_vec );
+    THEKERNEL->planner->append_block( actuator_pos, rate_mm_s, millimeters_of_travel, unit_vec );
     THEKERNEL->streams->printf("Appending block %f\n", millimeters_of_travel); 
 
     // Update the last_milestone to the current target for the next time we use last_milestone, use the requested target not the adjusted one
@@ -807,7 +807,7 @@ void Robot::append_line(Gcode *gcode, float target[], float rate_mm_s )
     this->append_milestone(target, rate_mm_s);
 
     // if adding these blocks didn't start executing, do that now
-    // TOADDBACK THEKERNEL->conveyor->ensure_running();
+    THEKERNEL->conveyor->ensure_running();
 }
 
 

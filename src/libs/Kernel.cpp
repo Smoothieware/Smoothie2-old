@@ -12,6 +12,8 @@
 #include "SlowTicker.h"
 #include "Blinker.h"
 #include "Robot.h"
+#include "Conveyor.h"
+#include "Planner.h"
 #include "GcodeDispatch.h"
 #include "Config.h"
 #include <malloc.h>
@@ -47,6 +49,9 @@ Kernel::Kernel(){
     // Core modules
     this->add_module( new GcodeDispatch() );
     this->add_module( this->robot = new Robot() );
+    this->add_module( this->conveyor = new Conveyor() );
+    this->planner = new Planner();
+
 }
 
 // Add a module to Kernel. We don't actually hold a list of modules we just call its on_module_loaded
