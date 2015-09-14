@@ -204,10 +204,10 @@ void Robot::on_config_reload(void *argument)
     Pin gamma_dir_pin;
     Pin gamma_en_pin;
 
-    alpha_step_pin.from_string( THEKERNEL->config->value(alpha_step_pin_checksum )->by_default("nc"  )->as_string())->as_output();
+    alpha_step_pin.from_string( THEKERNEL->config->value(alpha_step_pin_checksum )->by_default("1.1!"  )->as_string())->as_output();
     alpha_dir_pin.from_string(  THEKERNEL->config->value(alpha_dir_pin_checksum  )->by_default("nc"  )->as_string())->as_output();
     alpha_en_pin.from_string(   THEKERNEL->config->value(alpha_en_pin_checksum   )->by_default("nc"  )->as_string())->as_output();
-    beta_step_pin.from_string(  THEKERNEL->config->value(beta_step_pin_checksum  )->by_default("nc"  )->as_string())->as_output();
+    beta_step_pin.from_string(  THEKERNEL->config->value(beta_step_pin_checksum  )->by_default("1.2!"  )->as_string())->as_output();
     beta_dir_pin.from_string(   THEKERNEL->config->value(beta_dir_pin_checksum   )->by_default("nc" )->as_string())->as_output();
     beta_en_pin.from_string(    THEKERNEL->config->value(beta_en_pin_checksum    )->by_default("nc" )->as_string())->as_output();
     gamma_step_pin.from_string( THEKERNEL->config->value(gamma_step_pin_checksum )->by_default("nc"  )->as_string())->as_output();

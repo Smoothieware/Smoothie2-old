@@ -182,7 +182,7 @@ void Planner::append_block( float actuator_pos[], float rate_mm_s, float distanc
     block->ready();
 
     Conveyor::Queue_t &queue = THEKERNEL->conveyor->queue;
-    THEKERNEL->streams->printf("Appending block distance:%f, queue full:%d\n", distance, queue.is_full()); 
+//    THEKERNEL->streams->printf("Appending block distance:%f, queue full:%d\n", distance, queue.is_full()); 
 
     THEKERNEL->conveyor->queue_head_block();
 }

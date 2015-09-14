@@ -8,7 +8,7 @@
 
 #include "Kernel.h"
 //#include "MRI_Hooks.h"
-//#include "StepTicker.h"
+#include "StepTicker.h"
 
 #include <math.h>
 
@@ -36,7 +36,7 @@ StepperMotor::~StepperMotor()
 void StepperMotor::init()
 {
     // register this motor with the step ticker, and get its index in that array and bit position
-    // TOADDBACK this->index= THEKERNEL->step_ticker->register_motor(this);
+    this->index= THEKERNEL->step_ticker->register_motor(this);
     this->moving = false;
     this->paused = false;
     this->fx_counter = 0;
@@ -80,7 +80,7 @@ void StepperMotor::step()
 
     // we may need to callback on a specific step, usually used to synchronize deceleration timer
     if(this->signal_step != 0 && this->stepped == this->signal_step) {
-        // TOADDBACK THEKERNEL->step_ticker->synchronize_acceleration(true);
+        THEKERNEL->step_ticker->synchronize_acceleration(true);
         this->signal_step= 0;
     }
 
@@ -89,8 +89,8 @@ void StepperMotor::step()
         // Mark it as finished, then StepTicker will call signal_mode_finished()
         // This is so we don't call that before all the steps have been generated for this tick()
         this->is_move_finished = true;
-        // TOADDBACK THEKERNEL->step_ticker->a_move_finished= true;
-        // TOADDBACK this->last_step_tick= THEKERNEL->step_ticker->get_tick_cnt(); // remember when last step was
+        THEKERNEL->step_ticker->a_move_finished= true;
+        this->last_step_tick= THEKERNEL->step_ticker->get_tick_cnt(); // remember when last step was
     }
 }
 
@@ -120,10 +120,10 @@ void StepperMotor::update_exit_tick()
 {
     if( !this->moving || this->paused || this->steps_to_move == 0 ) {
         // No more ticks will be recieved and no more events from StepTicker
-        // TOADDBACK THEKERNEL->step_ticker->remove_motor_from_active_list(this);
+        THEKERNEL->step_ticker->remove_motor_from_active_list(this);
     } else {
         // we will now get ticks and StepTIcker will send us events
-        // TOADDBACK THEKERNEL->step_ticker->add_motor_to_active_list(this);
+        THEKERNEL->step_ticker->add_motor_to_active_list(this);
     }
 }
 
@@ -141,14 +141,14 @@ StepperMotor* StepperMotor::move( bool direction, unsigned int steps, float init
     this->fx_ticks_per_step = 0xFFFFF000UL; // some big number so we don't start stepping before it is set again
     if(this->last_step_tick_valid) {
         // we set this based on when the last step was, thus compensating for missed ticks
-        // TOADDBACK : uint32_t ts= THEKERNEL->step_ticker->ticks_since(this->last_step_tick);
+        uint32_t ts= THEKERNEL->step_ticker->ticks_since(this->last_step_tick);
         // if an axis stops too soon then we can get a huge number of ticks here which causes problems, so if the number of ticks is too great we ignore them
         // example of when this happens is when one axis is going very slow an the min 20steps/sec kicks in, the axis will reach its target much sooner leaving a long gap
         // until the end of the block.
         // TODO we may need to set this based on the current step rate, trouble is we don't know what that is yet, we could use the last fx_ticks_per_step as a guide
-        // TOADDBACK if(ts > 5) ts= 5; // limit to 50us catch up around 1-2 steps
-        // TOADDBACK else if(ts > 15) ts= 0; // no way to know what the delay was
-        // TOADDBACK this->fx_counter= ts*fx_increment;
+        if(ts > 5) ts= 5; // limit to 50us catch up around 1-2 steps
+        else if(ts > 15) ts= 0; // no way to know what the delay was
+        this->fx_counter= ts*fx_increment;
     }else{
         this->fx_counter = 0; // set to zero as there was no step last block
     }
@@ -184,7 +184,7 @@ StepperMotor* StepperMotor::set_speed( float speed )
     this->steps_per_second = speed;
 
     // set the new speed, NOTE this can be pre-empted by stepticker so the following write needs to be atomic
-    // TOADDBACK : this->fx_ticks_per_step= floor(fx_increment * THEKERNEL->step_ticker->get_frequency() / speed);
+    this->fx_ticks_per_step= floor(fx_increment * THEKERNEL->step_ticker->get_frequency() / speed);
     return this;
 }
 

@@ -3,11 +3,16 @@
 switch.first.enable                            true             #
 switch.first.input_on_command                  M106             #
 switch.first.input_off_command                 M107             #
-switch.first.output_pin                        1.1              #
+switch.first.output_pin                        2.8              #
 switch.first.output_type                       digital          # pwm output settable with S parameter in the input_on_comand
 
 switch.second.enable                            true             #
 switch.second.input_on_command                  M116             #
 switch.second.input_off_command                 M117             #
-switch.second.output_pin                        1.2              #
+switch.second.output_pin                        2.9              #
 switch.second.output_type                       pwm             # pwm output settable with S parameter in the input_on_comand
+
+microseconds_per_step_pulse                     5
+
+
+
