@@ -24,6 +24,9 @@ using namespace std;
 //#include "Stepper.h"
 #include "ConfigValue.h"
 
+#include "libs/StreamOutput.h"
+#include "StreamOutputPool.h"
+
 #include <math.h>
 
 #define acceleration_checksum          CHECKSUM("acceleration")
@@ -177,6 +180,9 @@ void Planner::append_block( float actuator_pos[], float rate_mm_s, float distanc
 
     // The block can now be used
     block->ready();
+
+    Conveyor::Queue_t &queue = THEKERNEL->conveyor->queue;
+    THEKERNEL->streams->printf("Appending block distance:%f, queue full:%d\n", distance, queue.is_full()); 
 
     THEKERNEL->conveyor->queue_head_block();
 }

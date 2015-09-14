@@ -10,10 +10,12 @@
 #include "StreamOutputPool.h"
 #include "SerialConsole.h"
 #include "SlowTicker.h"
+#include "StepTicker.h"
 #include "Blinker.h"
 #include "Robot.h"
 #include "Conveyor.h"
 #include "Planner.h"
+#include "Stepper.h"
 #include "GcodeDispatch.h"
 #include "Config.h"
 #include <malloc.h>
@@ -42,6 +44,9 @@ Kernel::Kernel(){
     // For slow repeteative tasks
     this->add_module( this->slow_ticker = new SlowTicker());
 
+    // For step generation and movement
+    this->step_ticker = new StepTicker();
+
     // The Blinker module blinks a GPIO pin for testing purposes
     this->blinker = new Blinker();
     this->add_module( this->blinker );
@@ -50,6 +55,7 @@ Kernel::Kernel(){
     this->add_module( new GcodeDispatch() );
     this->add_module( this->robot = new Robot() );
     this->add_module( this->conveyor = new Conveyor() );
+    this->add_module( this->stepper = new Stepper() );
     this->planner = new Planner();
 
 }

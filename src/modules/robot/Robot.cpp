@@ -475,14 +475,14 @@ void Robot::on_gcode_received(void *argument)
                     // enforce minimum
                     if (acc < 1.0F)
                         acc = 1.0F;
-                    // TOADDBACK THEKERNEL->planner->acceleration = acc;
+                    THEKERNEL->planner->acceleration = acc;
                 }
                 if (gcode->has_letter('Z')) {
                     float acc = gcode->get_value('Z'); // mm/s^2
                     // enforce positive
                     if (acc < 0.0F)
                         acc = 0.0F;
-                    // TOADDBACK THEKERNEL->planner->z_acceleration = acc;
+                    THEKERNEL->planner->z_acceleration = acc;
                 }
                 break;
 
@@ -493,21 +493,21 @@ void Robot::on_gcode_received(void *argument)
                     // enforce minimum
                     if (jd < 0.0F)
                         jd = 0.0F;
-                    // TOADDBACK THEKERNEL->planner->junction_deviation = jd;
+                    THEKERNEL->planner->junction_deviation = jd;
                 }
                 if (gcode->has_letter('Z')) {
                     float jd = gcode->get_value('Z');
                     // enforce minimum, -1 disables it and uses regular junction deviation
                     if (jd < -1.0F)
                         jd = -1.0F;
-                    // TOADDBACK THEKERNEL->planner->z_junction_deviation = jd;
+                    THEKERNEL->planner->z_junction_deviation = jd;
                 }
                 if (gcode->has_letter('S')) {
                     float mps = gcode->get_value('S');
                     // enforce minimum
                     if (mps < 0.0F)
                         mps = 0.0F;
-                    // TOADDBACK THEKERNEL->planner->minimum_planner_speed = mps;
+                    THEKERNEL->planner->minimum_planner_speed = mps;
                 }
                 if (gcode->has_letter('Y')) {
                     alpha_stepper_motor->default_minimum_actuator_rate = gcode->get_value('Y');
@@ -531,7 +531,7 @@ void Robot::on_gcode_received(void *argument)
 
             case 400: // wait until all moves are done up to this point
                 gcode->mark_as_taken();
-                // TOADDBACK THEKERNEL->conveyor->wait_for_empty_queue();
+                THEKERNEL->conveyor->wait_for_empty_queue();
                 break;
 
             case 500: // M500 saves some volatile settings to config override file
@@ -737,7 +737,6 @@ void Robot::append_milestone( float target[], float rate_mm_s )
 
     // Append the block to the planner
     THEKERNEL->planner->append_block( actuator_pos, rate_mm_s, millimeters_of_travel, unit_vec );
-    THEKERNEL->streams->printf("Appending block %f\n", millimeters_of_travel); 
 
     // Update the last_milestone to the current target for the next time we use last_milestone, use the requested target not the adjusted one
     memcpy(this->last_milestone, target, sizeof(this->last_milestone)); // this->last_milestone[] = target[];
