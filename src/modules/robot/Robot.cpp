@@ -349,7 +349,7 @@ void Robot::on_gcode_received(void *argument)
             case 2:  this->motion_mode = MOTION_MODE_CW_ARC; gcode->mark_as_taken();  break;
             case 3:  this->motion_mode = MOTION_MODE_CCW_ARC; gcode->mark_as_taken();  break;
             case 4: {
-                uint32_t delay_ms= 0;
+                int delay_ms= 0;
                 if (gcode->has_letter('P')) {
                     delay_ms= gcode->get_int('P');
                 }
@@ -357,13 +357,15 @@ void Robot::on_gcode_received(void *argument)
                     delay_ms += gcode->get_int('S') * 1000;
                 }
                 if (delay_ms > 0){
-                    // drain queue
+                    // Drain queue
                     THEKERNEL->conveyor->wait_for_empty_queue();
-                    // wait for specified time
-                    /* TOADDBACK uint32_t start= us_ticker_read(); // mbed call
-                    while ((us_ticker_read() - start) < delay_ms*1000) {
+                    
+                    // Wait for specified time
+                    Timer t;
+                    t.start();
+                    while( t.read_ms() < delay_ms ){
                         THEKERNEL->call_event(ON_IDLE, this);
-                    } */
+                    } 
                 }
                 gcode->mark_as_taken();
             } 
@@ -536,12 +538,12 @@ void Robot::on_gcode_received(void *argument)
 
             case 500: // M500 saves some volatile settings to config override file
             case 503: { // M503 just prints the settings
-                // TOADDBACK gcode->stream->printf(";Steps per unit:\nM92 X%1.5f Y%1.5f Z%1.5f\n", actuators[0]->steps_per_mm, actuators[1]->steps_per_mm, actuators[2]->steps_per_mm);
-                // TOADDBACK gcode->stream->printf(";Acceleration mm/sec^2:\nM204 S%1.5f Z%1.5f\n", THEKERNEL->planner->acceleration, THEKERNEL->planner->z_acceleration);
-                // TOADDBACK gcode->stream->printf(";X- Junction Deviation, Z- Z junction deviation, S - Minimum Planner speed mm/sec:\nM205 X%1.5f Z%1.5f S%1.5f\n", THEKERNEL->planner->junction_deviation, THEKERNEL->planner->z_junction_deviation, THEKERNEL->planner->minimum_planner_speed);
-                // TOADDBACK gcode->stream->printf(";Max feedrates in mm/sec, XYZ cartesian, ABC actuator:\nM203 X%1.5f Y%1.5f Z%1.5f A%1.5f B%1.5f C%1.5f\n",
-                //                      this->max_speeds[X_AXIS], this->max_speeds[Y_AXIS], this->max_speeds[Z_AXIS],
-                //                      alpha_stepper_motor->get_max_rate(), beta_stepper_motor->get_max_rate(), gamma_stepper_motor->get_max_rate());
+                gcode->stream->printf(";Steps per unit:\nM92 X%1.5f Y%1.5f Z%1.5f\n", actuators[0]->steps_per_mm, actuators[1]->steps_per_mm, actuators[2]->steps_per_mm);
+                gcode->stream->printf(";Acceleration mm/sec^2:\nM204 S%1.5f Z%1.5f\n", THEKERNEL->planner->acceleration, THEKERNEL->planner->z_acceleration);
+                gcode->stream->printf(";X- Junction Deviation, Z- Z junction deviation, S - Minimum Planner speed mm/sec:\nM205 X%1.5f Z%1.5f S%1.5f\n", THEKERNEL->planner->junction_deviation, THEKERNEL->planner->z_junction_deviation, THEKERNEL->planner->minimum_planner_speed);
+                gcode->stream->printf(";Max feedrates in mm/sec, XYZ cartesian, ABC actuator:\nM203 X%1.5f Y%1.5f Z%1.5f A%1.5f B%1.5f C%1.5f\n",
+                                      this->max_speeds[X_AXIS], this->max_speeds[Y_AXIS], this->max_speeds[Z_AXIS],
+                                      alpha_stepper_motor->get_max_rate(), beta_stepper_motor->get_max_rate(), gamma_stepper_motor->get_max_rate());
 
                 // get or save any arm solution specific optional values
                 BaseSolution::arm_options_t options;
