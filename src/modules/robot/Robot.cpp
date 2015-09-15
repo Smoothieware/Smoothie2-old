@@ -21,8 +21,8 @@ using std::string;
 #include "Pin.h"
 #include "StepperMotor.h"
 #include "Gcode.h"
-//#include "PublicDataRequest.h"
-//#include "RobotPublicAccess.h"
+#include "PublicDataRequest.h"
+#include "RobotPublicAccess.h"
 #include "arm_solutions/BaseSolution.h"
 #include "arm_solutions/CartesianSolution.h"
 #include "arm_solutions/RotatableCartesianSolution.h"
@@ -30,7 +30,7 @@ using std::string;
 #include "arm_solutions/RotatableDeltaSolution.h"
 #include "arm_solutions/HBotSolution.h"
 #include "arm_solutions/MorganSCARASolution.h"
-//#include "StepTicker.h"
+#include "StepTicker.h"
 #include "checksumm.h"
 #include "utils.h"
 #include "ConfigValue.h"
@@ -282,7 +282,7 @@ void Robot::on_halt(void *arg)
 
 void Robot::on_get_public_data(void *argument)
 {
-    /* TOADDBACK PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
+    PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
 
     if(!pdr->starts_with(robot_checksum)) return;
 
@@ -300,12 +300,12 @@ void Robot::on_get_public_data(void *argument)
 
         pdr->set_data_ptr(&return_data);
         pdr->set_taken();
-    } */
+    }
 }
 
 void Robot::on_set_public_data(void *argument)
 {
-/* TOADDBACK    PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
+    PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
 
     if(!pdr->starts_with(robot_checksum)) return;
 
@@ -330,7 +330,6 @@ void Robot::on_set_public_data(void *argument)
 
         pdr->set_taken();
     }
-    */
 }
 
 //A GCode has been received
