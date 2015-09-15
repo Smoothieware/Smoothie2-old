@@ -34,8 +34,6 @@ And finally compile the code
 
 Things that are broken during the port and should be added back as things progress ( some things might be missing here. I try to use the TOADDBACK label when commenting things so search for that too ) : 
 
-* In Switch.cpp : Dependence to Conveyor.h, and emptying of the queue in on_gcode_received
-* In Switch.cpp : Commented out all of the public access stuff
 * In GcodeDispatch.cpp : Removed dependency to Pauser.h, Conveyor.h
 * In GcodeDispatch.cpp : Commented out all of the public access stuff
 * In Switch.cpp : Commented out all of the set_low_on_debug stuff

@@ -198,7 +198,7 @@ void Switch::on_gcode_received(void *argument)
     }
 
     // drain queue
-    //THEKERNEL->conveyor->wait_for_empty_queue();
+    THEKERNEL->conveyor->wait_for_empty_queue();
 
     gcode->stream->printf("Received Gcode in Switch on:%d off:%d received:%d type:%d \n", this->input_on_command_code, this->input_off_command_code, gcode->m, this->output_type );
     gcode->stream->printf("SlowTicker, interval:%f, interval_us:%f, max_frequency:%f, hooks:%d \n", THEKERNEL->slow_ticker->interval, THEKERNEL->slow_ticker->interval * 1000000, THEKERNEL->slow_ticker->max_frequency, THEKERNEL->slow_ticker->hooks.size() );
