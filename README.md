@@ -44,6 +44,8 @@ Things changed from Smoothie1 :
 
 * Pin now uses mBed instead of registers
 * SlowTicker now uses mBed instead of registers
+* StepTicker now uses mBed instead of register
+* Various "waits" now use mBed's Timer
 
 Planned refactors : 
 

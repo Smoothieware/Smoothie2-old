@@ -4,6 +4,7 @@
 #include "mbed.h"
 #include "Kernel.h"
 #include "SwitchPool.h"
+#include "Endstops.h"
 #include "Config.h"
 
 int main() {
@@ -11,6 +12,9 @@ int main() {
     // Kernel creates modules, and receives and dispatches events between them
     Kernel* kernel = new Kernel(); 
 
+    // Create and add main modules
+    kernel->add_module( new Endstops() );
+    
     // Create all Switch modules
     SwitchPool *sp= new SwitchPool();
     sp->load_tools();
