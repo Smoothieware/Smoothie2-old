@@ -12,9 +12,9 @@
 #include "Switch.h"
 #include "libs/Pin.h"
 #include "SwitchPool.h"
-//#include "modules/robot/Conveyor.h"
-//#include "PublicDataRequest.h"
-//#include "SwitchPublicAccess.h"
+#include "modules/robot/Conveyor.h"
+#include "PublicDataRequest.h"
+#include "SwitchPublicAccess.h"
 #include "SlowTicker.h"
 #include "Config.h"
 #include "Gcode.h"
@@ -252,7 +252,7 @@ void Switch::on_gcode_received(void *argument)
 
 void Switch::on_get_public_data(void *argument)
 {
-/* TOADDBACK:    PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
+    PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
 
     if(!pdr->starts_with(switch_checksum)) return;
 
@@ -267,12 +267,11 @@ void Switch::on_get_public_data(void *argument)
 
     pdr->set_data_ptr(&pad);
     pdr->set_taken();
-    */
 }
 
 void Switch::on_set_public_data(void *argument)
 {
-    /* TOADDBACK : PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
+    PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
 
     if(!pdr->starts_with(switch_checksum)) return;
 
@@ -291,7 +290,6 @@ void Switch::on_set_public_data(void *argument)
         this->switch_changed= true;
         pdr->set_taken();
     }
-    */
 }
 
 void Switch::on_main_loop(void *argument)
