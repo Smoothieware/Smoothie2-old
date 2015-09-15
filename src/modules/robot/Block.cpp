@@ -15,7 +15,7 @@
 #include "Conveyor.h"
 #include "Gcode.h"
 #include "libs/StreamOutputPool.h"
-// TOADDBACK #include "Stepper.h"
+#include "Stepper.h"
 
 #include "mri.h"
 
