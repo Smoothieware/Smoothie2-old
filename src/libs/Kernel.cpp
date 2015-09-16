@@ -18,6 +18,7 @@
 #include "Stepper.h"
 #include "GcodeDispatch.h"
 #include "Config.h"
+#include "Adc.h"
 #include <malloc.h>
 #include <array>
 #include "mbed.h"
@@ -40,6 +41,9 @@ Kernel::Kernel(){
     
     // Pre-load the config cache, do after setting up serial so we can report errors to serial
     this->config->config_cache_load();
+
+    // ADC reading
+    this->adc = new Adc();
 
     // For slow repeteative tasks
     this->add_module( this->slow_ticker = new SlowTicker());

@@ -19,6 +19,7 @@ using namespace std;
 // TODO : Having the same name is confusing, should change that
 
 Adc::Adc(){
+    this->analogin = new AnalogIn(P4_3);
     // TOADDBACK this->adc = new ADC(1000, 1);
 }
 
@@ -33,7 +34,7 @@ void Adc::enable_pin(Pin* pin){
 // Read the last value ( burst mode ) on a given pin
 unsigned int Adc::read(Pin* pin){
     // TOADDBACK return this->adc->read(this->_pin_to_pinname(pin));
-    return 0;
+    return this->analogin->read_u16();
 }
 
 // Convert a smoothie Pin into a mBed Pin

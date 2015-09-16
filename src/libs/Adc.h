@@ -11,6 +11,7 @@
 #define ADC_H
 
 #include "PinNames.h" // mbed.h lib
+#include "mbed.h"
 // TOADDBACK #include "libs/ADC/adc.h"
 
 class Pin;
@@ -22,6 +23,7 @@ class Adc {
         unsigned int read(Pin* pin);
         PinName _pin_to_pinname(Pin* pin);
 
+        AnalogIn* analogin;
         // TOADDBACK ADC* adc;
 };
 

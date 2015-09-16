@@ -257,8 +257,7 @@ float Thermistor::adc_value_to_temperature(int adc_value)
 
 int Thermistor::new_thermistor_reading()
 {
-    int last_raw = 0;
-    // TOADDBACK int last_raw = THEKERNEL->adc->read(&thermistor_pin);
+    int last_raw = THEKERNEL->adc->read(&thermistor_pin);
     if (queue.size() >= queue.capacity()) {
         uint16_t l;
         queue.pop_front(l);
