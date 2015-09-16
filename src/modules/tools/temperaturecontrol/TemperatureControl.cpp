@@ -17,13 +17,13 @@
 #include "PublicDataRequest.h"
 
 #include "PublicData.h"
-#include "ToolManagerPublicAccess.h"
+// TOADDBACK #include "ToolManagerPublicAccess.h"
 #include "StreamOutputPool.h"
 #include "Config.h"
 #include "checksumm.h"
 #include "Gcode.h"
 #include "SlowTicker.h"
-#include "Pauser.h"
+// TOADDBACK #include "Pauser.h"
 #include "ConfigValue.h"
 #include "PID_Autotuner.h"
 #include "SerialMessage.h"
@@ -33,7 +33,7 @@
 #include "Thermistor.h"
 #include "max31855.h"
 
-#include "MRI_Hooks.h"
+// TOADDBACK #include "MRI_Hooks.h"
 
 #define UNDEFINED -1
 
@@ -174,7 +174,7 @@ void TemperatureControl::load_config()
         this->windup = THEKERNEL->config->value(temperature_control_checksum, this->name_checksum, windup_checksum)->by_default(false)->as_bool();
         this->heater_pin.max_pwm( THEKERNEL->config->value(temperature_control_checksum, this->name_checksum, max_pwm_checksum)->by_default(255)->as_number() );
         this->heater_pin.set(0);
-        set_low_on_debug(heater_pin.port_number, heater_pin.pin);
+        // TOADDBACK        set_low_on_debug(heater_pin.port_number, heater_pin.pin);
         // activate SD-DAC timer
         THEKERNEL->slow_ticker->attach( THEKERNEL->config->value(temperature_control_checksum, this->name_checksum, pwm_frequency_checksum)->by_default(2000)->as_number(), &heater_pin, &Pwm::on_tick);
     }
@@ -288,12 +288,13 @@ void TemperatureControl::on_gcode_received(void *argument)
 
             // this is safe as old configs as well as single extruder configs the toolmanager will not be running so will return false
             // this will also ignore anything that the tool manager is not controlling and return false, otherwise it returns the active tool
-            void *returned_data;
+            /* TOADDBACK void *returned_data;
             bool ok = PublicData::get_value( tool_manager_checksum, is_active_tool_checksum, this->name_checksum, &returned_data );
             if (ok) {
                 uint16_t active_tool_name =  *static_cast<uint16_t *>(returned_data);
                 this->active = (active_tool_name == this->name_checksum);
             }
+            */
 
             if(this->active) {
                 // required so temp change happens in order

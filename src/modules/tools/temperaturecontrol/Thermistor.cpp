@@ -10,7 +10,7 @@
 #include "libs/Pin.h"
 #include "Config.h"
 #include "checksumm.h"
-// TOADDBACK #include "Adc.h"
+#include "Adc.h"
 #include "ConfigValue.h"
 #include "libs/Median.h"
 #include "utils.h"
