@@ -6,6 +6,7 @@
 #include "SwitchPool.h"
 #include "TemperatureControlPool.h"
 #include "Endstops.h"
+#include "Reporter.h"
 #include "Config.h"
 
 int main() {
@@ -15,7 +16,8 @@ int main() {
 
     // Create and add main modules
     kernel->add_module( new Endstops() );
-    
+    kernel->add_module( new Reporter() );   
+
     // Create all Switch modules
     SwitchPool *sp= new SwitchPool();
     sp->load_tools();
