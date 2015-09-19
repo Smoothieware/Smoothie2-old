@@ -114,10 +114,6 @@ void Stepper::on_gcode_received(void *argument)
     if( gcode->has_m && (gcode->m == 84 || gcode->m == 17 || gcode->m == 18 )) {
         THEKERNEL->conveyor->append_gcode(gcode);
     }
-
-    THEKERNEL->streams->printf("%d %d \n", THEKERNEL->step_ticker->period_us, THEKERNEL->step_ticker->reset_delay_us);
-        // TOADDBACK REMOVE THEKERNEL->streams->printf("%d %f %d %d %d %d %d\n", (int)current_steps_completed, last_rate, (int)this->main_stepper->fx_counter, (int)this->main_stepper->fx_ticks_per_step, THEKERNEL->step_ticker->tick_cnt, this->main_stepper->steps_to_move, this->main_stepper->stepped );
-
 }
 
 // React to enable/disable gcodes
