@@ -39,6 +39,7 @@ Things that are broken during the port and should be added back as things progre
 * In SlowTicker.h and Hook.h : Using doubles instead of ints for intervals/frequencies and counting down. Done to accomodate mBed, but dirty costly hack
 * In SlowTicker.h : Assuming it's fine to use mBed for this, we can remove a lot of code and just rely fully on mBed
 * In RingBuffer.h : Removed the irq stuff
+* In Laser.cpp : PWM pin is broken, needs to be fixed
 
 Things changed from Smoothie1 : 
 
