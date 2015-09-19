@@ -7,6 +7,7 @@
 #include "TemperatureControlPool.h"
 #include "Endstops.h"
 #include "Reporter.h"
+#include "Laser.h"
 #include "Config.h"
 
 int main() {
@@ -17,6 +18,7 @@ int main() {
     // Create and add main modules
     kernel->add_module( new Endstops() );
     kernel->add_module( new Reporter() );   
+    kernel->add_module( new Laser() );
 
     // Create all Switch modules
     SwitchPool *sp= new SwitchPool();
