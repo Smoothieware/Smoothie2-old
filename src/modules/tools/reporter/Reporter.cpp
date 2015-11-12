@@ -10,13 +10,25 @@
 #include "Reporter.h"
 #include "Gcode.h"
 #include "StreamOutput.h"
-#include <math.h>
-
+#include "TemperatureControlPublicAccess.h"
+#include "TemperatureControlPool.h"
+#include "PublicData.h"
 #include "Robot.h"
+
+#include <math.h>
+#include <vector>
+
 
 Reporter::Reporter(){}
 
 Reporter::~Reporter(){}
+
+static struct pad_temperature getTemperatures(uint16_t heater_id)
+{
+    struct pad_temperature temp;
+    PublicData::get_value( temperature_control_checksum, pool_index_checksum, heater_id, &temp );
+    return temp;
+}
 
 void Reporter::on_module_loaded(){
     this->register_for_event(ON_GCODE_RECEIVED);
@@ -26,26 +38,28 @@ void Reporter::on_gcode_received(void *argument){
     Gcode *gcode = static_cast<Gcode *>(argument);
     if (gcode->has_m) {
         if( gcode->m == 408 ) {
-            // Beginning
-            gcode->stream->printf("{\"status\":\"I\",\"heaters{{\":[123,456,789],\"active\":[101,102,103],\"standby\":[202,404,606],\"hstat\":[0,2,1],\"pos\":[");
-                    
-            // Get position  
-            float pos[3];      
-            THEKERNEL->robot->get_axis_position(pos);                    
-            gcode->stream->printf("%f,%f,%f", pos[0], pos[1], pos[2]);
+            if (gcode->has_letter('S')) {
+                switch(static_cast<int>(gcode->get_value('S'))){
+                        case 0:
+                              // Beginning
+                              gcode->stream->printf("{\"status\":\"I\",");
+                              gcode->stream->printf("\"heaters{{\":[");
+                              for(auto id : THEKERNEL->temperature_control_pool->get_controllers()) {
+                                  struct pad_temperature c= getTemperatures(id);
+                                    printf("%f,", c.current_temperature);
+                              }
 
-            // End
-            gcode->stream->printf("],\"extr\":[12,34],\"sfactor\":100.00,\"efactor\":[100.00,100.00],\"tool\":1,\"probe\":\"535\",\"fanRPM\":0,\"homed\":[0,0,0],\"fraction_printed\":0.572}\n");
+                              gcode->stream->printf("],\"active\":[101,102,103],\"standby\":[202,404,606],\"hstat\":[0,2,1],\"pos\":[");
+
+                              // Get position
+                              float pos[3];
+                              THEKERNEL->robot->get_axis_position(pos);
+                              gcode->stream->printf("%f,%f,%f", pos[0], pos[1], pos[2]);
+
+                              // End
+                              gcode->stream->printf("],\"extr\":[12,34],\"sfactor\":100.00,\"efactor\":[100.00,100.00],\"tool\":1,\"probe\":\"535\",\"fanRPM\":0,\"homed\":[0,0,0],\"fraction_printed\":0.572}\n");
+                }
+            }
         }
     }
 }
-
-
-
-
-
-
-
-
-
-

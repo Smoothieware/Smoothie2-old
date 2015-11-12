@@ -18,7 +18,7 @@ class Reporter : public Module {
 
         void on_module_loaded();
         void on_gcode_received(void* argument);
- 
+
 };
 
 #endif
