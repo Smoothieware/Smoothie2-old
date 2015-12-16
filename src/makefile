@@ -17,8 +17,13 @@ GCC4MBED_DIR       := ../gcc4mbed/
 NO_FLOAT_SCANF     := 1
 NO_FLOAT_PRINTF    := 0
 LPC4330_M4_LSCRIPT := LPC4337.ld
+LIBS_PREFIX        := configdefault.o
 
 include $(GCC4MBED_DIR)/build/gcc4mbed.mk
+
+configdefault.o : config.default
+	@echo Packing $<
+	$(Q) $(OBJCOPY) -I binary -O elf32-littlearm -B arm --readonly-text --rename-section .data=.rodata.configdefault $< $@
 
 flash:
 	lpc21isp LPC4330_M4/Smoothie2.hex /dev/ttyUSB0 115200 14746

@@ -87,7 +87,6 @@ OBJECTS := $(filter-out $(EXCL_OBJECTS),$(OBJECTS))
 
 # Add in the GCC4MBED stubs which allow hooking in the MRI debug monitor.
 OBJECTS += $(OUTDIR)/gcc4mbed.o
-OBJECTS += $(OUTDIR)/configdefault.o
 
 # Add in device specific object file(s).
 OBJECTS += $(DEVICE_OBJECTS)
@@ -213,9 +212,6 @@ $(OUTDIR)/%.o : $(SRC)/%.s makefile
 	$(Q) $(MKDIR) $(call convert-slash,$(dir $@)) $(QUIET)
 	$(Q) $(GCC) $(ASM_FLAGS) $(MBED_INCLUDES) -c $< -o $@
 
-$(OUTDIR)/configdefault.o : $(SRC)/config.default
-	@echo Packing $<
-	$(Q) $(OBJCOPY) -I binary -O elf32-littlearm -B arm --readonly-text --rename-section .data=.rodata.configdefault $< $@
 
 ###############################################################################
 # Library mbed.a
