@@ -14,7 +14,6 @@
 
 # Vendor/device for which the library should be built.
 MBED_DEVICE        := KL25Z
-MBED_TARGET        := Freescale_KL25Z
 MBED_CLEAN         := $(MBED_DEVICE)-MBED-clean
 
 
@@ -37,7 +36,8 @@ DEVICE_MRI_LIB :=
 
 
 # Linker script to be used.  Indicates what code should be placed where in memory.
-LSCRIPT=$(GCC4MBED_DIR)/external/mbed/libraries/mbed/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL25Z/TOOLCHAIN_GCC_ARM/MKL25Z4.ld
+KL25Z_LSCRIPT ?= $(GCC4MBED_DIR)/external/mbed/libraries/mbed/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL25Z/TOOLCHAIN_GCC_ARM/MKL25Z4.ld
+LSCRIPT = $(KL25Z_LSCRIPT)
 
 
 include $(GCC4MBED_DIR)/build/device-common.mk

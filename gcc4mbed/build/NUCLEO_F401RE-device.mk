@@ -14,7 +14,6 @@
 
 # Vendor/device for which the library should be built.
 MBED_DEVICE        := NUCLEO_F401RE
-MBED_TARGET        := STM_NUCLEO_F401RE
 MBED_CLEAN         := $(MBED_DEVICE)-MBED-clean
 
 # Compiler flags which are specifc to this device.
@@ -37,7 +36,8 @@ DEVICE_MRI_LIB :=
 
 
 # Linker script to be used.  Indicates what code should be placed where in memory.
-LSCRIPT=$(GCC4MBED_DIR)/external/mbed/libraries/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F4/TARGET_NUCLEO_F401RE/TOOLCHAIN_GCC_ARM/STM32F401XE.ld
+NUCLEO_F401RE_LSCRIPT ?= $(GCC4MBED_DIR)/external/mbed/libraries/mbed/targets/cmsis/TARGET_STM/TARGET_STM32F4/TARGET_NUCLEO_F401RE/TOOLCHAIN_GCC_ARM/STM32F401XE.ld
+LSCRIPT = $(NUCLEO_F401RE_LSCRIPT)
 
 
 include $(GCC4MBED_DIR)/build/device-common.mk
