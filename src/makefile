@@ -18,6 +18,7 @@ NO_FLOAT_SCANF     := 1
 NO_FLOAT_PRINTF    := 0
 LPC4330_M4_LSCRIPT := LPC4337.ld
 LIBS_PREFIX        := configdefault.o
+OPTIMIZATION       =  0
 
 include $(GCC4MBED_DIR)/build/gcc4mbed.mk
 

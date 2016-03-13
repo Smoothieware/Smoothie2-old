@@ -216,9 +216,9 @@ void Robot::on_config_reload(void *argument)
 
 
     float steps_per_mm[3] = {
-        THEKERNEL->config->value(alpha_steps_per_mm_checksum)->by_default(  80.0F)->as_number(),
-        THEKERNEL->config->value(beta_steps_per_mm_checksum )->by_default(  80.0F)->as_number(),
-        THEKERNEL->config->value(gamma_steps_per_mm_checksum)->by_default(2560.0F)->as_number(),
+        THEKERNEL->config->value(alpha_steps_per_mm_checksum)->by_default(  1000)->as_number(),
+        THEKERNEL->config->value(beta_steps_per_mm_checksum )->by_default(  1000)->as_number(),
+        THEKERNEL->config->value(gamma_steps_per_mm_checksum)->by_default(  1000)->as_number(),
     };
 
 

@@ -14,6 +14,12 @@ switch.second.output_type                       pwm             # pwm output set
 
 microseconds_per_step_pulse                     5
 
+alpha_step_pin    1.7
+beta_step_pin     1.8
+
+
+junction_deviation 0.05
+acceleration 100
 
 # Hotend temperature control configuration
 temperature_control.hotend.enable            true             # Whether to activate this ( "hotend" ) module at all.
