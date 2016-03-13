@@ -20,6 +20,9 @@ LPC4330_M4_LSCRIPT := LPC4337.ld
 LIBS_PREFIX        := configdefault.o
 OPTIMIZATION       =  0
 
+# Use C++11 features for the checksums
+DEFINES += -DCHECKSUM_USE_CPP
+
 include $(GCC4MBED_DIR)/build/gcc4mbed.mk
 
 configdefault.o : config.default
