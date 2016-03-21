@@ -48,6 +48,13 @@ Things changed from Smoothie1 :
 * StepTicker now uses mBed instead of register
 * Various "waits" now use mBed's Timer
 
+Major current TODO : 
+ * Porting of existing functionality that hasn't been ported yet ( anything in https://github.com/Smoothieware/Smoothieware/tree/edge/src/modules that isn't ported yet )
+ * Some modules have been ported, but the underlying low-level/HAL stuff to talk to the peripherals isn't ( like SPI, or ADCs etc ), it's just dummy objects right now. So that needs porting too.
+ * USB and Ethernet need to be implemented.
+ * Doing the step generation on the M0 co-processor instead of on the M4 main core.
+
+
 Planned refactors : 
 
 * Remove the checksum system for config options
