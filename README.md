@@ -38,7 +38,23 @@ Current major TODOs : 
 TODO functionality to port from v1 in more detail : 
  * libs/Adc.cpp : Port low level ADC functionality, then re-enable it in TemperatureControl ( note : there is some weird pin configuration surrounding this that makes it more complicated than it seems, but I don't remember what it is. Logxen@gmail.com probably remembers what it is ).
  * libs/md5.cpp : Port and re-enable in SimpleShell
- * libs/Network : Port
+ * libs/Network : Port and enable
+ * libs/SDFAT.cpp : Port for SPI SD card access, not SDIO, and re-enable. Then add SDIO support.
+ * libs/SPI.cpp : Port and make to use the mBed library instead of registers
+ * libs/USBDevice : Port and enable
+ * libs/Watchdog : Port ( no mBed libraries available that I could find )
+ * modules/tools/drillingcycles : Port ( should be fairly simple )
+ * modules/tools/extruder : Port
+ * modules/tools/filamentdetector : Port
+ * modules/tools/filamentdetector : Get PWM to work
+ * modules/tools/scaracal : Port
+ * modules/tools/spindle : Port and get PWM to work
+ * modules/tools/temperaturecontrol : Finish porting, get the ADC to actually work, port the AD8495 temperature input
+ * modules/tools/temperatureswitch : Port ( should be fairly easy )
+ * modules/tools/toolmanager : Port ( should be trivial, is needed for Extruder )
+ * modules/tools/touchprobe : Port ( could be quite easy )
+ * modules/tools/zprobe : Port ( could be quite easy )
+
 
 Things that are broken during the port and should be added back as things progress ( some things might be missing here. I try to use the TOADDBACK label when commenting things so search for that too ) : 
 
@@ -56,7 +72,7 @@ Things changed from Smoothie1 :
 * StepTicker now uses mBed instead of register
 * Various "waits" now use mBed's Timer
 
-Planned refactors : 
+Planned refactors ( only to be done when the basic port is done ) : 
 
 * Remove the checksum system for config options
 * Try to read config directly from SD card without cache ( as smoothie used to do ) now that we have SDIO
