@@ -39,8 +39,8 @@ TODO functionality to port from v1 in more detail :
  * libs/Adc.cpp : Port low level ADC functionality, then re-enable it in TemperatureControl ( note : there is some weird pin configuration surrounding this that makes it more complicated than it seems, but I don't remember what it is. Logxen@gmail.com probably remembers what it is ).
  * libs/md5.cpp : Port and re-enable in SimpleShell
  * libs/Network : Port and enable
- * libs/SDFAT.cpp : Port for SPI SD card access, not SDIO, and re-enable. Then add SDIO support.
- * libs/SPI.cpp : Port and make to use the mBed library instead of registers
+ * [@adamgreen](https://github.com/adamgreen) - libs/SDFAT.cpp : Port for SPI SD card access, not SDIO, and re-enable. Then add SDIO support.
+ * [@adamgreen](https://github.com/adamgreen) - libs/SPI.cpp : Port and make to use the mBed library instead of registers
  * libs/USBDevice : Port and enable
  * libs/Watchdog : Port ( no mBed libraries available that I could find )
  * modules/tools/drillingcycles : Port ( should be fairly simple )
