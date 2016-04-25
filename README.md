@@ -1,12 +1,8 @@
 # Smoothie2
 
-(Attempt at) A Smoothie firmware port to the Smoothieboard v2 boards.
+A Smoothie firmware port to the Smoothieboard v2 boards.
 
-The current plan, is only to code as much as is needed to test the various peripherals on the v2-pro board.
-
-However, a minimal implementation of the Kernel/Module system is ported from Smoothie1
-
-Once the testing features are added, I plan to try to port minimal Smoothie motion control features
+Current status : Gcode processing, motion planning, and step generation work. Many secondary features need porting, and some major lower level things need implementation ( USB, Ethernet, SDIO ).
 
 # Compiling
 
@@ -32,6 +28,18 @@ And finally compile the code
 
 # TODO : 
 
+Current major TODOs : 
+ * Porting of existing functionality that hasn't been ported yet ( anything in https://github.com/Smoothieware/Smoothieware/tree/edge/src/modules that isn't ported yet )
+ * Some modules have been ported, but the underlying low-level/HAL stuff to talk to the peripherals isn't ( like SPI, or ADCs etc ), it's just dummy objects right now. So that needs porting too.
+ * USB and Ethernet need to be implemented.
+ * Doing the step generation on the M0 co-processor instead of on the M4 main core.
+ * This port was forked from Smoothie months ago, it should be updated to incoprorate changes to Smoothie done in the meantime.
+
+TODO functionality to port from v1 in more detail : 
+ * libs/Adc.cpp : Port low level ADC functionality, then re-enable it in TemperatureControl ( note : there is some weird pin configuration surrounding this that makes it more complicated than it seems, but I don't remember what it is. Logxen@gmail.com probably remembers what it is ).
+ * libs/md5.cpp : Port and re-enable in SimpleShell
+ * libs/Network : Port
+
 Things that are broken during the port and should be added back as things progress ( some things might be missing here. I try to use the TOADDBACK label when commenting things so search for that too ) : 
 
 * In GcodeDispatch.cpp : Removed dependency to Pauser.h
@@ -47,13 +55,6 @@ Things changed from Smoothie1 :
 * SlowTicker now uses mBed instead of registers
 * StepTicker now uses mBed instead of register
 * Various "waits" now use mBed's Timer
-
-Major current TODO : 
- * Porting of existing functionality that hasn't been ported yet ( anything in https://github.com/Smoothieware/Smoothieware/tree/edge/src/modules that isn't ported yet )
- * Some modules have been ported, but the underlying low-level/HAL stuff to talk to the peripherals isn't ( like SPI, or ADCs etc ), it's just dummy objects right now. So that needs porting too.
- * USB and Ethernet need to be implemented.
- * Doing the step generation on the M0 co-processor instead of on the M4 main core.
-
 
 Planned refactors : 
 
