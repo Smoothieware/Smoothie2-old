@@ -46,6 +46,7 @@ class Kernel {
 
         // These modules are available to all other modules
         SerialConsole*    serial;
+        SerialConsole*    secondary_serial;
         StreamOutputPool* streams;
 
         Robot*            robot;
