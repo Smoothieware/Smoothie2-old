@@ -22,7 +22,7 @@
 #include "ConfigValue.h"
 #include "PublicDataRequest.h"
 #include "PublicData.h"
-#include "SimpleShell.h"
+//#include "SimpleShell.h"
 #include "utils.h"
 //#include "LPC17xx.h"
 

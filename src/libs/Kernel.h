@@ -20,7 +20,6 @@ class Config;
 class Module;
 class Conveyor;
 class SlowTicker;
-class Pauser;
 class SerialConsole;
 class StreamOutputPool;
 class GcodeDispatch;
@@ -30,8 +29,6 @@ class Planner;
 class StepTicker;
 class Adc;
 class PublicData;
-class TemperatureControlPool;
-class Blinker;
 
 class Kernel {
     public:
@@ -41,29 +38,37 @@ class Kernel {
 
         void add_module(Module* module);
         void register_for_event(_EVENT_ENUM id_event, Module *module);
-        void call_event(_EVENT_ENUM id_event);
-        void call_event(_EVENT_ENUM id_event, void * argument);
+        void call_event(_EVENT_ENUM id_event, void * argument= nullptr);
+
+        bool kernel_has_event(_EVENT_ENUM id_event, Module *module);
+        void unregister_for_event(_EVENT_ENUM id_event, Module *module);
+
+        bool is_using_leds() const { return use_leds; }
+        bool is_halted() const { return halted; }
+        bool is_grbl_mode() const { return grbl_mode; }
+        bool is_ok_per_line() const { return ok_per_line; }
+
+        void set_feed_hold(bool f) { feed_hold= f; }
+        bool get_feed_hold() const { return feed_hold; }
+
+        std::string get_query_string();
 
         // These modules are available to all other modules
         SerialConsole*    serial;
         SerialConsole*    secondary_serial;
         StreamOutputPool* streams;
-
+        GcodeDispatch*    gcode_dispatch;
         Robot*            robot;
         Stepper*          stepper;
         Planner*          planner;
         Config*           config;
         Conveyor*         conveyor;
-        Pauser*           pauser;
         TemperatureControlPool* temperature_control_pool;
-
-        Blinker*          blinker;
 
         int debug;
         SlowTicker*       slow_ticker;
         StepTicker*       step_ticker;
         Adc*              adc;
-        bool              use_leds;
         std::string       current_path;
         uint32_t          base_stepping_frequency;
         uint32_t          acceleration_ticks_per_second;
@@ -71,6 +76,13 @@ class Kernel {
     private:
         // When a module asks to be called for a specific event ( a hook ), this is where that request is remembered
         std::array<std::vector<Module*>, NUMBER_OF_DEFINED_EVENTS> hooks;
+        struct {
+            bool use_leds:1;
+            bool halted:1;
+            bool grbl_mode:1;
+            bool feed_hold:1;
+            bool ok_per_line:1;
+        };
 
 };
 
