@@ -11,7 +11,6 @@
 #include <math.h>
 #include "Switch.h"
 #include "libs/Pin.h"
-#include "SwitchPool.h"
 #include "modules/robot/Conveyor.h"
 #include "PublicDataRequest.h"
 #include "SwitchPublicAccess.h"
@@ -32,6 +31,7 @@
 #define    input_pin_behavior_checksum  CHECKSUM("input_pin_behavior")
 #define    toggle_checksum              CHECKSUM("toggle")
 #define    momentary_checksum           CHECKSUM("momentary")
+#define    command_subcode_checksum     CHECKSUM("subcode")
 #define    input_on_command_checksum    CHECKSUM("input_on_command")
 #define    input_off_command_checksum   CHECKSUM("input_off_command")
 #define    output_pin_checksum          CHECKSUM("output_pin")
@@ -40,6 +40,8 @@
 #define    output_on_command_checksum   CHECKSUM("output_on_command")
 #define    output_off_command_checksum  CHECKSUM("output_off_command")
 #define    pwm_period_ms_checksum       CHECKSUM("pwm_period_ms")
+#define    failsafe_checksum            CHECKSUM("failsafe_set_to")
+#define    ignore_onhalt_checksum       CHECKSUM("ignore_on_halt")
 
 Switch::Switch() {}
 
@@ -47,6 +49,23 @@ Switch::Switch(uint16_t name)
 {
     this->name_checksum = name;
     //this->dummy_stream = &(StreamOutput::NullStream);
+}
+
+// set the pin to the fail safe value on halt
+void Switch::on_halt(void *arg)
+{
+    if(arg == nullptr) {
+        if(this->ignore_on_halt) return;
+
+        // set pin to failsafe value
+        switch(this->output_type) {
+            case DIGITAL: this->digital_pin->set(this->failsafe); break;
+            case SIGMADELTA: this->sigmadelta_pin->set(this->failsafe); break;
+            case HWPWM: this->pwm_pin->write(0); break;
+            case NONE: break;
+        }
+        this->switch_state= this->failsafe;
+    }
 }
 
 void Switch::on_module_loaded()
@@ -57,30 +76,37 @@ void Switch::on_module_loaded()
     this->register_for_event(ON_MAIN_LOOP);
     this->register_for_event(ON_GET_PUBLIC_DATA);
     this->register_for_event(ON_SET_PUBLIC_DATA);
+    this->register_for_event(ON_HALT);
 
     // Settings
     this->on_config_reload(this);
 }
 
-
 // Get config
 void Switch::on_config_reload(void *argument)
 {
     this->input_pin.from_string( THEKERNEL->config->value(switch_checksum, this->name_checksum, input_pin_checksum )->by_default("nc")->as_string())->as_input();
-    this->input_pin_behavior =   THEKERNEL->config->value(switch_checksum, this->name_checksum, input_pin_behavior_checksum )->by_default(momentary_checksum)->as_number();
-    std::string input_on_command =    THEKERNEL->config->value(switch_checksum, this->name_checksum, input_on_command_checksum )->by_default("")->as_string();
-    std::string input_off_command =   THEKERNEL->config->value(switch_checksum, this->name_checksum, input_off_command_checksum )->by_default("")->as_string();
-    this->output_on_command =    THEKERNEL->config->value(switch_checksum, this->name_checksum, output_on_command_checksum )->by_default("")->as_string();
-    this->output_off_command =   THEKERNEL->config->value(switch_checksum, this->name_checksum, output_off_command_checksum )->by_default("")->as_string();
-    this->switch_state =         THEKERNEL->config->value(switch_checksum, this->name_checksum, startup_state_checksum )->by_default(false)->as_bool();
-    string type =                THEKERNEL->config->value(switch_checksum, this->name_checksum, output_type_checksum )->by_default("")->as_string();
+    this->input_pin_behavior = THEKERNEL->config->value(switch_checksum, this->name_checksum, input_pin_behavior_checksum )->by_default(momentary_checksum)->as_number();
+    this->subcode = THEKERNEL->config->value(switch_checksum, this->name_checksum, command_subcode_checksum )->by_default(0)->as_number();
+    std::string input_on_command = THEKERNEL->config->value(switch_checksum, this->name_checksum, input_on_command_checksum )->by_default("")->as_string();
+    std::string input_off_command = THEKERNEL->config->value(switch_checksum, this->name_checksum, input_off_command_checksum )->by_default("")->as_string();
+    this->output_on_command = THEKERNEL->config->value(switch_checksum, this->name_checksum, output_on_command_checksum )->by_default("")->as_string();
+    this->output_off_command = THEKERNEL->config->value(switch_checksum, this->name_checksum, output_off_command_checksum )->by_default("")->as_string();
+    this->switch_state = THEKERNEL->config->value(switch_checksum, this->name_checksum, startup_state_checksum )->by_default(false)->as_bool();
+    string type = THEKERNEL->config->value(switch_checksum, this->name_checksum, output_type_checksum )->by_default("pwm")->as_string();
+    this->failsafe= THEKERNEL->config->value(switch_checksum, this->name_checksum, failsafe_checksum )->by_default(0)->as_number();
+    this->ignore_on_halt= THEKERNEL->config->value(switch_checksum, this->name_checksum, ignore_onhalt_checksum )->by_default(false)->as_bool();
 
     if(type == "pwm"){
         this->output_type= SIGMADELTA;
         this->sigmadelta_pin= new Pwm();
         this->sigmadelta_pin->from_string(THEKERNEL->config->value(switch_checksum, this->name_checksum, output_pin_checksum )->by_default("nc")->as_string())->as_output();
         if(this->sigmadelta_pin->connected()) {
-            // TOADDBACK : set_low_on_debug(sigmadelta_pin->port_number, sigmadelta_pin->pin);
+            if(failsafe == 1) {
+                set_high_on_debug(sigmadelta_pin->port_number, sigmadelta_pin->pin);
+            }else{
+                set_low_on_debug(sigmadelta_pin->port_number, sigmadelta_pin->pin);
+            }
         }else{
             this->output_type= NONE;
             delete this->sigmadelta_pin;
@@ -92,7 +118,11 @@ void Switch::on_config_reload(void *argument)
         this->digital_pin= new Pin();
         this->digital_pin->from_string(THEKERNEL->config->value(switch_checksum, this->name_checksum, output_pin_checksum )->by_default("nc")->as_string())->as_output();
         if(this->digital_pin->connected()) {
-            // TOADDBACK : set_low_on_debug(digital_pin->port_number, digital_pin->pin);
+            if(failsafe == 1) {
+                set_high_on_debug(digital_pin->port_number, digital_pin->pin);
+            }else{
+                set_low_on_debug(digital_pin->port_number, digital_pin->pin);
+            }
         }else{
             this->output_type= NONE;
             delete this->digital_pin;
@@ -104,7 +134,11 @@ void Switch::on_config_reload(void *argument)
         Pin *pin= new Pin();
         pin->from_string(THEKERNEL->config->value(switch_checksum, this->name_checksum, output_pin_checksum )->by_default("nc")->as_string())->as_output();
         this->pwm_pin= pin->hardware_pwm();
-        // TOADDBACK : set_low_on_debug(pin->port_number, pin->pin);
+        if(failsafe == 1) {
+            set_high_on_debug(pin->port_number, pin->pin);
+        }else{
+            set_low_on_debug(pin->port_number, pin->pin);
+        }
         delete pin;
         if(this->pwm_pin == nullptr) {
             THEKERNEL->streams->printf("Selected Switch output pin is not PWM capable - disabled");
@@ -126,7 +160,9 @@ void Switch::on_config_reload(void *argument)
 
     } else if(this->output_type == HWPWM) {
         // default is 50Hz
-        this->pwm_pin->period_ms(THEKERNEL->config->value(switch_checksum, this->name_checksum, pwm_period_ms_checksum )->by_default(20)->as_number());
+        float p= THEKERNEL->config->value(switch_checksum, this->name_checksum, pwm_period_ms_checksum )->by_default(20)->as_number() * 1000.0F; // ms but fractions are allowed
+        this->pwm_pin->period_us(p);
+
         // default is 0% duty cycle
         this->switch_value = THEKERNEL->config->value(switch_checksum, this->name_checksum, startup_value_checksum )->by_default(0)->as_number();
         if(this->switch_state) {
@@ -179,14 +215,17 @@ void Switch::on_config_reload(void *argument)
 
 bool Switch::match_input_on_gcode(const Gcode *gcode) const
 {
-    return ((input_on_command_letter == 'M' && gcode->has_m && gcode->m == input_on_command_code) ||
+    bool b= ((input_on_command_letter == 'M' && gcode->has_m && gcode->m == input_on_command_code) ||
             (input_on_command_letter == 'G' && gcode->has_g && gcode->g == input_on_command_code));
+
+    return (b && gcode->subcode == this->subcode);
 }
 
 bool Switch::match_input_off_gcode(const Gcode *gcode) const
 {
-    return ((input_off_command_letter == 'M' && gcode->has_m && gcode->m == input_off_command_code) ||
+    bool b= ((input_off_command_letter == 'M' && gcode->has_m && gcode->m == input_off_command_code) ||
             (input_off_command_letter == 'G' && gcode->has_g && gcode->g == input_off_command_code));
+    return (b && gcode->subcode == this->subcode);
 }
 
 void Switch::on_gcode_received(void *argument)
@@ -197,25 +236,30 @@ void Switch::on_gcode_received(void *argument)
         return;
     }
 
-    // drain queue
-    THEKERNEL->conveyor->wait_for_empty_queue();
-
-    gcode->stream->printf("Received Gcode in Switch on:%d off:%d received:%d type:%d \n", this->input_on_command_code, this->input_off_command_code, gcode->m, this->output_type );
-    gcode->stream->printf("SlowTicker, interval:%f, interval_us:%f, max_frequency:%f, hooks:%d \n", THEKERNEL->slow_ticker->interval, THEKERNEL->slow_ticker->interval * 1000000, THEKERNEL->slow_ticker->max_frequency, THEKERNEL->slow_ticker->hooks.size() );
-
+    // we need to sync this with the queue, so we need to wait for queue to empty, however due to certain slicers
+    // issuing redundant swicth on calls regularly we need to optimize by making sure the value is actually changing
+    // hence we need to do the wait for queue in each case rather than just once at the start
     if(match_input_on_gcode(gcode)) {
         if (this->output_type == SIGMADELTA) {
             // SIGMADELTA output pin turn on (or off if S0)
             if(gcode->has_letter('S')) {
-                int v = round(gcode->get_value('S') * sigmadelta_pin->max_pwm() / 255.0); // scale by max_pwm so input of 255 and max_pwm of 128 would set value to 128
-                this->sigmadelta_pin->pwm(v);
-                this->switch_state= (v > 0);
+                int v = roundf(gcode->get_value('S') * sigmadelta_pin->max_pwm() / 255.0F); // scale by max_pwm so input of 255 and max_pwm of 128 would set value to 128
+                if(v != this->sigmadelta_pin->get_pwm()){ // optimize... ignore if already set to the same pwm
+                    // drain queue
+                    THEKERNEL->conveyor->wait_for_empty_queue();
+                    this->sigmadelta_pin->pwm(v);
+                    this->switch_state= (v > 0);
+                }
             } else {
+                // drain queue
+                THEKERNEL->conveyor->wait_for_empty_queue();
                 this->sigmadelta_pin->pwm(this->switch_value);
                 this->switch_state= (this->switch_value > 0);
             }
 
         } else if (this->output_type == HWPWM) {
+            // drain queue
+            THEKERNEL->conveyor->wait_for_empty_queue();
             // PWM output pin set duty cycle 0 - 100
             if(gcode->has_letter('S')) {
                 float v = gcode->get_value('S');
@@ -229,12 +273,16 @@ void Switch::on_gcode_received(void *argument)
             }
 
         } else if (this->output_type == DIGITAL) {
+            // drain queue
+            THEKERNEL->conveyor->wait_for_empty_queue();
             // logic pin turn on
             this->digital_pin->set(true);
             this->switch_state = true;
         }
 
     } else if(match_input_off_gcode(gcode)) {
+        // drain queue
+        THEKERNEL->conveyor->wait_for_empty_queue();
         this->switch_state = false;
         if (this->output_type == SIGMADELTA) {
             // SIGMADELTA output pin
@@ -259,13 +307,11 @@ void Switch::on_get_public_data(void *argument)
     if(!pdr->second_element_is(this->name_checksum)) return; // likely fan, but could be anything
 
     // ok this is targeted at us, so send back the requested data
-    // this must be static as it will be accessed long after we have returned
-    static struct pad_switch pad;
-    pad.name = this->name_checksum;
-    pad.state = this->switch_state;
-    pad.value = this->switch_value;
-
-    pdr->set_data_ptr(&pad);
+    // caller has provided the location to write the state to
+    struct pad_switch *pad= static_cast<struct pad_switch *>(pdr->get_data_ptr());
+    pad->name = this->name_checksum;
+    pad->state = this->switch_state;
+    pad->value = this->switch_value;
     pdr->set_taken();
 }
 
