@@ -97,10 +97,11 @@ Kernel::Kernel(){
     this->add_module( this->robot          = new Robot()         );
     this->add_module( this->stepper        = new Stepper()       );
     this->add_module( this->conveyor       = new Conveyor()      );
-    // this->add_module( this->simpleshell    = new SimpleShell()   );
+    // TOADDBACK this->add_module( this->simpleshell    = new SimpleShell()   );
 
-    //this->planner = new(AHB0) Planner();
-    //this->configurator   = new Configurator();
+    this->planner = new Planner();
+
+    // TOADDBACK this->configurator   = new Configurator();
 }
 
 // return a GRBL-like query string for serial ?

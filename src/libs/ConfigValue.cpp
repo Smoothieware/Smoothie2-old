@@ -4,7 +4,7 @@
 #include "libs/Kernel.h"
 #include "libs/utils.h"
 #include "libs/Pin.h"
-//#include "Pwm.h"
+#include "Pwm.h"
 
 
 #define printErrorandExit(...) THEKERNEL->streams->printf(__VA_ARGS__); // exit(1);
