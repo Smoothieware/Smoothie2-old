@@ -5,19 +5,33 @@
       You should have received a copy of the GNU General Public License along with Smoothie. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Kernel.h"
-#include "Module.h"
-#include "StreamOutputPool.h"
-#include "SerialConsole.h"
-#include "SlowTicker.h"
-#include "StepTicker.h"
-#include "Robot.h"
-#include "Conveyor.h"
-#include "Planner.h"
-#include "Stepper.h"
-#include "GcodeDispatch.h"
-#include "Config.h"
-#include "Adc.h"
+#include "libs/Kernel.h"
+#include "libs/Module.h"
+#include "libs/Config.h"
+#include "libs/nuts_bolts.h"
+#include "libs/SlowTicker.h"
+//#include "libs/Adc.h"
+#include "libs/StreamOutputPool.h"
+//#include <mri.h>
+#include "checksumm.h"
+#include "ConfigValue.h"
+
+#include "libs/StepTicker.h"
+#include "libs/PublicData.h"
+#include "modules/communication/SerialConsole.h"
+#include "modules/communication/GcodeDispatch.h"
+#include "modules/robot/Planner.h"
+#include "modules/robot/Robot.h"
+#include "modules/robot/Stepper.h"
+#include "modules/robot/Conveyor.h"
+#include "StepperMotor.h"
+#include "BaseSolution.h"
+#include "EndstopsPublicAccess.h"
+//#include "Configurator.h"
+//#include "SimpleShell.h"
+
+//#include "platform_memory.h"
+
 #include <malloc.h>
 #include <array>
 #include <string>
@@ -55,7 +69,7 @@ Kernel::Kernel(){
     this->config->config_cache_load();
 
     // ADC reading
-    this->adc = new Adc();
+    //this->adc = new Adc();
 
     // For slow repeteative tasks
     this->add_module( this->slow_ticker = new SlowTicker());
@@ -85,8 +99,8 @@ Kernel::Kernel(){
     this->add_module( this->conveyor       = new Conveyor()      );
     // this->add_module( this->simpleshell    = new SimpleShell()   );
 
-    this->planner = new(AHB0) Planner();
-    this->configurator   = new Configurator();
+    //this->planner = new(AHB0) Planner();
+    //this->configurator   = new Configurator();
 }
 
 // return a GRBL-like query string for serial ?

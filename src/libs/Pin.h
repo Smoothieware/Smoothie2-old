@@ -71,6 +71,9 @@ class Pin {
 
         mbed::InterruptIn *interrupt_pin();
 
+        bool is_inverting() const { return inverting; }
+        void set_inverting(bool f) { inverting= f; }
+
         // these should be private, and use getters
         DigitalInOut* mbed_pin;
 

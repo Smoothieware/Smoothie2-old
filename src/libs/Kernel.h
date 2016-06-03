@@ -63,7 +63,6 @@ class Kernel {
         Planner*          planner;
         Config*           config;
         Conveyor*         conveyor;
-        TemperatureControlPool* temperature_control_pool;
 
         int debug;
         SlowTicker*       slow_ticker;

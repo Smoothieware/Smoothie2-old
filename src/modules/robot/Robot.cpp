@@ -37,7 +37,7 @@ using std::string;
 #include "ConfigValue.h"
 #include "libs/StreamOutput.h"
 #include "StreamOutputPool.h"
-#include "ExtruderPublicAccess.h"
+// TOADDBACK #include "ExtruderPublicAccess.h"
 #include "GcodeDispatch.h"
 
 
@@ -913,7 +913,7 @@ bool Robot::append_line(Gcode *gcode, const float target[], float rate_mm_s )
     // We ask Extruder to do all the work, but as Extruder won't even see this gcode until after it has been planned
     // we need to ask it now passing in the relevant data.
     // NOTE we need to do this before we segment the line (for deltas)
-    if(gcode->has_letter('E')) {
+    /* TOADDBACK When extruder is implemented  if(gcode->has_letter('E')) {
         float data[2];
         data[0] = gcode->get_value('E'); // E target (may be absolute or relative)
         data[1] = rate_mm_s / gcode->millimeters_of_travel; // inverted seconds for the move
@@ -921,8 +921,7 @@ bool Robot::append_line(Gcode *gcode, const float target[], float rate_mm_s )
             rate_mm_s *= data[1];
             //THEKERNEL->streams->printf("Extruder has changed the rate by %f to %f\n", data[1], rate_mm_s);
         }
-    }
-
+    } */
     // We cut the line into smaller segments. This is only needed on a cartesian robot for zgrid, but always necessary for robots with rotational axes like Deltas.
     // In delta robots either mm_per_line_segment can be used OR delta_segments_per_second
     // The latter is more efficient and avoids splitting fast long lines into very small segments, like initial z move to 0, it is what Johanns Marlin delta port does
