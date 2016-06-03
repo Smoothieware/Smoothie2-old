@@ -43,6 +43,7 @@ TODO functionality to port from v1 in more detail :
  * [@adamgreen](https://github.com/adamgreen) - libs/SPI.cpp : Port and make to use the mBed library instead of registers
  * libs/USBDevice : Port and enable
  * libs/Watchdog : Port ( no mBed libraries available that I could find )
+ * libs/Hook.h : Uses doubles instead of ints ( in v1 ) for some reason, should be fixed
  * modules/tools/drillingcycles : Port ( should be fairly simple )
  * modules/tools/extruder : Port
  * modules/tools/filamentdetector : Port
@@ -54,6 +55,7 @@ TODO functionality to port from v1 in more detail :
  * modules/tools/toolmanager : Port ( should be trivial, is needed for Extruder )
  * modules/tools/touchprobe : Port ( could be quite easy )
  * modules/tools/zprobe : Port ( could be quite easy )
+ * modules/tools/simpleshell : Port
 
 
 Things that are broken during the port and should be added back as things progress ( some things might be missing here. I try to use the TOADDBACK label when commenting things so search for that too ) : 
