@@ -14,6 +14,8 @@
 #include <string>
 using std::string;
 
+class StreamOutput;
+
 class GcodeDispatch : public Module
 {
 public:
@@ -21,17 +23,16 @@ public:
 
     virtual void on_module_loaded();
     virtual void on_console_line_received(void *line);
-    void on_halt(void *arg);
 
+    uint8_t get_modal_command() const { return modal_group_1<4 ? modal_group_1 : 0; }
 private:
     int currentline;
     string upload_filename;
     FILE *upload_fd;
-    uint8_t last_g;
+    StreamOutput* upload_stream{nullptr};
+    uint8_t modal_group_1;
     struct {
         bool uploading: 1;
-        bool halted: 1;
-        bool return_error_on_unhandled_gcode:1;
     };
 };
 
