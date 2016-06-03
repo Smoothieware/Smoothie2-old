@@ -33,6 +33,8 @@ class Switch : public Module {
         void on_gcode_received(void* argument);
         void on_get_public_data(void* argument);
         void on_set_public_data(void* argument);
+        void on_halt(void *arg);
+
         uint32_t pinpoll_tick(uint32_t dummy);
         enum OUTPUT_TYPE {NONE, SIGMADELTA, DIGITAL, HWPWM};
 
@@ -59,9 +61,12 @@ class Switch : public Module {
         char      input_on_command_letter;
         char      input_off_command_letter;
         struct {
+            uint8_t   subcode:4;
             bool      switch_changed:1;
             bool      input_pin_state:1;
-            bool      switch_state;
+            bool      switch_state:1;
+            bool      ignore_on_halt:1;
+            uint8_t   failsafe:1;
         };
 };
 

@@ -48,7 +48,8 @@ StepTicker::StepTicker(){
     this->tick_cnt= 0;
 }
 
-StepTicker::~StepTicker() {}
+StepTicker::~StepTicker() {
+}
 
 // Called when everything is setup and interrupts can start
 void StepTicker::start() {}
@@ -76,6 +77,7 @@ void StepTicker::synchronize_acceleration(bool fire_now) {
     if( fire_now ){ this->acceleration_tick(); }
     this->acceleration_timer->attach_us( this, &StepTicker::acceleration_tick, this->acceleration_period_us); 
 }
+
 
 // Call signal_move_finished() on each active motor that asked to be signaled. We do this instead of inside of tick() so that
 // all tick()s are called before we do the move finishing
@@ -150,8 +152,9 @@ int StepTicker::register_motor(StepperMotor* motor)
 }
 
 // activate the specified motor, must have been registered
-void StepTicker::add_motor_to_active_list(StepperMotor* motor){
-    bool enabled= active_motor.any();
+void StepTicker::add_motor_to_active_list(StepperMotor* motor)
+{
+    bool enabled= active_motor.any(); // see if interrupt was previously enabled
     active_motor[motor->index]= 1;
     if(!enabled) {
         this->step_timer->attach_us( this, &StepTicker::step_tick, this->period_us); 
@@ -161,6 +164,7 @@ void StepTicker::add_motor_to_active_list(StepperMotor* motor){
 // Remove a stepper from the list of active motors
 void StepTicker::remove_motor_from_active_list(StepperMotor* motor){
     active_motor[motor->index]= 0;
+    // If we have no motor to work on, disable the whole interrupt
     if(this->active_motor.none()){
         this->step_timer->detach();
         tick_cnt= 0;

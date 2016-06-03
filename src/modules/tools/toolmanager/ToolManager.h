@@ -5,20 +5,33 @@
       you should have received a copy of the gnu general public license along with smoothie. if not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef REPORTER_H
-#define REPORTER_H
+#ifndef TOOLMANAGER_H
+#define TOOLMANAGER_H
 
-#include "Module.h"
+using namespace std;
+#include <vector>
 
-class Reporter : public Module {
+class Tool;
 
-    public:
-        Reporter();
-        ~Reporter();
+class ToolManager : public Module
+{
+public:
+    ToolManager();
 
-        void on_module_loaded();
-        void on_gcode_received(void* argument);
- 
+    void on_module_loaded();
+    void on_gcode_received(void *);
+    void on_get_public_data(void *argument);
+    void on_set_public_data(void *argument);
+    void add_tool(Tool *tool_to_add);
+    int get_active_tool() const { return active_tool; }
+
+private:
+    vector<Tool *> tools;
+
+    int active_tool;
+    uint16_t current_tool_name;
 };
+
+
 
 #endif

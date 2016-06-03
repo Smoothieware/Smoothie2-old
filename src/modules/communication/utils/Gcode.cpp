@@ -12,17 +12,18 @@
 #include <stdlib.h>
 #include <algorithm>
 
-// This is a gcode object. It reprensents a GCode string/command, an caches some important values about that command for the sake of performance.
+// This is a gcode object. It represents a GCode string/command, and caches some important values about that command for the sake of performance.
 // It gets passed around in events, and attached to the queue ( that'll change )
 Gcode::Gcode(const string &command, StreamOutput *stream, bool strip)
 {
     this->command= strdup(command.c_str());
     this->m= 0;
     this->g= 0;
+    this->subcode= 0;
     this->add_nl= false;
+    this->is_error= false;
     this->stream= stream;
     this->millimeters_of_travel = 0.0F;
-    this->accepted_by_module = false;
     prepare_cached_values(strip);
     this->stripped= strip;
 }
@@ -43,9 +44,10 @@ Gcode::Gcode(const Gcode &to_copy)
     this->has_g                 = to_copy.has_g;
     this->m                     = to_copy.m;
     this->g                     = to_copy.g;
+    this->subcode               = to_copy.subcode;
     this->add_nl                = to_copy.add_nl;
+    this->is_error              = to_copy.is_error;
     this->stream                = to_copy.stream;
-    this->accepted_by_module    = false;
     this->txt_after_ok.assign( to_copy.txt_after_ok );
 }
 
@@ -58,11 +60,12 @@ Gcode &Gcode::operator= (const Gcode &to_copy)
         this->has_g                 = to_copy.has_g;
         this->m                     = to_copy.m;
         this->g                     = to_copy.g;
+        this->subcode               = to_copy.subcode;
         this->add_nl                = to_copy.add_nl;
+        this->is_error              = to_copy.is_error;
         this->stream                = to_copy.stream;
         this->txt_after_ok.assign( to_copy.txt_after_ok );
     }
-    this->accepted_by_module = false;
     return *this;
 }
 
@@ -155,6 +158,19 @@ std::map<char,float> Gcode::get_args() const
     return m;
 }
 
+std::map<char,int> Gcode::get_args_int() const
+{
+    std::map<char,int> m;
+    for(size_t i = stripped?0:1; i < strlen(command); i++) {
+        char c= this->command[i];
+        if( c >= 'A' && c <= 'Z' ) {
+            if(c == 'T') continue;
+            m[c]= get_int(c);
+        }
+    }
+    return m;
+}
+
 // Cache some of this command's properties, so we don't have to parse the string every time we want to look at them
 void Gcode::prepare_cached_values(bool strip)
 {
@@ -162,14 +178,27 @@ void Gcode::prepare_cached_values(bool strip)
     if( this->has_letter('G') ) {
         this->has_g = true;
         this->g = this->get_int('G', &p);
+
     } else {
         this->has_g = false;
     }
+
     if( this->has_letter('M') ) {
         this->has_m = true;
         this->m = this->get_int('M', &p);
+
     } else {
         this->has_m = false;
+    }
+
+    if(has_g || has_m) {
+        // look for subcode and extract it
+        if(p != nullptr && *p == '.') {
+            this->subcode = strtoul(p+1, &p, 10);
+
+        }else{
+            this->subcode= 0;
+        }
     }
 
     if(!strip) return;
@@ -180,11 +209,6 @@ void Gcode::prepare_cached_values(bool strip)
         free(command);
         command= n;
     }
-}
-
-void Gcode::mark_as_taken()
-{
-    this->accepted_by_module = true;
 }
 
 // strip off X Y Z I J K parameters if G0/1/2/3

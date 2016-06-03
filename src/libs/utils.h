@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+
 using std::string;
 using std::vector;
 
@@ -17,6 +18,7 @@ bool is_whitespace( int );
 
 vector<string> split(const char *str, char c = ',');
 vector<float> parse_number_list(const char *str);
+vector<uint32_t> parse_number_list(const char *str, uint8_t radix);
 
 string remove_non_number( string str );
 
@@ -27,11 +29,14 @@ void get_checksums(uint16_t check_sums[], const string& key);
 
 string shift_parameter( string &parameters );
 
-string get_arguments( string possible_command );
+string get_arguments( const string& possible_command );
 
 bool file_exists( const string file_name );
 
 string absolute_from_relative( string path );
 
+int append_parameters(char *buf, std::vector<std::pair<char,float>> params, size_t bufsize);
+string wcs2gcode(int wcs);
+void safe_delay(uint32_t delay);
 
 #endif
