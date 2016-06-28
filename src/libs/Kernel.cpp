@@ -59,10 +59,14 @@ Kernel::Kernel(){
     this->streams = new StreamOutputPool();
 
     // Create the default UART Serial Console interface
-    this->serial = new SerialConsole(P6_5, P6_4, 9600);
-    this->add_module( this->serial );
-    this->secondary_serial = new SerialConsole(P1_14, P5_6, 9600);
-    this->add_module( this->secondary_serial );
+    if (SMOOTHIE_UART_PRIMARY_ENABLE) {
+        this->serial = new SerialConsole(SMOOTHIE_UART_PRIMARY_TX, SMOOTHIE_UART_PRIMARY_RX, 9600);
+        this->add_module( this->serial );
+    }
+    if (SMOOTHIE_UART_SECONDARY_ENABLE) {
+        this->secondary_serial = new SerialConsole(SMOOTHIE_UART_SECONDARY_TX, SMOOTHIE_UART_SECONDARY_RX, 9600);
+        this->add_module( this->secondary_serial );
+    }
 
     // Config next, but does not load cache yet
     this->config = new Config();
