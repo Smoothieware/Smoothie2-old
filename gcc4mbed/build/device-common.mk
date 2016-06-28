@@ -42,12 +42,25 @@ C_FLAGS   += -std=gnu99
 # Flags used to assemble assembly languages sources.
 ASM_FLAGS += -g3 -x assembler-with-cpp $(GCC_DEFINES)
 
-# Clear out the include path for the mbed libraries required to build this project.
+# Clear out the include path for the libraries required to build this project.
 MBED_INCLUDES :=
+LIB_INCLUDES  :=
+
+# Clear out the list of user libraries to link into this binary.
+USER_LIBS_FULL :=
 
 # Directories where mbed library output files should be placed.
-RELEASE_DIR :=$(LIB_RELEASE_DIR)/$(MBED_TARGET)
-DEBUG_DIR   :=$(LIB_DEBUG_DIR)/$(MBED_TARGET)
+RELEASE_DIR := $(MBED_RELEASE_DIR)/$(MBED_DEVICE)
+DEBUG_DIR   := $(MBED_DEBUG_DIR)/$(MBED_DEVICE)
+
+
+
+###############################################################################
+# Build User Libraries
+###############################################################################
+$(foreach i,$(sort $(USER_LIBS)),$(eval $(call build_user_lib,$i)))
+$(foreach i,$(USER_LIBS),$(eval $(call add_user_lib,$i)))
+
 
 
 ###############################################################################
@@ -74,7 +87,6 @@ OBJECTS := $(filter-out $(EXCL_OBJECTS),$(OBJECTS))
 
 # Add in the GCC4MBED stubs which allow hooking in the MRI debug monitor.
 OBJECTS += $(OUTDIR)/gcc4mbed.o
-OBJECTS += $(OUTDIR)/configdefault.o
 
 # Add in device specific object file(s).
 OBJECTS += $(DEVICE_OBJECTS)
@@ -86,7 +98,7 @@ DEPFILES := $(patsubst %.o,%.d,$(OBJECTS))
 EXTERNAL_DIR = $(GCC4MBED_DIR)/external
 
 # Include path which points to subdirectories of this project, MRI, and user specified directory.
-INCLUDE_DIRS := $(patsubst %,-I%,$(INCDIRS) $(SRC) $(call filter_dirs,$(call recurse_dir,$(SRC)),$(TARGETS_FOR_DEVICE)) $(GCC4MBED_DIR)/mri)
+INCLUDE_DIRS := $(patsubst %,-I%,$(INCDIRS) $(SRC) $(call filter_dirs,$(call recurse_dir,$(SRC)),$(TARGETS_FOR_DEVICE)) $(LIB_INCLUDES) $(GCC4MBED_DIR)/mri)
 
 # DEFINEs to be used when building C/C++ code
 MAIN_DEFINES := $(DEFINES) -DMRI_ENABLE=$(DEVICE_MRI_ENABLE) -DMRI_INIT_PARAMETERS='"$(MRI_INIT_PARAMETERS)"'
@@ -94,7 +106,7 @@ MAIN_DEFINES += -DMRI_BREAK_ON_INIT=$(MRI_BREAK_ON_INIT) -DMRI_SEMIHOST_STDIO=$(
 
 # Libraries to be linked into final binary
 SYS_LIBS  := -lstdc++ -lsupc++ -lm -lgcc -lc -lgcc -lc -lnosys
-LIBS      := $(LIBS_PREFIX)
+LIBS      := $(LIBS_PREFIX) $(USER_LIBS_FULL)
 
 # Some choices like mbed SDK library locations and enabling of asserts depend on build type.
 ifeq "$(GCC4MBED_TYPE)" "Debug"
@@ -124,7 +136,7 @@ endif
 
 # Linker Options.
 $(MBED_DEVICE): LD_FLAGS := $(LD_FLAGS) -specs=$(GCC4MBED_DIR)/build/startfile.spec
-$(MBED_DEVICE): LD_FLAGS += -Wl,-Map=$(OUTDIR)/$(PROJECT).map,--cref,--gc-sections,--wrap=_isatty,--wrap=malloc,--wrap=realloc,--wrap=free,--wrap=main$(MRI_WRAPS)
+$(MBED_DEVICE): LD_FLAGS += -Wl,-Map=$(OUTDIR)/$(PROJECT).map,--cref,--gc-sections,-zmuldefs,--wrap=_isatty,--wrap=malloc,--wrap=realloc,--wrap=free,--wrap=main$(MRI_WRAPS)
 ifneq "$(NO_FLOAT_SCANF)" "1"
 $(MBED_DEVICE): LD_FLAGS += -u _scanf_float
 endif
@@ -168,11 +180,11 @@ $(MBED_DEVICE)-clean:
 	$(Q) $(REMOVE) $(PROJECT).hex $(QUIET)
 	$(Q) $(REMOVE) $(PROJECT).elf $(QUIET)
 
-ifdef LPC_DEPLOY
+ifdef GCC4MBED_DEPLOY
 $(MBED_DEVICE)-deploy: DEPLOY_PREFIX := $(OUTDIR)/$(PROJECT)
 $(MBED_DEVICE)-deploy: $(MBED_DEVICE)
 	@echo Deploying to target.
-	$(Q) $(subst PROJECT,$(call convert-slash,$(DEPLOY_PREFIX)),$(LPC_DEPLOY))
+	$(Q) $(subst PROJECT,$(call convert-slash,$(DEPLOY_PREFIX)),$(GCC4MBED_DEPLOY))
 endif
 
 $(OUTDIR)/gcc4mbed.o : $(GCC4MBED_DIR)/src/gcc4mbed.c makefile
@@ -195,20 +207,17 @@ $(OUTDIR)/%.o : $(SRC)/%.S makefile
 	$(Q) $(MKDIR) $(call convert-slash,$(dir $@)) $(QUIET)
 	$(Q) $(GCC) $(ASM_FLAGS) $(MBED_INCLUDES) -c $< -o $@
 
-$(OUTDIR)/%.o : $(SRC)/%.S makefile
+$(OUTDIR)/%.o : $(SRC)/%.s makefile
 	@echo Assembling $<
 	$(Q) $(MKDIR) $(call convert-slash,$(dir $@)) $(QUIET)
 	$(Q) $(GCC) $(ASM_FLAGS) $(MBED_INCLUDES) -c $< -o $@
 
-$(OUTDIR)/configdefault.o : $(SRC)/config.default
-	@echo Packing $<
-	$(Q) $(OBJCOPY) -I binary -O elf32-littlearm -B arm --readonly-text --rename-section .data=.rodata.configdefault $< $@
 
 ###############################################################################
 # Library mbed.a
 ###############################################################################
 MBED_DIRS := $(call filter_dirs,$(call recurse_dir,$(MBED_SRC_ROOT)),$(TARGETS_FOR_DEVICE))
-$(eval $(call build_lib,mbed,\
+$(eval $(call build_mbed_lib,mbed,\
                        $(MBED_DIRS),\
                        $(MBED_DIRS)))
 
@@ -217,7 +226,7 @@ $(eval $(call build_lib,mbed,\
 ###############################################################################
 ifeq "$(findstring rtos,$(MBED_LIBS))" "rtos"
     RTOS_DIRS := $(call filter_dirs,$(call recurse_dir,$(MBED_LIB_SRC_ROOT)/rtos),$(TARGETS_FOR_DEVICE))
-    $(eval $(call build_lib,rtos,$(RTOS_DIRS),$(RTOS_DIRS)))
+    $(eval $(call build_mbed_lib,rtos,$(RTOS_DIRS),$(RTOS_DIRS)))
 endif
 
 ###############################################################################
@@ -225,7 +234,7 @@ endif
 ###############################################################################
 ifeq "$(findstring net/lwip,$(MBED_LIBS))" "net/lwip"
     LWIP_DIRS := $(call filter_dirs,$(call recurse_dir,$(MBED_LIB_SRC_ROOT)/net/lwip),$(TARGETS_FOR_DEVICE))
-    $(eval $(call build_lib,net/lwip,$(LWIP_DIRS),$(LWIP_DIRS)))
+    $(eval $(call build_mbed_lib,net/lwip,$(LWIP_DIRS),$(LWIP_DIRS)))
 endif
 
 ###############################################################################
@@ -233,7 +242,7 @@ endif
 ###############################################################################
 ifeq "$(findstring net/eth,$(MBED_LIBS))" "net/eth"
     ETH_DIRS := $(call filter_dirs,$(call recurse_dir,$(MBED_LIB_SRC_ROOT)/net/eth),$(TARGETS_FOR_DEVICE))
-    $(eval $(call build_lib,net/eth,$(ETH_DIRS),$(ETH_DIRS)))
+    $(eval $(call build_mbed_lib,net/eth,$(ETH_DIRS),$(ETH_DIRS)))
 endif
 
 ###############################################################################
@@ -241,7 +250,7 @@ endif
 ###############################################################################
 ifeq "$(findstring fs,$(MBED_LIBS))" "fs"
     FS_DIRS := $(call filter_dirs,$(call recurse_dir,$(MBED_LIB_SRC_ROOT)/fs),$(TARGETS_FOR_DEVICE))
-    $(eval $(call build_lib,fs,$(FS_DIRS),$(FS_DIRS)))
+    $(eval $(call build_mbed_lib,fs,$(FS_DIRS),$(FS_DIRS)))
 endif
 
 ###############################################################################
@@ -249,7 +258,7 @@ endif
 ###############################################################################
 ifeq "$(findstring USBDevice,$(MBED_LIBS))" "USBDevice"
     USB_DEVICE_DIRS := $(call filter_dirs,$(call recurse_dir,$(MBED_LIB_SRC_ROOT)/USBDevice),$(TARGETS_FOR_DEVICE))
-    $(eval $(call build_lib,USBDevice,$(USB_DEVICE_DIRS),$(USB_DEVICE_DIRS)))
+    $(eval $(call build_mbed_lib,USBDevice,$(USB_DEVICE_DIRS),$(USB_DEVICE_DIRS)))
 endif
 
 ###############################################################################
@@ -257,7 +266,7 @@ endif
 ###############################################################################
 ifeq "$(findstring USBHost,$(MBED_LIBS))" "USBHost"
     USB_HOST_DIRS := $(call filter_dirs,$(call recurse_dir,$(MBED_LIB_SRC_ROOT)/USBHost),$(TARGETS_FOR_DEVICE))
-    $(eval $(call build_lib,USBHost,$(USB_HOST_DIRS),$(USB_HOST_DIRS)))
+    $(eval $(call build_mbed_lib,USBHost,$(USB_HOST_DIRS),$(USB_HOST_DIRS)))
 endif
 
 ###############################################################################
@@ -265,7 +274,7 @@ endif
 ###############################################################################
 ifeq "$(findstring rpc,$(MBED_LIBS))" "rpc"
     RPC_DIRS := $(call filter_dirs,$(call recurse_dir,$(MBED_LIB_SRC_ROOT)/rpc),$(TARGETS_FOR_DEVICE))
-    $(eval $(call build_lib,rpc,$(RPC_DIRS),$(RPC_DIRS)))
+    $(eval $(call build_mbed_lib,rpc,$(RPC_DIRS),$(RPC_DIRS)))
 endif
 
 ###############################################################################
@@ -273,7 +282,7 @@ endif
 ###############################################################################
 ifeq "$(findstring dsp,$(MBED_LIBS))" "dsp"
     DSP_DIRS := $(call filter_dirs,$(call recurse_dir,$(MBED_LIB_SRC_ROOT)/dsp),$(TARGETS_FOR_DEVICE))
-    $(eval $(call build_lib,dsp,$(DSP_DIRS),$(DSP_DIRS)))
+    $(eval $(call build_mbed_lib,dsp,$(DSP_DIRS),$(DSP_DIRS)))
 endif
 
 #########################################################################
@@ -319,6 +328,7 @@ $(RELEASE_DIR)/%.o : $(MBED_LIB_SRC_ROOT)/%.S
 	$(Q) $(MKDIR) $(call convert-slash,$(dir $@)) $(QUIET)
 	$(Q) $(GCC) $(ASM_FLAGS) $(MBED_INCLUDES) -c $< -o $@
 
+
 #########################################################################
 # High level rule for cleaning out all official mbed libraries.
 #########################################################################
@@ -338,12 +348,20 @@ $(MBED_CLEAN):
 # the mbed components used.
 $(MBED_DEVICE): MBED_INCLUDES := $(patsubst %,-I%,$(MBED_INCLUDES))
 
+# Do the same for the user libraries.
+$(MBED_DEVICE): LIB_INCLUDES  := $(patsubst %,-I%,$(LIB_INCLUDES))
+
 
 else
 # Have an empty rule for this device since it isn't supported.
 .PHONY: $(MBED_DEVICE)
 
+ifeq "$(OS)" "Windows_NT"
+$(MBED_DEVICE):
+	@REM >nul
+else
 $(MBED_DEVICE):
 	@#
+endif
 
 endif # ifeq "$(findstring $(MBED_DEVICE),$(DEVICES))"...

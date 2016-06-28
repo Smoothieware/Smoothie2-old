@@ -7,11 +7,13 @@ Example: {{{make -j 4 all}}}
 The GCC4MBED supports the following rules when building your project makefile:
 * **all**: The main rule for building your project and all of its official mbed dependencies.
 * **clean**: Will clean out all of the output files for your project.  This will cause a full rebuild when you next issue the **all** rule.
-* **clean-all**: Will clean out all of the output files, those for your project and the mbed libraries.
+* **clean-libs**: Will clean out all of the output files for your **USER_LIBS** folders.  This will cause a full rebuild of the user libraries when you next issue the **all** rule.
+* **clean-mbed**: Will clean out all of the output files for the mbed SDK libraries.  This will cause a full rebuild of the mbed SDK libraries when you next issue the **all** rule.
+* **clean-all**: Cleans out all output files.  Same as issuing **clean**, **clean-libs**, and **clean-mbed** rules.
 * **LPC1768-clean**: Will clean out the LPC1768 output files for your project.
 * **LPC11U24-clean**: Will clean out the LPC11U24 output files for your project.
 * **KL25Z-clean**: Will clean out the KL25Z output files for your project.
-* **deploy**: Deploys the LPC1768 output binary to your device.  Uses the **LPC_DEPLOY** environment variable to specify the commands for executing the copy operation.
+* **deploy**: Deploys the LPC1768 output binary to your device.  Uses the **GCC4MBED_DEPLOY** environment variable to specify the commands for executing the copy operation.
 * **LPC1768-deploy**: Same as deploy rule.
 * **LPC11U24-deploy**: Deploys the LPC11U24 output binary to your device.
 * **KL25Z-deploy**: Deploys the KL25Z output binary to your device.
@@ -38,10 +40,12 @@ These devices are currently in beta:
 
 These devices were added by the community.  I make sure that they build during a release but I don't test on actual hardware:
 * DISCO_F407VG (added by [[https://developer.mbed.org/users/svkatielee/ | Larry Littlefield]])
+* LPC11C24 (added by [[https://github.com/merkur2k | merkur2k]])
+* NUCLEO_F072RB (added by [[https://github.com/aftermathew | aftermathew]])
+* NUCLEO_F103RB (added by [[https://github.com/KenjutsuGH | KenjutsuGH]])
 * NUCLEO_F401RE (added by [[https://developer.mbed.org/users/svkatielee/ | Larry Littlefield]])
 * NUCLEO_F411RE (added by [[https://github.com/weyoui | weyoui]])
-* NUCLEO_F072RB (added by [[https://github.com/aftermathew | aftermathew]])
-* LPC11C24 (added by [[https://github.com/merkur2k | merkur2k]])
+* NUCLEO_L053R8 (added by [[https://github.com/ashier | Ashier de Leon]])
 
 The default target device is LPC1768.
 
@@ -61,6 +65,9 @@ The **MBED_LIBS** variable is an optional variable that an application's makefil
 * **USBDevice**: Pulls in the USBDevice drivers such USBMouse, USBKeyboard, USBSerial, USBKeyboardMouse, etc.
 * **USBHost**: Pulls in the USBHost drivers such as USBHostMSD, USBHostMouse, USBHostKeyboard, USBHostHub, USBHostSerial, etc.
 
+===USER_LIBS
+The **USER_LIBS** variable is an optional variable that an application's makefile can use to provide a space delimited list of folders containing user libraries to be compiled and linked into the application.
+
 ===NO_FLOAT_SCANF
 The **NO_FLOAT_SCANF** variable is an optional variable that an application's makefile can set to 1, indicating that scanf() does not need to support floating point values which reduces code size.
 
@@ -69,6 +76,9 @@ The **NO_FLOAT_PRINTF** variable is an optional variable that an application's m
 
 ===DEFINES
 The **DEFINES** variable can be used by an application's makefile to explicitly define some preprocessor macros that should be set when compiling the files for the main application.  It doesn't get used for building the mbed SDK libraries.
+
+===GCC4MBED_TOOLPATH
+The **GCC4MBED_TOOLPATH** is an optional path to where the GNU tools are located. It defaults to $(GCC4MBED_DIR)/gcc-arm-none-eabi/bin
 
 ===INCDIRS
 The **INCDIRS** variable can be used by an application's makefile to prepend a list of directories to the INCLUDE path used by the compiler for finding #included header files.  This list should be space delimited.
@@ -117,7 +127,7 @@ The **MRI_SEMIHOST_STDIO** variable can be set in an application's makefile to a
 
 ====MRI_UART
 The **MRI_UART** is an optional variable that can be set in an application's makefile to configure the device's UART being used for communicating between GDB and MRI.  You can select any of the 4 available UARTs on the mbed device:
-| MRI_UART_MBED_USB | 
+| MRI_UART_MBED_USB |
 | MRI_UART_MBED_P9_P10 |
 | MRI_UART_MBED_P13_P14 |
 | MRI_UART_MBED_P28_P27 |
@@ -131,6 +141,9 @@ MRI_UART := "MRI_UART_MBED_USB MRI_UART_BAUD=115200"
 
 ====MRI_ENABLE
 The **MRI_ENABLE** variable is typically configured automatically based on the setting of **GCC4MBED_TYPE**.  If you however want a non-optimized build that you can use with a JTAG debugger then you can set **GCC4MBED_TYPE** to Debug and **MRI_ENABLE** to 0.
+
+===Customized Linker Scripts (*_LSCRIPT)
+The linker script to be used for a particular device can be overridden by setting the appropriate *_LSCRIPT variable.  For example setting {{{LPC1768_LSCRIPT := lpc1768custom.ld}}} will cause the linker to use **lpc1768custom.ld** instead of the one provided by the mbed SDK when building for the LPC1768 target.
 
 ===Example Makefile
 {{{

@@ -17,6 +17,9 @@ using std::string;
 #include "libs/RingBuffer.h"
 #include "libs/StreamOutput.h"
 
+
+#define baud_rate_setting_checksum CHECKSUM("baud_rate")
+
 class SerialConsole : public Module, public StreamOutput {
     public:
         SerialConsole( PinName rx_pin, PinName tx_pin, int baud_rate );
@@ -24,6 +27,7 @@ class SerialConsole : public Module, public StreamOutput {
         void on_module_loaded();
         void on_serial_char_received();
         void on_main_loop(void * argument);
+        void on_idle(void * argument);
         bool has_char(char letter);
 
         int _putc(int c);
@@ -34,6 +38,10 @@ class SerialConsole : public Module, public StreamOutput {
         //vector<std::string> received_lines;    // Received lines are stored here until they are requested
         RingBuffer<char,256> buffer;             // Receive buffer
         mbed::Serial* serial;
+        struct {
+          bool query_flag:1;
+          bool halt_flag:1;
+        };
 };
 
 #endif

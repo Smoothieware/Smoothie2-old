@@ -6,18 +6,20 @@
 #include "SwitchPool.h"
 #include "TemperatureControlPool.h"
 #include "Endstops.h"
-#include "Reporter.h"
 #include "Laser.h"
 #include "Config.h"
+#include "StreamOutputPool.h"
 
 int main() {
 
     // Kernel creates modules, and receives and dispatches events between them
     Kernel* kernel = new Kernel(); 
 
+    // Say hello ( TODO : Add back version and all )
+    kernel->streams->printf("Smoothie2 dev\n");
+
     // Create and add main modules
     kernel->add_module( new Endstops() );
-    kernel->add_module( new Reporter() );   
     kernel->add_module( new Laser() );
 
     // Create all Switch modules

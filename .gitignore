@@ -1,4 +1,15 @@
-/gcc4mbed/
-/src/LPC4330_M4/
+# Build output
+*.bin
+*.disasm
+*.elf
+*.hex
+*.map
+*.o
+*.d
+*.a
+
+# Editor temporary files
 *~
 
+# OS specific files
+.DS_Store

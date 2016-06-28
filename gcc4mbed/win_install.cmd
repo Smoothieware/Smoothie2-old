@@ -19,11 +19,11 @@ setlocal
 set ROOTDIR=%~dp0
 set LOGFILE=%ROOTDIR%win_install.log
 set ERRORFILE=%ROOTDIR%win_install.err
-set GCC4ARM_VERSION=gcc-arm-none-eabi-4_9-2015q1
-set GCC4ARM_FILENAME=gcc-arm-none-eabi-4_9-2015q1-20150306-win32.zip
-set GCC4ARM_URL=https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q1-update/+download/%GCC4ARM_FILENAME%
+set GCC4ARM_VERSION=gcc-arm-none-eabi-4_9-2015q3
+set GCC4ARM_FILENAME=gcc-arm-none-eabi-4_9-2015q3-20150921-win32.zip
+set GCC4ARM_URL=https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/%GCC4ARM_FILENAME%
 set GCC4ARM_TAR=%ROOTDIR%%GCC4ARM_FILENAME%
-set GCC4ARM_MD5=ef2df916f1ea4c5cc1022fa9aaf338a1
+set GCC4ARM_MD5=d944be40a5bdb2327d80db23290c6b9d
 set GCC4ARM_MD5_FILENAME=%ROOTDIR%gcc-arm-none-eabi.md5
 set GCC4ARM_DIR=%ROOTDIR%gcc-arm-none-eabi
 set GCC4ARM_BINDIR=%GCC4ARM_DIR%\bin
@@ -64,7 +64,7 @@ call :RunAndLog cd ..
 echo Creating helper scripts...
 echo @echo off>%BUILDENV_CMD%
 echo REM Uncomment next line and set destination drive to match mbed device>>%BUILDENV_CMD%
-echo REM SET LPC_DEPLOY=copy PROJECT.bin f:\>>%BUILDENV_CMD%
+echo REM SET GCC4MBED_DEPLOY=copy PROJECT.bin f:\>>%BUILDENV_CMD%
 echo.>>%BUILDENV_CMD%
 echo SET PATH=%%~dp0;%%~dp0..\..\external\win32;%%PATH%%>>%BUILDENV_CMD%
 rem
