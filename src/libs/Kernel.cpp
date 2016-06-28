@@ -55,13 +55,15 @@ Kernel::Kernel(){
 
     instance= this; // setup the Singleton instance of the kernel
 
+    // All streams register to the Kernel so we can broadcast messages
+    this->streams = new StreamOutputPool();
 
     // Create the default UART Serial Console interface
-    this->serial = new SerialConsole(P3_4, P3_5, 9600);
+    this->serial = new SerialConsole(P6_5, P6_4, 9600);
     this->add_module( this->serial );
-    this->secondary_serial = new SerialConsole(P2_0, P2_1, 9600);
+    this->secondary_serial = new SerialConsole(P1_14, P5_6, 9600);
     this->add_module( this->secondary_serial );
-    
+
     // Config next, but does not load cache yet
     this->config = new Config();
 
@@ -74,21 +76,12 @@ Kernel::Kernel(){
     // For slow repeteative tasks
     this->add_module( this->slow_ticker = new SlowTicker());
 
-    // All streams register to the Kernel so we can broadcast messages
-    this->streams = new StreamOutputPool();
-
     this->current_path   = "/";
-
 
     //some boards don't have leds.. TOO BAD!
     this->use_leds= !this->config->value( disable_leds_checksum )->by_default(false)->as_bool();
     this->grbl_mode= this->config->value( grbl_mode_checksum )->by_default(false)->as_bool();
     this->ok_per_line= this->config->value( ok_per_line_checksum )->by_default(true)->as_bool();
-
-    this->add_module( this->serial );
-
-    // HAL stuff
-    add_module( this->slow_ticker = new SlowTicker());
 
     this->step_ticker = new StepTicker();
 
