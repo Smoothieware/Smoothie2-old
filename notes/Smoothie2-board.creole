@@ -1,6 +1,6 @@
 = Smoothie2 Board Programming/Debugging Notes
 [[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2-board.creole#lpcscrypt | Using LPCScrypt to upload firmware to Smoothie2 via high speed USB]]\\
-[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2-board.creole#lp21isp | Using LPC21ISP to upload firmware to Smoothie2 via UART0]]\\
+[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2-board.creole#lpc21isp | Using LPC21ISP to upload firmware to Smoothie2 via UART0]]\\
 [[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2-board.creole#j-link | Using J-Link hardware dongle to program and debug Smoothie2]]\\
 
 
