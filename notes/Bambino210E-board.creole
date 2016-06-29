@@ -1,0 +1,70 @@
+= Bambino210E Board Programming/Debugging Notes
+[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Bambino210E-board.creole#building | Updating the makefile to build for Bambino210E]]\\
+[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Bambino210E-board.creole#lpcscrypt | Using LPCScrypt to upload firmware to Bambino210E via high speed USB]]\\
+
+
+
+==Building
+By default the Smoothie2 makefile will build images which are configured to execute on the Smoothie2 board rather than
+the Bambino210E. To switch it to targeting your Bambino210E you need to make the following change to your makefile:
+{{{
+--- a/src/makefile
++++ b/src/makefile
+@@ -14,7 +14,7 @@ DEFINES += -DCHECKSUM_USE_CPP
+ # Can be one of: Smoothie2 (**default**)
+ #                Bambino210E
+ #                Bambino200E
+-BOARD ?= Smoothie2
++BOARD ?= Bambino210E
+ 
+ # Need to use a custom LPC4337 script for boards like the Smoothie2 hardware which use that chip instead of the LPC4330
+ ifeq "$(BOARD)" "Smoothie2"
+}}}
+
+
+
+==LPCScrypt
+===Installing LPCScrypt
+You can install LPCScrypt from [[https://www.lpcware.com/LPCScrypt | here]].  Once you have it installed you should read
+the ** LPCScrypt_User_Guide**.  In particular, sections 3.2 and 3.3 which discuss additional steps that will probably be
+required on Linux and Windows.  On OS X, the installer does everything that is required.
+
+Here is a brief summary of what is required for Ubuntu platforms:
+* LPCScrypt installs 32-bit binaries so 64-bit Ubuntu installs will need additional 32-bit library support:
+** **Ubuntu 13.04 of earlier:** {{{sudo apt-get install linux32 ia32-libs}}}
+** **Ubuntu 13.10 and later:** {{{sudo apt-get install libc6:i386 libusb-dev:i386 uuid-dev:i386 libgtk2.0-0:i386 gtk2-engines-murrine:i386}}}
+* It can be nice to have the USB based serial ports exposed by the LPCScrypt second stage boot loader accessible from
+  user mode:
+** {{{￼sudo scripts/install_udev_rules}}}
+
+===Booting Bambino210E into USB0 Boot Loader Mode
+You will first want to connect a USB cable to the USB0 port (found next to the Ethernet jack) on the Bambino210E board.
+Before plugging the other end of the USB cable into your PC, you should short together the two **BOOT** pins on the
+other end of the board (on the same end of the board as the uSD slot). While keeping these two pins shorted together,
+plug the USB cable into your PC to apply power to the board. Once the board is powered up in boot loader mode, you no
+longer need to keep the **BOOT** pins shorted together.\\
+{{https://raw.githubusercontent.com/Smoothieware/Smoothie2/master/notes/20160628-01.jpg}}\\
+
+
+===Programming via USB0 Boot Loader
+Here are the commands that I used to program my Bambino210E board on my MacBook.
+{{{
+/Applications/lpcscrypt_1.6.0_652/scripts/boot_lpcscrypt 
+/Applications/lpcscrypt_1.6.0_652/bin/lpcscrypt program +c LPC4330_M4/Smoothie2.bin SPIFI
+/Applications/lpcscrypt_1.6.0_652/bin/lpcscrypt resetCore
+}}}
+
+A sample run from my machine:
+{{{
+/depots/Smoothie2/src$ /Applications/lpcscrypt_1.6.0_652/scripts/boot_lpcscrypt 
+Looking for DFU devices with VID 1fc9 PID 000c ...
+dfu-util -d 0x1fc9:0x000c -c 0 -i 0 -t 2048 -R -D /Applications/lpcscrypt_1.6.0_652/scripts/../bin/LPCScrypt_103.bin.hdr
+Booted LPCScrypt target (0x1fc9:0x000c) with /Applications/lpcscrypt_1.6.0_652/scripts/../bin/LPCScrypt_103.bin.hdr
+/depots/Smoothie2/src$ /Applications/lpcscrypt_1.6.0_652/bin/lpcscrypt program +c LPC4330_M4/Smoothie2.bin SPIFI
+......
+Programmed 187068 bytes to 0x14000000 in 1.000s (182.745KB/sec)
+/depots/Smoothie2/src$ /Applications/lpcscrypt_1.6.0_652/bin/lpcscrypt resetCore
+}}}
+
+You may want to add the LPCScrypt bin/ and scripts/ directory to your path so that you don't need to use absolute
+paths like I did in my above sample run.
