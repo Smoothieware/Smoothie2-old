@@ -12,6 +12,7 @@ pyocd.log
 deploy
 debug
 !/mri/*.a
+!*_softdevice.hex
 /BuildShell
 /BuildShellDebug
 /BuildShell.cmd
