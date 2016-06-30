@@ -11,6 +11,7 @@ mri.log
 pyocd.log
 deploy
 debug
+!/mri/*.a
 /BuildShell
 /BuildShellDebug
 /BuildShell.cmd
