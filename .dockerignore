@@ -1,0 +1,12 @@
+.git
+.dockerignore
+Dockerfile
+notes
+# gcc4mbed/external/mbed/libraries/mbed/targets/cmsis/TARGET_*
+# !gcc4mbed/external/mbed/libraries/mbed/targets/cmsis/TARGET_STM
+# !gcc4mbed/external/mbed/libraries/mbed/targets/cmsis/TARGET_NXP
+# gcc4mbed/external/mbed/libraries/mbed/targets/hal/TARGET_*
+# !gcc4mbed/external/mbed/libraries/mbed/targets/hal/TARGET_STM
+# !gcc4mbed/external/mbed/libraries/mbed/targets/hal/TARGET_NXP
+# **/TOOLCHAIN_*
+# !**/TOOLCHAIN_GCC
