@@ -3,6 +3,10 @@
 #
 #   docker --tag shimaore/smoothie2 src/
 #
+# To export the binary:
+#
+#   docker run shimaore/smoothie2 /bin/sh -c 'tar cf - LPC4330_M4/Smoothie2*' | tar xvf -
+#
 FROM shimaore/smoothie2-gcc4mbed
 
 COPY . /opt/smoothie/src
