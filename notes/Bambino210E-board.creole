@@ -1,6 +1,7 @@
 = Bambino210E Board Programming/Debugging Notes
 [[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Bambino210E-board.creole#building | Updating the makefile to build for Bambino210E]]\\
 [[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Bambino210E-board.creole#lpcscrypt | Using LPCScrypt to upload firmware to Bambino210E via high speed USB]]\\
+[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Bambino210E-board.creole#debugging-with-mri | Debugging Bambino210E with the MRI debug monitor]]\\
 
 
 
@@ -56,7 +57,7 @@ Here are the commands that I used to program my Bambino210E board on my MacBook.
 
 A sample run from my machine:
 {{{
-/depots/Smoothie2/src$ /Applications/lpcscrypt_1.6.0_652/scripts/boot_lpcscrypt 
+/depots/Smoothie2/src$ /Applications/lpcscrypt_1.6.0_652/scripts/boot_lpcscrypt
 Looking for DFU devices with VID 1fc9 PID 000c ...
 dfu-util -d 0x1fc9:0x000c -c 0 -i 0 -t 2048 -R -D /Applications/lpcscrypt_1.6.0_652/scripts/../bin/LPCScrypt_103.bin.hdr
 Booted LPCScrypt target (0x1fc9:0x000c) with /Applications/lpcscrypt_1.6.0_652/scripts/../bin/LPCScrypt_103.bin.hdr
@@ -68,3 +69,56 @@ Programmed 187068 bytes to 0x14000000 in 1.000s (182.745KB/sec)
 
 You may want to add the LPCScrypt bin/ and scripts/ directory to your path so that you don't need to use absolute
 paths like I did in my above sample run.
+
+
+
+==Debugging with MRI
+It is possible to link the MRI (Monitor for Remote Inspection) debug monitor into the Smoothie firmware and then use a
+secondary serial connection to debug Smoothie with GDB (GNU Debugger) if you don't have JTAG debug hardware.
+
+===Enabling MRI
+The Smoothie makefile must be modified to enable MRI and have it linked into the firmware.
+{{{
+--- a/src/makefile
++++ b/src/makefile
+@@ -5,7 +5,7 @@
+ BOARD ?= Bambino210E
+
+ # Set MRI_ENABLE to a value of 1 to enable the MRI debug monitor on the secondary UART.
+-MRI_ENABLE ?= 0
++MRI_ENABLE ?= 1
+
+ # Set MRI_BREAK_ON_INIT to a value of 0 if you don't want MRI to break before running global constructors.
+ MRI_BREAK_ON_INIT ?= 1
+}}}
+When switching between builds which enable and disable MRI, you should issue a {{{make clean}}}.
+
+===MRI Serial Connection
+You will need to connect a USB to serial adapter to the secondary UART port on your Bambino210E to allow GDB to connect
+to MRI running on the LPC4330. I use a [[https://www.adafruit.com/products/70 | FTDI USB to Serial cable from Adafruit]]
+to make this connection. The following table summarizes the connections between the FTDI cable and the Arduino-style
+header pins on the Bambino210E:
+|= FTDI Pin            |= Bambino Pin |
+| Pin 1 - GND - Black  | Gnd |
+| Pin 4 - TxD - Orange | D0 |
+| Pin 5 - RxD - Yellow | D1 |
+These connections can be seen in the following photo:\\
+{{https://raw.githubusercontent.com/Smoothieware/Smoothie2/master/notes/20160630-01.jpg}}\\
+
+===Launching GDB
+GDB should have been installed along with the GCC compiler and other GNU tools used to build the Smoothie2 source code.
+
+From a Terminal or Command Prompt that is able to build Smoothie2, you should set the current directory to the src/
+directory of the Smoothie project and use one of the following commands to launch GDB. The main difference between the
+operating systems is the type of name used for the serial port.  You will need to substitute the serial device
+designator appropriate for your setup.
+
+**Windows:**\\
+{{{
+arm-none-eabi-gdb LPC4330_M4\Smoothie2.elf --baud 230400 -ex "set target-charset ASCII" -ex "set remotelogfile mri.log" -ex "set mem-inaccessible-by-default off" -ex "target remote com1"
+}}}
+
+**OS X and Linux:**\\
+{{{
+arm-none-eabi-gdb LPC4330_M4/Smoothie2.elf --baud 230400 -ex "set target-charset ASCII" -ex "set remotelogfile mri.log" -ex "set mem-inaccessible-by-default off" -ex "target remote /dev/tty.usbserial-FTDXR25Z"
+}}}

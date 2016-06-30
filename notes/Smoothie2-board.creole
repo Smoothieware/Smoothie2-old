@@ -2,6 +2,7 @@
 [[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2-board.creole#lpcscrypt | Using LPCScrypt to upload firmware to Smoothie2 via high speed USB]]\\
 [[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2-board.creole#lpc21isp | Using LPC21ISP to upload firmware to Smoothie2 via UART0]]\\
 [[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2-board.creole#j-link | Using J-Link hardware dongle to program and debug Smoothie2]]\\
+[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2-board.creole#debugging-with-mri | Debugging Smoothie2 with the MRI debug monitor]]\\
 
 
 
@@ -145,3 +146,51 @@ microcontroller and start it executing again from a clean reset.
 * load
 * monitor reset
 * continue
+
+
+
+==Debugging with MRI
+It is possible to link the MRI (Monitor for Remote Inspection) debug monitor into the Smoothie firmware and then use a
+secondary serial connection to debug Smoothie with GDB (GNU Debugger) if you don't have JTAG debug hardware.
+
+===Enabling MRI
+The Smoothie makefile must be modified to enable MRI and have it linked into the firmware.
+{{{
+--- a/src/makefile
++++ b/src/makefile
+@@ -5,7 +5,7 @@
+ BOARD ?= Smoothie2
+
+ # Set MRI_ENABLE to a value of 1 to enable the MRI debug monitor on the secondary UART.
+-MRI_ENABLE ?= 0
++MRI_ENABLE ?= 1
+
+ # Set MRI_BREAK_ON_INIT to a value of 0 if you don't want MRI to break before running global constructors.
+ MRI_BREAK_ON_INIT ?= 1
+}}}
+When switching between builds which enable and disable MRI, you should issue a {{{make clean}}}.
+
+===MRI Serial Connection
+You will need to connect a USB to serial adapter to the UART0 port on your Smoothie2 board to allow GDB to connect
+to MRI running on the LPC4337. I use a [[https://www.adafruit.com/products/70 | FTDI USB to Serial cable from Adafruit]]
+to make this connection. The diagram below shows how to attach the FTDI cable to the Smoothie2 board's UART0
+header correctly.\\
+{{https://raw.githubusercontent.com/Smoothieware/Smoothie2/master/notes/20151216-02.jpg}}\\
+
+===Launching GDB
+GDB should have been installed along with the GCC compiler and other GNU tools used to build the Smoothie2 source code.
+
+From a Terminal or Command Prompt that is able to build Smoothie2, you should set the current directory to the src/
+directory of the Smoothie project and use one of the following commands to launch GDB. The main difference between the
+operating systems is the type of name used for the serial port.  You will need to substitute the serial device
+designator appropriate for your setup.
+
+**Windows:**\\
+{{{
+arm-none-eabi-gdb LPC4330_M4\Smoothie2.elf --baud 230400 -ex "set target-charset ASCII" -ex "set remotelogfile mri.log" -ex "set mem-inaccessible-by-default off" -ex "target remote com1"
+}}}
+
+**OS X and Linux:**\\
+{{{
+arm-none-eabi-gdb LPC4330_M4/Smoothie2.elf --baud 230400 -ex "set target-charset ASCII" -ex "set remotelogfile mri.log" -ex "set mem-inaccessible-by-default off" -ex "target remote /dev/tty.usbserial-FTDXR25Z"
+}}}
