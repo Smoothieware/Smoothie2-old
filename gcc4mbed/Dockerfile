@@ -1,7 +1,7 @@
 #
-# Usage:   docker --tag shimaore/smoothie2 .
+# To build, from base directory:
+#  docker build --tag shimaore/smoothie2-gcc4mbed gcc4mbed
 #
-
 FROM debian:testing
 MAINTAINER stephane@shimaore.net
 
@@ -17,7 +17,7 @@ RUN \
     libncurses5:i386 \
     libstdc++6:i386
 
-COPY gcc4mbed/ /opt/smoothie/gcc4mbed
+COPY . /opt/smoothie/gcc4mbed
 WORKDIR /opt/smoothie/gcc4mbed
 
 RUN \
@@ -43,8 +43,3 @@ RUN \
     external/mbed/libraries/mbed/targets/hal/TARGET_STM \
     external/mbed/libraries/mbed/targets/hal/TARGET_Silicon_Labs \
     external/mbed/libraries/mbed/targets/hal/TARGET_WIZNET
-
-COPY src/ /opt/smoothie/src
-WORKDIR /opt/smoothie/src
-
-RUN PATH=$PATH:/opt/smoothie/gcc4mbed/gcc-arm-none-eabi/bin make
