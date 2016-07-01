@@ -102,7 +102,9 @@ public:
     template<typename T>
     void attach_us(T* tptr, void (T::*mptr)(void), timestamp_t t) {
         _function.attach(tptr, mptr);
+#ifndef BAMBINO210E
         setup(t);
+#endif
     }
 
     virtual ~Ticker() {
