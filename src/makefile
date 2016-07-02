@@ -10,6 +10,11 @@ MRI_ENABLE ?= 0
 # Set MRI_BREAK_ON_INIT to a value of 0 if you don't want MRI to break before running global constructors.
 MRI_BREAK_ON_INIT ?= 1
 
+# Can set OPTIMIZATION to 0 to disable compiler optimizations. This makes debugging easier but the code will run more
+# slowly. It may run so slowly that it fails to execute properly since some routines (ie. step tickers) are
+# time sensitive.
+# OPTIMIZATION        :=  0
+
 
 
 ########################################################################################################################
@@ -19,8 +24,7 @@ GCC4MBED_DIR        := ../gcc4mbed/
 NO_FLOAT_SCANF      := 1
 NO_FLOAT_PRINTF     := 0
 LIBS_PREFIX         := configdefault.o
-OPTIMIZATION        :=  0
-MRI_SEMIHOST_STDIO  ?= 0
+MRI_SEMIHOST_STDIO  := 0
 
 # Use C++11 features for the checksums
 DEFINES += -DCHECKSUM_USE_CPP
