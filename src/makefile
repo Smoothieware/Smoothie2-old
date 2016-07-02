@@ -21,7 +21,7 @@ NO_FLOAT_PRINTF     := 0
 LIBS_PREFIX         := configdefault.o
 GCC4MBED_TYPE       := Checked
 OPTIMIZATION        :=  0
-MMRI_SEMIHOST_STDIO ?= 0
+MRI_SEMIHOST_STDIO  ?= 0
 
 # Use C++11 features for the checksums
 DEFINES += -DCHECKSUM_USE_CPP
