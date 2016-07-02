@@ -19,9 +19,8 @@ GCC4MBED_DIR        := ../gcc4mbed/
 NO_FLOAT_SCANF      := 1
 NO_FLOAT_PRINTF     := 0
 LIBS_PREFIX         := configdefault.o
-GCC4MBED_TYPE       := Checked
 OPTIMIZATION        :=  0
-MMRI_SEMIHOST_STDIO ?= 0
+MRI_SEMIHOST_STDIO  ?= 0
 
 # Use C++11 features for the checksums
 DEFINES += -DCHECKSUM_USE_CPP
@@ -67,7 +66,10 @@ endif
 # Disable the secondary console if the MRI debug monitor is enabled so that the secondary UART can be used by
 # MRI instead.
 ifeq "$(MRI_ENABLE)" "1"
-DEFINES := $(subst -DSMOOTHIE_UART_SECONDARY_ENABLE=1,-DSMOOTHIE_UART_SECONDARY_ENABLE=0,$(DEFINES))
+DEFINES       := $(subst -DSMOOTHIE_UART_SECONDARY_ENABLE=1,-DSMOOTHIE_UART_SECONDARY_ENABLE=0,$(DEFINES))
+GCC4MBED_TYPE := Checked
+else
+GCC4MBED_TYPE := Release
 endif
 
 
