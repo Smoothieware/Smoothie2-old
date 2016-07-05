@@ -1,8 +1,8 @@
 # Select the board that you want to build Smoothie to run upon.
-# Can be one of: Smoothie2 (**default**)
+# Can be one of: Smoothie2Proto1 (**current default**)
 #                Bambino210E
 #                Bambino200E
-BOARD ?= Smoothie2
+BOARD ?= Smoothie2Proto1
 
 # Set MRI_ENABLE to a value of 1 to enable the MRI debug monitor on the secondary UART.
 MRI_ENABLE ?= 0
@@ -32,18 +32,19 @@ DEFINES += -DCHECKSUM_USE_CPP
 
 
 # Need to use a custom LPC4337 script for boards like the Smoothie2 hardware which use that chip instead of the LPC4330.
-ifeq "$(BOARD)" "Smoothie2"
+ifeq "$(BOARD)" "Smoothie2Proto1"
 LPC4330_M4_LSCRIPT := LPC4337.ld
 endif
 
 # Select the UART to be used for primary and secondary console (if any).
-ifeq "$(BOARD)" "Smoothie2"
+ifeq "$(BOARD)" "Smoothie2Proto1"
 DEFINES += -DSMOOTHIE_UART_PRIMARY_ENABLE=1
 DEFINES += -DSMOOTHIE_UART_PRIMARY_TX=P3_4
 DEFINES += -DSMOOTHIE_UART_PRIMARY_RX=P3_5
 DEFINES += -DSMOOTHIE_UART_SECONDARY_ENABLE=1
 DEFINES += -DSMOOTHIE_UART_SECONDARY_TX=P2_0
 DEFINES += -DSMOOTHIE_UART_SECONDARY_RX=P2_1
+DEFINES += -DTARGET_SMOOTHIE2_PROTO1
 MRI_UART ?= MRI_UART_TX_P2_0 MRI_UART_RX_P2_1 MRI_UART_BAUD=230400
 endif
 
@@ -54,6 +55,7 @@ DEFINES += -DSMOOTHIE_UART_PRIMARY_RX=P2_11
 DEFINES += -DSMOOTHIE_UART_SECONDARY_ENABLE=1
 DEFINES += -DSMOOTHIE_UART_SECONDARY_TX=P6_4
 DEFINES += -DSMOOTHIE_UART_SECONDARY_RX=P6_5
+DEFINES += -DTARGET_BAMBINO210E
 MRI_UART ?= MRI_UART_TX_P6_4 MRI_UART_RX_P6_5 MRI_UART_BAUD=230400
 endif
 
@@ -64,6 +66,7 @@ DEFINES += -DSMOOTHIE_UART_PRIMARY_RX=P6_5
 DEFINES += -DSMOOTHIE_UART_SECONDARY_ENABLE=1
 DEFINES += -DSMOOTHIE_UART_SECONDARY_TX=P5_6
 DEFINES += -DSMOOTHIE_UART_SECONDARY_RX=P1_14
+DEFINES += -DTARGET_BAMBINO200E
 MRI_UART ?= MRI_UART_TX_P5_6 MRI_UART_RX_P1_14 MRI_UART_BAUD=230400
 endif
 

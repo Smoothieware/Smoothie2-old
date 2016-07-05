@@ -1,8 +1,8 @@
-= Smoothie2 Board Programming/Debugging Notes
-[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2-board.creole#lpcscrypt | Using LPCScrypt to upload firmware to Smoothie2 via high speed USB]]\\
-[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2-board.creole#lpc21isp | Using LPC21ISP to upload firmware to Smoothie2 via UART0]]\\
-[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2-board.creole#j-link | Using J-Link hardware dongle to program and debug Smoothie2]]\\
-[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2-board.creole#debugging-with-mri | Debugging Smoothie2 with the MRI debug monitor]]\\
+= Smoothie2 Pro Proto1 Board Programming/Debugging Notes
+[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2Proto1-board.creole#lpcscrypt | Using LPCScrypt to upload firmware to Smoothie2 via high speed USB]]\\
+[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2Proto1-board.creole#lpc21isp | Using LPC21ISP to upload firmware to Smoothie2 via UART0]]\\
+[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2Proto1-board.creole#j-link | Using J-Link hardware dongle to program and debug Smoothie2]]\\
+[[https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2Proto1-board.creole#debugging-with-mri | Debugging Smoothie2 with the MRI debug monitor]]\\
 
 
 
@@ -159,7 +159,7 @@ The Smoothie makefile must be modified to enable MRI and have it linked into the
 --- a/src/makefile
 +++ b/src/makefile
 @@ -5,7 +5,7 @@
- BOARD ?= Smoothie2
+ BOARD ?= Smoothie2Proto1
 
  # Set MRI_ENABLE to a value of 1 to enable the MRI debug monitor on the secondary UART.
 -MRI_ENABLE ?= 0
