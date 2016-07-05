@@ -27,7 +27,7 @@ And finally compile the code
     make
 
 # Board Specific Programming/Debugging Notes
-* [Smoothie2 Boards](https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2-board.creole#smoothie2-board-programmingdebugging-notes)
+* [Smoothie2 Pro Proto1 Boards](https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2Proto1-board.creole#smoothie2-board-programmingdebugging-notes)
 * [Bambino210E Boards](https://github.com/Smoothieware/Smoothie2/blob/master/notes/Bambino210E-board.creole#bambino210e-board-programmingdebugging-notes)
 
 # TODO : 
