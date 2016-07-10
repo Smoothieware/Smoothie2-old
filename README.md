@@ -61,6 +61,8 @@ TODO functionality to port from v1 in more detail :
  * modules/tools/zprobe : Port ( could be quite easy )
  * modules/tools/simpleshell : Port
 
+ * The FPGA requires a SGPIO spi library
+ * The FPGA requires a way to flash a .bin to it over JTAG from the M4 
 
 Things that are broken during the port and should be added back as things progress ( some things might be missing here. I try to use the TOADDBACK label when commenting things so search for that too ) : 
 
