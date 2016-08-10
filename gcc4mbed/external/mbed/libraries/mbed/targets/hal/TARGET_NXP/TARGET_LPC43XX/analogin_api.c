@@ -14,6 +14,9 @@
  * limitations under the License.
  *
  * Ported to NXP LPC43XX by Micromint USA <support@micromint.com>
+ *
+ * CHANGE LOG:
+ * 10/8/2016 marcosfg - added pin names for adc only pins
  */
 #include "mbed_assert.h"
 #include "analogin_api.h"
