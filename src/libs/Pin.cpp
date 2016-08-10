@@ -28,10 +28,32 @@ Pin* Pin::from_string(std::string value){
     char* cn = NULL;
     valid= true;
 
+    //initialize adc only vars
+    adc_only = false;
+    adc_channel = 0xff;
+
+    //verify if it is an analog only pin
+    std::size_t found = value.find("adc");
+    if (found!=std::string::npos) adc_only = true;
+
+    if(adc_only)
+    {
+    	std::string channelStr = value.substr (4);
+    	cs = channelStr.c_str();
+    	adc_channel = strtol(cs, &cn, 10);
+
+    	PinName adc_pins[16] = {adc0_0,adc0_1,adc0_2,adc0_3,adc0_4,adc0_5,adc0_6,adc0_7,adc1_0,adc1_1,adc1_2,adc1_3,adc1_4,adc1_5,adc1_6,adc1_7};
+    	this->pinName = adc_pins[adc_channel];
+
+    	return this;
+    }
+
+
     // grab first integer as port. pointer to first non-digit goes in cn
-    port_number = strtol(cs, &cn, 10);
+    port_number = strtol(cs, &cn, 16); //allow hexadecimal portnumbes
+
     // if cn > cs then strtol read at least one digit
-    if ((cn > cs) && (port_number <= 7)){
+    if ((cn > cs) && (port_number <= 15)){
         // if the char after the first integer is a . then we should expect a pin index next
         if (*cn == '.'){
             // move pointer to first digit (hopefully) of pin index
@@ -45,6 +67,7 @@ Pin* Pin::from_string(std::string value){
             // Find the pin
             if( pins.count((port_number<<8)+pin) > 0 ){
                 this->mbed_pin = new DigitalInOut( pins[(port_number<<8)+pin] );
+                this->pinName = pins[(port_number<<8)+pin];
             }
 
             // if strtol read some numbers, cn will point to the first non-digit

@@ -25,6 +25,8 @@ class Adc {
 
         AnalogIn* analogin;
         // TOADDBACK ADC* adc;
+
+        int get_max_value() const { return 65536;}    //Assuming 16bit reading from mbed
 };
 
 

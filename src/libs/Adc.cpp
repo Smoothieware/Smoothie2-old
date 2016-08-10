@@ -19,12 +19,14 @@ using namespace std;
 // TODO : Having the same name is confusing, should change that
 
 Adc::Adc(){
-    this->analogin = new AnalogIn(P4_3);
+    //this->analogin = new AnalogIn(P4_3);
     // TOADDBACK this->adc = new ADC(1000, 1);
 }
 
 // Enables ADC on a given pin
 void Adc::enable_pin(Pin* pin){
+	PinName pin_name = this->_pin_to_pinname(pin);
+	this->analogin = new AnalogIn(pin_name);
     /* TOADDBACK PinName pin_name = this->_pin_to_pinname(pin);
     this->adc->burst(1);
     this->adc->setup(pin_name,1);
@@ -39,6 +41,7 @@ unsigned int Adc::read(Pin* pin){
 
 // Convert a smoothie Pin into a mBed Pin
 PinName Adc::_pin_to_pinname(Pin* pin){
+	return pin->getPinName();
     /* TOADDBACK if( pin->port == LPC_GPIO0 && pin->pin == 23 ){
         return p15;
     }else if( pin->port == LPC_GPIO0 && pin->pin == 24 ){
