@@ -407,7 +407,7 @@ int BurstADC::read(PinName pin) {
 	_adc_data[_pin_to_channel(pin)] &= ~(((uint32_t)0x01 << 31) | ((uint32_t)0x01 << 30));
 	//Return value
 	int pinData = ((_data_of_pin(pin) >> 6) & 0x3FF);
-	return pinData;
+	return (pinData << 6) | ((pinData >> 4) & 0x003F); // 10 bit;
 }
 
 //Return DONE flag of ADC on pin
