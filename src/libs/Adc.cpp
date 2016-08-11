@@ -59,7 +59,7 @@ void Adc::enable_pin(Pin* pin){
 
 	this->adc->burst(1);
 	this->adc->setup(pin_name, 1);
-	this->adc->interrupt_state(pin_name, 0);//TODO interrupt p
+	this->adc->interrupt_state(pin_name, 0);//TODO Find out what is wrong with interrupts
 }
 
 // Read the last value ( burst mode ) on a given pin

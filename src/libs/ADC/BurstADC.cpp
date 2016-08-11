@@ -331,6 +331,7 @@ void BurstADC::interrupt_state(PinName pin, int state) {
 	if (state == 1) {
 		adc->INTEN &= ~0x100;
 		adc->INTEN |= 1 << chan;
+		fprintf(stderr, "ADC Warning. Current Not supporting interrupts in Busrt mode\n");
 		/* Enable the ADC Interrupt */
 		NVIC_EnableIRQ((adc_number>0)?ADC1_IRQn:ADC0_IRQn);
 	} else {
