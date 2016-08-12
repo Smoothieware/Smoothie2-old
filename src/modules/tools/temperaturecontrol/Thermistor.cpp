@@ -124,7 +124,7 @@ void Thermistor::UpdateConfig(uint16_t module_checksum, uint16_t name_checksum)
 
     // Thermistor pin for ADC readings
     this->thermistor_pin.from_string(THEKERNEL->config->value(module_checksum, name_checksum, thermistor_pin_checksum )->required()->as_string());
-    // TOADDBACK THEKERNEL->adc->enable_pin(&thermistor_pin);
+    THEKERNEL->adc->enable_pin(&thermistor_pin);
 
     // specify the three Steinhart-Hart coefficients
     // specified as three comma separated floats, no spaces
@@ -251,7 +251,7 @@ void Thermistor::get_raw()
     }
 
     int adc_value= new_thermistor_reading();
-    const uint32_t max_adc_value= 0; // TOADDBACK THEKERNEL->adc->get_max_value();
+    const uint32_t max_adc_value= THEKERNEL->adc->get_max_value();
 
      // resistance of the thermistor in ohms
     float r = r2 / (((float)max_adc_value / adc_value) - 1.0F);
@@ -282,7 +282,7 @@ void Thermistor::get_raw()
 
 float Thermistor::adc_value_to_temperature(uint32_t adc_value)
 {
-    const uint32_t max_adc_value= 0; //TOADDBACK THEKERNEL->adc->get_max_value();
+    const uint32_t max_adc_value= THEKERNEL->adc->get_max_value();
     if ((adc_value >= max_adc_value) || (adc_value == 0))
         return infinityf();
 

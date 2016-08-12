@@ -2,7 +2,7 @@
 # Can be one of: Smoothie2Proto1 (**current default**)
 #                Bambino210E
 #                Bambino200E
-BOARD ?= Smoothie2Proto1
+BOARD ?= Bambino210E
 
 # Set MRI_ENABLE to a value of 1 to enable the MRI debug monitor on the secondary UART.
 MRI_ENABLE ?= 0
@@ -13,7 +13,7 @@ MRI_BREAK_ON_INIT ?= 1
 # Can set OPTIMIZATION to 0 to disable compiler optimizations. This makes debugging easier but the code will run more
 # slowly. It may run so slowly that it fails to execute properly since some routines (ie. step tickers) are
 # time sensitive.
-# OPTIMIZATION        :=  0
+OPTIMIZATION        :=  0
 
 
 
