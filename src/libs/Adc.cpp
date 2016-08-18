@@ -62,14 +62,14 @@ void Adc::enable_pin(Pin* pin){
 	this->adc->interrupt_state(pin_name, 0);//TODO Find out what is wrong with interrupts
 }
 
-
+/*
 // Read the last value ( burst mode ) on a given pin
 unsigned int Adc::read(Pin* pin){
 	return this->adc->read(this->_pin_to_pinname(pin));
 }
+*/
 
 
-/*
 //#define USE_MEDIAN_FILTER
 // Read the filtered value ( burst mode ) on a given pin
 unsigned int Adc::read(Pin *pin)
@@ -104,7 +104,7 @@ unsigned int Adc::read(Pin *pin)
 	ave_buf[channel][3]= ave_buf[channel][2];
 	ave_buf[channel][2]= ave_buf[channel][1];
 	ave_buf[channel][1]= ave_buf[channel][0];
-	ave_buf[channel][0]= sum >> OVERSAMPLE*2;
+	ave_buf[channel][0]= sum >> OVERSAMPLE;
 
 	unsigned int tValue =roundf((ave_buf[channel][0]+ave_buf[channel][1]+ave_buf[channel][2]+ave_buf[channel][3])/4.0F);
 
@@ -121,7 +121,7 @@ unsigned int Adc::read(Pin *pin)
 
 #endif
 }
-*/
+
 
 // Convert a smoothie Pin into a mBed Pin
 PinName Adc::_pin_to_pinname(Pin* pin){

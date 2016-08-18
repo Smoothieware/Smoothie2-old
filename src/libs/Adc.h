@@ -35,7 +35,7 @@ public:
 	void new_sample(int chan, uint32_t value);
 	// return the maximum ADC value, base is 12bits 4095.
 #ifdef OVERSAMPLE
-	int get_max_value() const { return 65535 << OVERSAMPLE;}
+	int get_max_value() const { return 1025 << OVERSAMPLE;}
 #else
 	int get_max_value() const { return 65535;}    //Assuming 16bit reading from mbed
 	//int get_max_value() const { return 4294967296;}    //Assuming 32bit reading from mbed
