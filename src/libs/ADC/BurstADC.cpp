@@ -123,6 +123,7 @@ void BurstADC::adcisr(void)
 
 	// Read status
 	stat = adc->STAT;
+
 	//Scan channels for over-run or done and update array
 	if (stat & 0x0101) _adc_data[0] = adc->DR[0];
 	if (stat & 0x0202) _adc_data[1] = adc->DR[1];
@@ -135,11 +136,13 @@ void BurstADC::adcisr(void)
 
 	// Channel that triggered interrupt
 	chan = (adc->GDR >> 24) & 0x07;
+
 	//User defined interrupt handlers
 	if (_adc_isr[chan] != NULL)
 		_adc_isr[chan](_adc_data[chan]);
 	if (_adc_g_isr != NULL)
 		_adc_g_isr(chan, _adc_data[chan]);
+
 
 	return;
 }

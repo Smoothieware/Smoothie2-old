@@ -42,7 +42,7 @@ void Adc::new_sample(int chan, uint32_t value)
 	if(chan < num_channels) {
 		memmove(&sample_buffers[chan][0], &sample_buffers[chan][1], sizeof(sample_buffers[0]) - sizeof(sample_buffers[0][0]));
 		//sample_buffers[chan][num_samples - 1] = (value >> 4) & 0xFFF; // the 12 bit ADC reading
-		sample_buffers[chan][num_samples - 1] = (value >> 6) & 0x3FF; // the 10 bit ADC reading
+		sample_buffers[chan][num_samples - 1] = value;
 	}
 }
 
@@ -62,10 +62,66 @@ void Adc::enable_pin(Pin* pin){
 	this->adc->interrupt_state(pin_name, 0);//TODO Find out what is wrong with interrupts
 }
 
+
 // Read the last value ( burst mode ) on a given pin
 unsigned int Adc::read(Pin* pin){
 	return this->adc->read(this->_pin_to_pinname(pin));
 }
+
+
+/*
+//#define USE_MEDIAN_FILTER
+// Read the filtered value ( burst mode ) on a given pin
+unsigned int Adc::read(Pin *pin)
+{
+	PinName p = this->_pin_to_pinname(pin);
+	int channel = adc->_pin_to_channel(p);
+	uint32_t value = this->adc->read(p);
+
+	new_sample(channel, value);
+
+	uint16_t median_buffer[num_samples];
+	// needs atomic access TODO maybe be able to use std::atomic here or some lockless mutex
+	__disable_irq();
+	memcpy(median_buffer, sample_buffers[channel], sizeof(median_buffer));
+	__enable_irq();
+
+#ifdef USE_MEDIAN_FILTER
+	// returns the median value of the last 8 samples
+	return median_buffer[quick_median(median_buffer, num_samples)];
+
+#elif defined(OVERSAMPLE)
+	// Oversample to get 2 extra bits of resolution
+	// weed out top and bottom worst values then oversample the rest
+	// put into a 4 element moving average and return the average of the last 4 oversampled readings
+	static uint16_t ave_buf[num_channels][4] =  { {0} };
+	std::sort(median_buffer, median_buffer + num_samples);
+	uint32_t sum = 0;
+	for (int i = num_samples / 4; i < (num_samples - (num_samples / 4)); ++i) {
+		sum += median_buffer[i];
+	}
+	// this slows down the rate of change a little bit
+	ave_buf[channel][3]= ave_buf[channel][2];
+	ave_buf[channel][2]= ave_buf[channel][1];
+	ave_buf[channel][1]= ave_buf[channel][0];
+	ave_buf[channel][0]= sum >> OVERSAMPLE*2;
+
+	unsigned int tValue =roundf((ave_buf[channel][0]+ave_buf[channel][1]+ave_buf[channel][2]+ave_buf[channel][3])/4.0F);
+
+	return tValue;
+
+#else
+	// sort the 8 readings and return the average of the middle 4
+	std::sort(median_buffer, median_buffer + num_samples);
+	int sum = 0;
+	for (int i = num_samples / 4; i < (num_samples - (num_samples / 4)); ++i) {
+		sum += median_buffer[i];
+	}
+	return sum / (num_samples / 2);
+
+#endif
+}
+*/
 
 // Convert a smoothie Pin into a mBed Pin
 PinName Adc::_pin_to_pinname(Pin* pin){

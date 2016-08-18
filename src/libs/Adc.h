@@ -19,6 +19,9 @@
 
 class Pin;
 
+// 2 bits means the 10bit ADC is 12 bits of resolution
+#define OVERSAMPLE 2
+
 class Adc {
 public:
 	Adc();
@@ -32,9 +35,9 @@ public:
 	void new_sample(int chan, uint32_t value);
 	// return the maximum ADC value, base is 12bits 4095.
 #ifdef OVERSAMPLE
-	int get_max_value() const { return 4095 << OVERSAMPLE;}
+	int get_max_value() const { return 65535 << OVERSAMPLE;}
 #else
-	int get_max_value() const { return 65536;}    //Assuming 16bit reading from mbed
+	int get_max_value() const { return 65535;}    //Assuming 16bit reading from mbed
 	//int get_max_value() const { return 4294967296;}    //Assuming 32bit reading from mbed
 #endif
 
