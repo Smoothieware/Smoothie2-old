@@ -40,7 +40,7 @@ StepTicker::StepTicker(){
     this->a_move_finished = false;
     this->do_move_finished = 0;
     this->unstep.reset();
-    this->set_frequency(100000);
+    this->set_frequency(10000);
     this->set_reset_delay(5);
     this->set_acceleration_ticks_per_second(1000);
     this->num_motors= 0;
