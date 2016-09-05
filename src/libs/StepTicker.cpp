@@ -157,7 +157,7 @@ void StepTicker::add_motor_to_active_list(StepperMotor* motor)
     bool enabled= active_motor.any(); // see if interrupt was previously enabled
     active_motor[motor->index]= 1;
     if(!enabled) {
-        this->step_timer->attach_us( this, &StepTicker::step_tick, this->period_us); 
+        this->step_timer->attach_us( this, &StepTicker::step_tick, this->period_us);
     }
 }
 

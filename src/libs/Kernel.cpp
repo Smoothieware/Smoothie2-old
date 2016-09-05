@@ -87,6 +87,12 @@ Kernel::Kernel(){
     this->grbl_mode= this->config->value( grbl_mode_checksum )->by_default(false)->as_bool();
     this->ok_per_line= this->config->value( ok_per_line_checksum )->by_default(true)->as_bool();
 
+    // Configure the step ticker
+    this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
+    float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(5)->as_number();
+    this->acceleration_ticks_per_second = THEKERNEL->config->value(acceleration_ticks_per_second_checksum)->by_default(1000)->as_number();
+
+
     this->step_ticker = new StepTicker();
 
     // Core modules

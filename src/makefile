@@ -13,7 +13,7 @@ MRI_BREAK_ON_INIT ?= 1
 # Can set OPTIMIZATION to 0 to disable compiler optimizations. This makes debugging easier but the code will run more
 # slowly. It may run so slowly that it fails to execute properly since some routines (ie. step tickers) are
 # time sensitive.
-OPTIMIZATION        :=  0
+#OPTIMIZATION        :=  0
 
 
 
