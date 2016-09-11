@@ -10,6 +10,11 @@
 
 #define THEKERNEL Kernel::instance
 
+//new bit
+//#define THECONVEYOR THEKERNEL->conveyor
+//#define THEROBOT THEKERNEL->robot
+//end of new bit
+
 #include "Module.h"
 #include <array>
 #include <vector>

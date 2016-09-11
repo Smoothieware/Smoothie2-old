@@ -58,6 +58,45 @@ Conveyor::Conveyor(){
     flush = false;
     halted= false;
 }
+// Wait for the queue to be empty and for all the jobs to finish in step ticker
+void Conveyor::wait_for_idle()
+{
+    // wait for the job queue to empty, this means cycling everything on the block queue into the job queue
+    // forcing them to be jobs
+    running = false; // stops on_idle calling check_queue
+    while (!queue.is_empty()) {
+//        check_queue(true); // forces queue to be made available to stepticker
+        THEKERNEL->call_event(ON_IDLE, this);
+    }
+
+    // now we wait for all motors to stop moving
+    while(!is_idle()) {
+        THEKERNEL->call_event(ON_IDLE, this);
+    }
+    running = true;
+    // returning now means that everything has totally finished
+}
+
+
+// see if we are idle
+// this checks the block queue is empty, and that the step queue is empty and
+// checks that all motors are no longer moving
+//bool Conveyor::is_idle() const
+bool Conveyor::is_idle()
+{
+    if(queue.is_empty()) {
+
+//    	for (size_t i = 0; i < THEKERNEL->robot->actuators.size(); i++) {
+//    	        if(THEKERNEL->robot->actuators[i]->moving) return false;
+//    	}
+//    	for(auto &a : THEKERNEL->robot->actuators) {
+//            if(a->is_moving()) return false;
+//        }
+        return true;
+    }
+
+    return false;
+}
 
 void Conveyor::on_module_loaded(){
     register_for_event(ON_IDLE);

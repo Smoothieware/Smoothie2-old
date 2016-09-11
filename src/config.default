@@ -1,42 +1,125 @@
 # this file is proprietary. do not distribute.
 # Switch module for fan control
-switch.first.enable                            true             #
-switch.first.input_on_command                  M106             #
-switch.first.input_off_command                 M107             #
-switch.first.output_pin                        2.8              #
-switch.first.output_type                       digital          # pwm output settable with S parameter in the input_on_comand
+switch.first.enable                             false           #
+switch.first.input_on_command                   M106            #
+switch.first.input_off_command                  M107            #
+switch.first.output_pin                         4.1             #
+switch.first.output_type                        pwm             # pwm output settable with S parameter in the input_on_comand
 
-switch.second.enable                            true             #
-switch.second.input_on_command                  M116             #
-switch.second.input_off_command                 M117             #
-switch.second.output_pin                        2.9              #
-switch.second.output_type                       pwm             # pwm output settable with S parameter in the input_on_comand
+switch.second.enable                            false           #
+switch.second.input_on_command                  M116            #
+switch.second.input_off_command                 M117            #
+switch.second.output_pin                        7.7             #
+switch.second.output_type                       digital         # pwm output settable with S parameter in the input_on_comand
 
 microseconds_per_step_pulse                     5
 
-alpha_step_pin    1.7
-beta_step_pin     1.8
+# Arm solution configuration : Rotatable Delta robot. Translates mm positions into stepper positions
+arm_solution                                    rotary_delta   # selects the delta arm solution
 
+delta_e                                         131.636        # End effector length, triangle side length in mm
+delta_f                                         190.526        # Base length, triangle side length in mm
+delta_re                                        270.000        # Carbon rod length
+delta_rf                                        90.000         # Servo horn length
 
-junction_deviation 0.05
-acceleration 100
+delta_z_offset                                  268.0          # Distance from big pulley shaft to table/bed
+delta_ee_offs                                   15.000         # Ball joint plane to bottom of end effector surface
+delta_tool_offset                               30.500         # Distance between end effector ball joint plane and tip of tool (PnP)
 
-# Hotend temperature control configuration
-temperature_control.hotend.enable            true             # Whether to activate this ( "hotend" ) module at all.
-                                                              # All configuration is ignored if false.
-temperature_control.hotend.thermistor_pin    adc.5             # Pin for the thermistor to read
-temperature_control.hotend.heater_pin        2.7              # Pin that controls the heater, set to nc if a readonly thermistor is being defined
-temperature_control.hotend.thermistor        EPCOS100K        # see http://smoothieware.org/temperaturecontrol#toc5
-#temperature_control.hotend.beta             4066             # or set the beta value
-temperature_control.hotend.set_m_code        104              #
-temperature_control.hotend.set_and_wait_m_code 109            #
-temperature_control.hotend.designator        T                #
-#temperature_control.hotend.max_temp         300              # Set maximum temperature - Will prevent heating above 300 by default
-#temperature_control.hotend.min_temp         0                # Set minimum temperature - Will prevent heating below if set
+delta_mirror_xy                                 true           # true for firepick
 
-#temperature_control.hotend.p_factor         13.7             # permanently set the PID values after an auto pid
-#temperature_control.hotend.i_factor         0.097            #
-#temperature_control.hotend.d_factor         24               #
+# For a FirePick Rotary Delta, the steps per degree are calculated as:
+#
+# (1) First determine the circumference of the big pulley, which has a smooth surface, and calculate the 'teeth it would have'
+# (2) Determine the GT2 belt thickness and tooth depth
+# (3) Calculate the ACTUAL big pulley circumference taking into account that the GT2 belt affects this as
+#     it rests on the big pulley and not into teeth cut into the pulley, the formula is:
+#     BIG_PULLEY_CIRCUMFERENCE = BIG_PULLEY_TEETH * TOOTH_SPACING + (BELT_THICKNESS - TOOTH_DEPTH)*6.283185
+# (4) Calculate the ACTUAL small pulley circumference taking into account that the GT2 belt affects this as
+#     rests into the small pulley as it has teeth cut into the pulley, the formula is:
+#     SMALL_PULLEY_CIRCUMFERENCE = SMALL_PULLEY_TEETH * TOOTH_SPACING
+# (5) Now determine the pulley reduction which is:
+#     PULLEY_REDUCTION = BIG_PULLEY_CIRCUMFERENCE / SMALL_PULLEY_CIRCUMFERENCE
+# (6) Finally, given the number of steps a stepper motor needs for a full 360 degree rotation, and the number of microsteps your
+#     stepper motor driver chip is set for, you can calculate the STEPS_PER_MM for each axis, which for a Rotary Delta, are the same:
+#    [ALPHA/BETA/GAMMA]_STEPS_PER_MM = (XYZ_STEPS_PER_ROTATION*XYZ_MICROSTEPS*PULLEY_REDUCTION)/360
+#    e.g. a FirePick Delta mechanism, we can calulate:
+#    BIG_PULLEY_CIRCUMFERENCE = 150 * 2 + (1.49 - 0.74) * 6.283185 = 304.712389
+#    SMALL_PULLEY_CIRCUMFERENCE = 16 * 2 = 32
+#    PULLEY_REDUCTION = 304.712389 / 32 = 9.52226215
+#    For a 0.9 degree stepper motor and an a4988   driver set for  16 microsteps = (400 * 16  * 9.52226215)/360 =  169.2846604
+#    For a 1.8 degree stepper motor and an a4988   driver set for  16 microsteps = (200 * 16  * 9.52226215)/360 =   84.6423302
+#    For a 0.9 degree stepper motor and an drv8825 driver set for  32 microsteps = (400 * 32  * 9.52226215)/360 =  338.5693208
+#    For a 1.8 degree stepper motor and an drv8825 driver set for  32 microsteps = (200 * 32  * 9.52226215)/360 =  169.2846604
+#    For a 0.9 degree stepper motor and an TMC2130 driver set for 256 microsteps = (400 * 256 * 9.52226215)/360 = 2708.554567
+#    For a 1.8 degree stepper motor and an TMC2130 driver set for 256 microsteps = (200 * 256 * 9.52226215)/360 = 1354.277284
 
-#temperature_control.hotend.max_pwm          64               # max pwm, 64 is a good value if driving a 12v resistor with 24v.
+alpha_steps_per_mm                           2708.554567      # Steps per mm for alpha stepper
+beta_steps_per_mm                            2708.554567      # Steps per mm for beta stepper
+gamma_steps_per_mm                           2708.554567      # Steps per mm for gamma stepper
 
+# Stepper module pins ( ports, and pin numbers, appending "!" to the number will invert a pin )
+alpha_step_pin                               5.0              # Pin for alpha stepper step signal
+alpha_dir_pin                                6.12             # Pin for alpha stepper direction
+alpha_en_pin                                 4.10             # Pin for alpha enable pin
+alpha_current                                1.5              # X stepper motor current
+alpha_max_rate                               30000.0          # mm/min
+
+beta_step_pin                                5.7              # Pin for beta stepper step signal
+beta_dir_pin                                 5.5              # Pin for beta stepper direction
+beta_en_pin                                  7.6              # Pin for beta enable
+beta_current                                 1.5              # Y stepper motor current
+beta_max_rate                                30000.0          # mm/min
+
+gamma_step_pin                               4.0              # Pin for gamma stepper step signal
+gamma_dir_pin                                1.7              # Pin for gamma stepper direction
+gamma_en_pin                                 6.9              # Pin for gamma enable
+gamma_current                                1.5              # Z stepper motor current
+gamma_max_rate                               300.0            # mm/min
+
+junction_deviation                           0.05m
+acceleration                                 100
+
+# Endstops
+endstops_enable                              true             # the endstop module is enabled by default and can be disabled here
+rdelta_homing                                 true             # forces all three axis to home a the same time regardless of
+                                                              # what is specified in G28
+alpha_min_endstop                            7.4^               #
+alpha_max_endstop                            7.7^             # add ! to invert pullup if switch is NO to ground
+alpha_homing_direction                       home_to_max      # Home up
+alpha_max                                    0                #
+beta_min_endstop                             7.5^             #
+beta_max_endstop                             4.3^             #
+beta_homing_direction                        home_to_max      #
+beta_max                                     0                #
+gamma_min_endstop                            4.1^             #
+gamma_max_endstop                            4.4^             #
+gamma_homing_direction                       home_to_max      #
+gamma_max                                    300              #
+
+alpha_fast_homing_rate_mm_s                  200              # homing feedrates in mm/second
+beta_fast_homing_rate_mm_s                   200              #
+gamma_fast_homing_rate_mm_s                  200              #
+alpha_slow_homing_rate_mm_s                  20               #
+beta_slow_homing_rate_mm_s                   20               #
+gamma_slow_homing_rate_mm_s                  20
+
+alpha_homing_retract_mm                      5                # retract/bounce distance after homing in mm
+beta_homing_retract_mm                       5                #
+gamma_homing_retract_mm                      5                #
+
+alpha_trim                                   0                # software trim for alpha stepper endstop (in mm)
+beta_trim                                    0                # software trim for beta stepper endstop (in mm)
+gamma_trim                                   0                # software trim for gamma stepper endstop (in mm)
+
+# optional Z probe
+zprobe.enable                                true            # set to true to enable a zprobe
+zprobe.probe_pin                             4.4!^           # pin probe is attached to if NC remove the !
+zprobe.slow_feedrate                         5                # mm/sec probe feed rate
+#zprobe.debounce_count                       100              # set if noisy
+zprobe.fast_feedrate                         100              # move feedrate mm/sec
+zprobe.probe_height                          15               # how much above bed to start probe
+
+# DistanceProbes
+distanceprobes_enable				true
+rdelta_homing                                 true             # forces all three axis to home a the same time regardless of

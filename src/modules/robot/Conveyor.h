@@ -22,7 +22,8 @@ class Conveyor : public Module
 {
 public:
     Conveyor();
-
+    void wait_for_idle();
+    bool is_idle() ; //const;
     void on_module_loaded(void);
     void on_idle(void *);
     void on_main_loop(void *);
@@ -49,7 +50,7 @@ public:
 
 private:
     typedef HeapRing<Block> Queue_t;
-
+    void check_queue(bool force= false);
     Queue_t queue;  // Queue of Blocks
     volatile unsigned int gc_pending;
     float current_feedrate{0}; // actual nominal feedrate that current block is running at in mm/sec
