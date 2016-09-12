@@ -29,6 +29,8 @@ MRI_SEMIHOST_STDIO  := 0
 # Use C++11 features for the checksums
 DEFINES += -DCHECKSUM_USE_CPP
 
+
+
 # Need to use a custom LPC4337 script for boards like the Smoothie2 hardware which use that chip instead of the LPC4330.
 ifeq "$(BOARD)" "Smoothie2Proto1"
 LPC4330_M4_LSCRIPT := LPC4337.ld
