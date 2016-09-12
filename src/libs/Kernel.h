@@ -15,11 +15,6 @@
 //#define THEROBOT THEKERNEL->robot
 //end of new bit
 
-#include "Module.h"
-#include <array>
-#include <vector>
-#include <string>
-
 //Module manager
 class Config;
 class Module;
