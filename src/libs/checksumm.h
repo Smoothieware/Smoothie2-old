@@ -30,7 +30,7 @@
    Keeping both versions here: the active C version and the C++ version
    that we should switch to later if newer compilers do the required constant
    folding (maybe there are optimization flags to help here.)
- */
+*/
 #ifdef CHECKSUM_USE_CPP
 
 #include <type_traits>
