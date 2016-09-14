@@ -133,7 +133,7 @@ bool ThreePointStrategy::handleGcode(Gcode *gcode)
 
         } else if( gcode->g == 32 ) { // three point probe
             // first wait for an empty queue i.e. no moves left
-            THEKERNEL->conveyor->wait_for_idle();
+            THEKERNEL->conveyor->wait_for_empty_queue();
 
              // clear any existing plane and compensation
             delete this->plane;
@@ -278,8 +278,8 @@ bool ThreePointStrategy::doProbing(StreamOutput *stream)
     // TODO this needs to be configurable to use min z or probe
 
     // find bed via probe
-    float mm;
-    if(!zprobe->run_probe(mm)) return false;
+    int s;
+    if(!zprobe->run_probe(s)) return false;
 
     // TODO if using probe then we probably need to set Z to 0 at first probe point, but take into account probe offset from head
     THEKERNEL->robot->reset_axis_position(std::get<Z_AXIS>(this->probe_offsets), Z_AXIS);
@@ -307,8 +307,8 @@ bool ThreePointStrategy::doProbing(StreamOutput *stream)
     // define the plane
     delete this->plane;
     // check tolerance level here default 0.03mm
-    auto mmx = std::minmax({v[0][2], v[1][2], v[2][2]});
-    if((mmx.second - mmx.first) <= this->tolerance) {
+    auto mm = std::minmax({v[0][2], v[1][2], v[2][2]});
+    if((mm.second - mm.first) <= this->tolerance) {
         this->plane= nullptr; // plane is flat no need to do anything
         stream->printf("DEBUG: flat plane\n");
         // clear the compensationTransform in robot

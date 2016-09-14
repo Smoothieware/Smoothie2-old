@@ -6,11 +6,9 @@
 #include "SwitchPool.h"
 #include "TemperatureControlPool.h"
 #include "Endstops.h"
-#include "DistanceProbes.h"
 #include "Laser.h"
 #include "Config.h"
 #include "StreamOutputPool.h"
-#include "ZProbe.h"
 
 DigitalOut leds[4] = {
 		DigitalOut(LED1),
@@ -32,8 +30,6 @@ int main() {
 	// Create and add main modules
 	kernel->add_module( new Endstops() );
 	kernel->add_module( new Laser() );
-	kernel->add_module( new DistanceProbes() );
-	kernel->add_module( new ZProbe() );
 
 	// Create all Switch modules
 	SwitchPool *sp= new SwitchPool();

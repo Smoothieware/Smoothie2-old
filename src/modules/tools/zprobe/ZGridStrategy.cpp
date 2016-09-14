@@ -100,9 +100,10 @@
 #include "ZProbe.h"
 #include "libs/FileStream.h"
 #include "nuts_bolts.h"
+#include "platform_memory.h"
+#include "MemoryPool.h"
 #include "libs/utils.h"
 
-#include <malloc.h>
 #include <string>
 #include <algorithm>
 #include <cstdlib>
@@ -150,8 +151,7 @@ ZGridStrategy::ZGridStrategy(ZProbe *zprobe) : LevelingStrategy(zprobe)
 ZGridStrategy::~ZGridStrategy()
 {
     // Free program memory for the pData grid
-    //if(this->pData != nullptr) AHB0.dealloc(this->pData);
-	if(this->pData != nullptr) free(this->pData);
+    if(this->pData != nullptr) AHB0.dealloc(this->pData);
 }
 
 bool ZGridStrategy::handleConfig()
@@ -210,12 +210,10 @@ void ZGridStrategy::calcConfig()
     this->bed_div_y = this->bed_y / float(this->numCols-1);
 
     // Ensure free program memory for the pData grid
-    //if(this->pData != nullptr) AHB0.dealloc(this->pData);
-    if(this->pData != nullptr) free(this->pData);
+    if(this->pData != nullptr) AHB0.dealloc(this->pData);
 
     // Allocate program memory for the pData grid
-    //this->pData = (float *)AHB0.alloc(probe_points * sizeof(float));
-    this->pData = (float *)malloc(probe_points * sizeof(float));
+    this->pData = (float *)AHB0.alloc(probe_points * sizeof(float));
 }
 
 bool ZGridStrategy::handleGcode(Gcode *gcode)
@@ -240,7 +238,7 @@ bool ZGridStrategy::handleGcode(Gcode *gcode)
 
         } else if( gcode->g == 32 ) { //run probe
             // first wait for an empty queue i.e. no moves left
-            THEKERNEL->conveyor->wait_for_idle();
+            THEKERNEL->conveyor->wait_for_empty_queue();
 
             this->setAdjustFunction(false); // Disable leveling code
             if(!doProbing(gcode->stream)) {
