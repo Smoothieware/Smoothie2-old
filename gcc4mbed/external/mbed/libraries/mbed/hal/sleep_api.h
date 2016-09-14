@@ -18,6 +18,9 @@
 
 #include "device.h"
 
+
+#undef DEVICE_SLEEP  //TODO THIS IS REQUIRED AS SLEEP CONFLICTS WITH OTHER DEFINITION OF SLEEP
+
 #if DEVICE_SLEEP
 
 #ifdef __cplusplus
