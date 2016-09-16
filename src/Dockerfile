@@ -1,7 +1,7 @@
 #
 # To build, from base directory:
 #
-#   docker --tag shimaore/smoothie2 src/
+#   docker build --tag shimaore/smoothie2 src/
 #
 # To export the binary:
 #
