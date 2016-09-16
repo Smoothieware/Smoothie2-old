@@ -12,14 +12,14 @@ the Bambino210E. To switch it to targeting your Bambino210E you need to make the
 --- a/src/makefile
 +++ b/src/makefile
 @@ -14,7 +14,7 @@ DEFINES += -DCHECKSUM_USE_CPP
- # Can be one of: Smoothie2 (**default**)
+ # Can be one of: Smoothie2Proto1 (**current default**)
  #                Bambino210E
  #                Bambino200E
--BOARD ?= Smoothie2
+-BOARD ?= Smoothie2Proto1
 +BOARD ?= Bambino210E
  
  # Need to use a custom LPC4337 script for boards like the Smoothie2 hardware which use that chip instead of the LPC4330
- ifeq "$(BOARD)" "Smoothie2"
+ ifeq "$(BOARD)" "Smoothie2Proto1"
 }}}
 
 

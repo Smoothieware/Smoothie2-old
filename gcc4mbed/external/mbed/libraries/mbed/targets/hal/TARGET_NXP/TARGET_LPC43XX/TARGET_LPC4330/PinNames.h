@@ -12,6 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * CHANGE LOG:
+ * 10/8/2016 marcosfg - added pin names for adc only pins
  */
 #ifndef MBED_PINNAMES_H
 #define MBED_PINNAMES_H
@@ -29,6 +32,7 @@ typedef enum {
 
 #define PORT_SHIFT  5
 #define NO_GPIO     15
+#define NO_PORT     0xFF
 
 // On the LPC43xx the MCU pin name and the GPIO pin name are not the same.
 // Encode SCU and GPIO offsets as a pin identifier
@@ -663,6 +667,23 @@ typedef enum {
     DAC0 = P4_4,      // J8-6*    J8-6*   S3-5    S3-5
                       // (*)  if DAC0 is configured, ADC4 is not available
                       // (**) ADC5 requires JP2 mod
+
+	adc0_0 = MBED_PIN(NO_PORT, 0, NO_GPIO, 0),
+	adc0_1 = MBED_PIN(NO_PORT, 1, NO_GPIO, 0),
+	adc0_2 = MBED_PIN(NO_PORT, 2, NO_GPIO, 0),
+	adc0_3 = MBED_PIN(NO_PORT, 3, NO_GPIO, 0),
+	adc0_4 = MBED_PIN(NO_PORT, 4, NO_GPIO, 0),
+	adc0_5 = MBED_PIN(NO_PORT, 5, NO_GPIO, 0),
+	adc0_6 = MBED_PIN(NO_PORT, 6, NO_GPIO, 0),
+	adc0_7 = MBED_PIN(NO_PORT, 7, NO_GPIO, 0),
+	adc1_0 = MBED_PIN(NO_PORT, 8, NO_GPIO, 0),
+	adc1_1 = MBED_PIN(NO_PORT, 9, NO_GPIO, 0),
+	adc1_2 = MBED_PIN(NO_PORT, 10, NO_GPIO, 0),
+	adc1_3 = MBED_PIN(NO_PORT, 11, NO_GPIO, 0),
+	adc1_4 = MBED_PIN(NO_PORT, 12, NO_GPIO, 0),
+	adc1_5 = MBED_PIN(NO_PORT, 13, NO_GPIO, 0),
+	adc1_6 = MBED_PIN(NO_PORT, 14, NO_GPIO, 0),
+	adc1_7 = MBED_PIN(NO_PORT, 15, NO_GPIO, 0),
 
     // USB pins
     //                   210E    210     200E    200

@@ -13,3 +13,9 @@
 
 # OS specific files
 .DS_Store
+
+
+#eclipse project files
+.cproject
+.project
+

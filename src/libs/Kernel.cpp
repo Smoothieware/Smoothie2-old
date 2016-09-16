@@ -10,7 +10,7 @@
 #include "libs/Config.h"
 #include "libs/nuts_bolts.h"
 #include "libs/SlowTicker.h"
-//#include "libs/Adc.h"
+#include "libs/Adc.h"
 #include "libs/StreamOutputPool.h"
 //#include <mri.h>
 #include "checksumm.h"
@@ -75,7 +75,7 @@ Kernel::Kernel(){
     this->config->config_cache_load();
 
     // ADC reading
-    //this->adc = new Adc();
+    this->adc = new Adc();
 
     // For slow repeteative tasks
     this->add_module( this->slow_ticker = new SlowTicker());
