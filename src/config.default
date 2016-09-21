@@ -180,12 +180,12 @@ gamma_max                                    200              #
 #beta_limit_enable                           false            # set to true to enable Y min and max limit switches
 #gamma_limit_enable                          false            # set to true to enable Z min and max limit switches
 
-alpha_fast_homing_rate_mm_s                  50               # feedrates in mm/second
-beta_fast_homing_rate_mm_s                   50               # "
-gamma_fast_homing_rate_mm_s                  4                # "
-alpha_slow_homing_rate_mm_s                  25               # "
-beta_slow_homing_rate_mm_s                   25               # "
-gamma_slow_homing_rate_mm_s                  2                # "
+alpha_fast_homing_rate_mm_s                  500               # feedrates in mm/second
+beta_fast_homing_rate_mm_s                   500               # "
+gamma_fast_homing_rate_mm_s                  40                # "
+alpha_slow_homing_rate_mm_s                  250               # "
+beta_slow_homing_rate_mm_s                   250               # "
+gamma_slow_homing_rate_mm_s                  20                # "
 
 alpha_homing_retract_mm                      5                # distance in mm
 beta_homing_retract_mm                       5                # "
