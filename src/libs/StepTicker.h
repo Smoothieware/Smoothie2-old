@@ -49,10 +49,6 @@ class StepTicker{
         void start();
 
         friend class StepperMotor;
-    
-        LPC_TIMER_T* stepTimer;
-		LPC_TIMER_T* unstepTimer;
-		LPC_TIMER_T* accelerationTimer;
 
         // TOADDBACK was private
         volatile uint32_t tick_cnt;
