@@ -49,12 +49,13 @@ class StepTicker{
         void start();
 
         friend class StepperMotor;
-    
+
         // TOADDBACK was private
         volatile uint32_t tick_cnt;
         uint32_t period_us;
         uint32_t reset_delay_us;
     private:
+
         float frequency;
         uint32_t acceleration_period_us;
         std::vector<std::function<void(void)>> acceleration_tick_handlers;
@@ -64,11 +65,6 @@ class StepTicker{
         std::atomic_uchar do_move_finished;
         uint8_t num_motors;
         volatile bool a_move_finished;
-
-        Ticker* step_timer;
-        Ticker* acceleration_timer;
-        Timeout* unstep_timer;
-
 
 };
 

@@ -32,9 +32,40 @@ StepTicker* StepTicker::global_step_ticker;
 StepTicker::StepTicker(){
     StepTicker::global_step_ticker = this;
 
-    this->step_timer = new Ticker();
-    this->acceleration_timer = new Ticker();
-    this->unstep_timer = new Timeout(); 
+    uint32_t PCLK = SystemCoreClock;
+    uint32_t prescale = PCLK / 10000000;
+
+    /* Enable timer 0 clock and reset it */
+    LPC_CCU1->CLKCCU[CLK_MX_TIMER0].CFG |= 1;
+    LPC_RGU->RESET_CTRL1 = 1 << (RGU_TIMER0_RST & 31);	//Trigger a peripheral reset for the timer
+    while (!(LPC_RGU->RESET_ACTIVE_STATUS1 & (1 << (RGU_TIMER0_RST & 31)))){}
+    /* Configure Timer 0 */
+    LPC_TIMER0->CTCR = 0x0;    // timer mode
+	LPC_TIMER0->TCR = 0;    // Disable interrupt
+	LPC_TIMER0->PR = prescale - 1;
+	LPC_TIMER0->MR[0] = 10000000;    // Initial dummy value for Match Register
+	LPC_TIMER0->MCR |= 3;    // Match on MR0, reset on MR0
+	NVIC_SetPriority(TIMER0_IRQn,0);
+
+	/* Enable timer 1 clock and reset it */
+	LPC_CCU1->CLKCCU[CLK_MX_TIMER1].CFG |= 1;
+	LPC_RGU->RESET_CTRL1 = 1 << (RGU_TIMER1_RST & 31);	//Trigger a peripheral reset for the timer
+	while (!(LPC_RGU->RESET_ACTIVE_STATUS1 & (1 << (RGU_TIMER1_RST & 31)))){}
+	/* Configure Timer 0 */
+	LPC_TIMER1->CTCR = 0x0;    // timer mode
+	LPC_TIMER1->TCR = 0;    // Disable interrupt
+	LPC_TIMER1->PR = prescale - 1;
+	LPC_TIMER1->MR[0] = 10000000;    // Initial dummy value for Match Register
+	LPC_TIMER1->MCR |= 5;    // match on Mr0, stop on match
+
+	//Configure RIT Timer for 1ms acceleration ticks
+	LPC_CCU1->CLKCCU[CLK_MX_RITIMER].CFG = 0x07;
+	LPC_RITIMER->COMPVAL = 0xFFFFFFFF;
+	LPC_RITIMER->MASK  = 0x00000000;
+	LPC_RITIMER->CTRL  = 0x0C;
+	LPC_RITIMER->COUNTER   = 0x00000000;
+	LPC_RITIMER->COMPVAL = (uint32_t)(((SystemCoreClock / 1000000L) * 1000)-1); // 1ms period
+	LPC_RITIMER->CTRL |= 0; //disable RIT Timer
 
     // Default start values
     this->a_move_finished = false;
@@ -46,24 +77,37 @@ StepTicker::StepTicker(){
     this->num_motors= 0;
     this->active_motor.reset();
     this->tick_cnt= 0;
+
+    /* Enable Timers IRQ */
+	NVIC_EnableIRQ(TIMER1_IRQn);     // Enable interrupt handler
+	NVIC_EnableIRQ(RITIMER_IRQn);
+
 }
 
 StepTicker::~StepTicker() {
 }
 
 // Called when everything is setup and interrupts can start
-void StepTicker::start() {}
+void StepTicker::start() {
+
+}
 
 // Set the base stepping frequency
 void StepTicker::set_frequency( float frequency ){
     this->frequency = frequency;
     this->period_us = (int)lrint(1000000/frequency);
-    //this->step_timer->attach_us( this, &StepTicker::step_tick, this->period_us); 
+
+    /* Update Timer 0 Match register and reset timer */
+    LPC_TIMER0->MR[0] = this->period_us;
+    LPC_TIMER0->TCR = 3;  // Reset
+    LPC_TIMER0->TCR = 1; // start
 }
 
 // Set the reset delay
 void StepTicker::set_reset_delay( float microseconds ){
     this->reset_delay_us = (int)lrint(microseconds);
+    /* Update Timer 1 Match register */
+    LPC_TIMER1->MR[0] = this->reset_delay_us;
 }
 
 // This is the number of acceleration ticks per second
@@ -74,8 +118,16 @@ void StepTicker::set_acceleration_ticks_per_second(uint32_t acceleration_ticks_p
 
 // Synchronize the acceleration timer, and optionally schedule it to fire now
 void StepTicker::synchronize_acceleration(bool fire_now) {
-    if( fire_now ){ this->acceleration_tick(); }
-    this->acceleration_timer->attach_us( this, &StepTicker::acceleration_tick, this->acceleration_period_us); 
+	LPC_RITIMER->COUNTER = 0;
+	if(fire_now){
+		NVIC_SetPendingIRQ(RITIMER_IRQn);
+	}else{
+		if(NVIC_GetPendingIRQ(RITIMER_IRQn)) {
+			// clear pending interrupt so it does not interrupt immediately
+			LPC_RITIMER->CTRL |= 1L; // also clear the interrupt in case it fired
+			NVIC_ClearPendingIRQ(RITIMER_IRQn);
+		}
+	}
 }
 
 
@@ -99,7 +151,33 @@ inline void StepTicker::unstep_tick(){
     this->unstep.reset();
 }
 
-// run in RIT lower priority than PendSV
+// Acceleration timer interrupt handler
+extern "C" void RITIMER_IRQHandler (void)
+{
+	LPC_RITIMER->CTRL |= 1L;
+	//LPC_TIMER2->IR |= 1 << 0;
+	StepTicker::global_step_ticker->acceleration_tick();
+	//NVIC_ClearPendingIRQ(TIMER2_IRQn);
+	LPC_RITIMER->COUNTER = 0;
+}
+
+// Unstep timer interrupt handler
+extern "C" void TIMER1_IRQHandler (void)
+{
+	LPC_TIMER1->IR |= 1 << 0;
+	StepTicker::global_step_ticker->unstep_tick();
+	NVIC_ClearPendingIRQ(TIMER1_IRQn);
+}
+
+// Step timer interrupt handler
+extern "C" void TIMER0_IRQHandler (void)
+{
+	LPC_TIMER0->IR |= 1 << 0;
+	StepTicker::global_step_ticker->step_tick();
+	NVIC_ClearPendingIRQ(TIMER0_IRQn);
+}
+
+// RIT Timeer interrupt handler
 void  StepTicker::acceleration_tick() {
     // call registered acceleration handlers
     for (size_t i = 0; i < acceleration_tick_handlers.size(); ++i) {
@@ -125,7 +203,9 @@ void StepTicker::step_tick(void){
     // right now it takes about 3-4us but if the unstep were near 10uS or greater it would be an issue
     // also it takes at least 2us to get here so even when set to 1us pulse width it will still be about 3us
     if( this->unstep.any()){
-        this->unstep_timer->attach_us( this, &StepTicker::unstep_tick, this->reset_delay_us); 
+    	/* Start Unstep timer (Timer 1) */
+    	LPC_TIMER1->TCR = 0x3;  // reset
+    	LPC_TIMER1->TCR = 1; // enable = 1, reset = 0
     }
    
     // Check if any moves finished 
@@ -157,7 +237,10 @@ void StepTicker::add_motor_to_active_list(StepperMotor* motor)
     bool enabled= active_motor.any(); // see if interrupt was previously enabled
     active_motor[motor->index]= 1;
     if(!enabled) {
-        this->step_timer->attach_us( this, &StepTicker::step_tick, this->period_us); 
+    	/* Enable Step Timer (Timer 0) */
+    	LPC_TIMER0->TCR = 0x2;  // reset
+		LPC_TIMER0->TCR = 0x1;  // enable
+		NVIC_EnableIRQ(TIMER0_IRQn);
     }
 }
 
@@ -166,7 +249,9 @@ void StepTicker::remove_motor_from_active_list(StepperMotor* motor){
     active_motor[motor->index]= 0;
     // If we have no motor to work on, disable the whole interrupt
     if(this->active_motor.none()){
-        this->step_timer->detach();
+        /* Disable step Timer (Timer 0) */
+    	NVIC_DisableIRQ(TIMER0_IRQn);
         tick_cnt= 0;
     }
 }
+
