@@ -24,7 +24,7 @@ int main() {
 	// Kernel creates modules, and receives and dispatches events between them
 	Kernel* kernel = new Kernel();
 
-	// Say hello ( TODO : Add back version and all )
+	// Say hello ( TODO: Add back version and all )
 	kernel->streams->printf("Smoothie2 dev\n");
 
 	// Create and add main modules

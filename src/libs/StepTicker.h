@@ -66,13 +66,6 @@ class StepTicker{
         uint8_t num_motors;
         volatile bool a_move_finished;
 
-        //Ticker* step_timer;
-        //Ticker* acceleration_timer;
-        //Timeout* unstep_timer;
-
-
-
-
 };
 
 
