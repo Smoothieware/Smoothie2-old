@@ -38,6 +38,7 @@ Current major TODOs : 
  * USB and Ethernet need to be implemented.
  * Doing the step generation on the M0 co-processor instead of on the M4 main core.
  * This port was forked from Smoothie months ago, it should be updated to incoprorate changes to Smoothie done in the meantime.
+ * Explore using http://nuttx.org/ for a RTOS ( major rewrite )
 
 TODO functionality to port from v1 in more detail : 
  * libs/Adc.cpp : Port low level ADC functionality, then re-enable it in TemperatureControl ( note : there is some weird pin configuration surrounding this that makes it more complicated than it seems, but I don't remember what it is. Logxen@gmail.com probably remembers what it is ).
