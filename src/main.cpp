@@ -11,10 +11,25 @@
 #include "StreamOutputPool.h"
 
 DigitalOut leds[4] = {
-		DigitalOut(LED1),
-		DigitalOut(LED2),
-		DigitalOut(LED3),
-		DigitalOut(LED4)
+#ifdef TARGET_BAMBINO210E
+        DigitalOut(P6_11),
+        DigitalOut(P2_5),
+        DigitalOut(P6_1),
+        DigitalOut(P6_2)
+
+#elif defined(TARGET_BAMBINO200E)
+        DigitalOut(P6_11),
+        DigitalOut(P2_5),
+        DigitalOut(P6_11), // only has 2 leds
+        DigitalOut(P2_5)
+
+#elif defined(TARGET_SMOOTHIE2_PROTO1)
+        // smoothie 2 proto1
+        DigitalOut(P1_1),
+        DigitalOut(P1_2),
+        DigitalOut(P2_8),
+        DigitalOut(P2_9)
+#endif
 };
 
 int main() {
