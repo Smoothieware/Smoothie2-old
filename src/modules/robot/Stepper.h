@@ -23,6 +23,7 @@ public:
     void on_block_begin(void *argument);
     void on_block_end(void *argument);
     void on_gcode_received(void *argument);
+    void on_gcode_execute(void *argument);
     void on_halt(void *argument);
 
     void trapezoid_generator_reset();
@@ -44,6 +45,7 @@ private:
     struct {
         bool enable_pins_status:1;
         bool force_speed_update:1;
+        bool halted:1;
     };
 
 };

@@ -16,8 +16,6 @@
 #include <functional>
 #include <atomic>
 
-#include "mbed.h"
-
 class StepperMotor;
 
 class StepTicker{
@@ -35,29 +33,25 @@ class StepTicker{
         void set_acceleration_ticks_per_second(uint32_t acceleration_ticks_per_second);
         float get_frequency() const { return frequency; }
         void unstep_tick();
-        void step_tick();
         uint32_t get_tick_cnt() const { return tick_cnt; }
         uint32_t ticks_since(uint32_t last) const { return (tick_cnt>=last) ? tick_cnt-last : (UINT32_MAX-last) + tick_cnt + 1; }
-        
+
+        void TIMER0_IRQHandler (void);
+        void PendSV_IRQHandler (void);
         void register_acceleration_tick_handler(std::function<void(void)> cb){
             acceleration_tick_handlers.push_back(cb);
         }
         void acceleration_tick();
         void synchronize_acceleration(bool fire_now);
-        void schedule_unstep(int motor);
 
         void start();
 
         friend class StepperMotor;
 
-        // TOADDBACK was private
-        volatile uint32_t tick_cnt;
-        uint32_t period_us;
-        uint32_t reset_delay_us;
     private:
-
         float frequency;
-        uint32_t acceleration_period_us;
+        uint32_t period;
+        volatile uint32_t tick_cnt;
         std::vector<std::function<void(void)>> acceleration_tick_handlers;
         std::vector<StepperMotor*> motor;
         std::bitset<32> active_motor; // limit to 32 motors
@@ -65,7 +59,6 @@ class StepTicker{
         std::atomic_uchar do_move_finished;
         uint8_t num_motors;
         volatile bool a_move_finished;
-
 };
 
 
