@@ -1,8 +1,15 @@
 # Smoothie2
 
-A Smoothie firmware port to the Smoothieboard v2 boards.
+A Smoothie firmware port to the Bambino210E board ahead of making changes to support the SmoothieV2 hardware.
 
-Current status : Gcode processing, motion planning, and step generation work. Many secondary features need porting, and some major lower level things need implementation ( USB, Ethernet, SDIO ).
+There are no guarantees that this code works, won't burn down your house or destroy your electronics or hardware, use entirely at your own risk.
+
+There are a lot of bugs in the code and it is very much a work in progress, the reason it is published is to allow others to contriute before it is folded back into the Smoothie2 main repo.
+
+Current status : 
+* This code base is equivalent to Smoothie V1 as at 2016-10-18.
+* The Extruder code is being worked on and as of 2016-10-22 and does not yet compile.
+* Some major lower level things need implementation ( USB, Ethernet, SDIO ).  
 
 # Compiling
 
@@ -27,17 +34,14 @@ And finally compile the code
     make
 
 # Board Specific Programming/Debugging Notes
-* [Smoothie2 Pro Proto1 Boards](https://github.com/Smoothieware/Smoothie2/blob/master/notes/Smoothie2Proto1-board.creole#smoothie2-board-programmingdebugging-notes)
 * [Bambino210E Boards](https://github.com/Smoothieware/Smoothie2/blob/master/notes/Bambino210E-board.creole#bambino210e-board-programmingdebugging-notes)
 
 # TODO : 
 
 Current major TODOs : 
- * Porting of existing functionality that hasn't been ported yet ( anything in https://github.com/Smoothieware/Smoothieware/tree/edge/src/modules that isn't ported yet )
- * Some modules have been ported, but the underlying low-level/HAL stuff to talk to the peripherals isn't ( like SPI, or ADCs etc ), it's just dummy objects right now. So that needs porting too.
- * USB and Ethernet need to be implemented.
- * Doing the step generation on the M0 co-processor instead of on the M4 main core.
- * This port was forked from Smoothie months ago, it should be updated to incoprorate changes to Smoothie done in the meantime.
+ * Complete the Extruder port (IT DOES NOT YET COMPILE, STILL AN ALPHA PORT)
+ * SD-Card, USB and Ethernet need to be implemented.
+ * Move the step generation to the M0 co-processor instead of on the M4 main core.
 
 TODO functionality to port from v1 in more detail : 
  * libs/Adc.cpp : Port low level ADC functionality, then re-enable it in TemperatureControl ( note : there is some weird pin configuration surrounding this that makes it more complicated than it seems, but I don't remember what it is. Logxen@gmail.com probably remembers what it is ).
@@ -49,15 +53,11 @@ TODO functionality to port from v1 in more detail :
  * libs/Watchdog : Port ( no mBed libraries available that I could find )
  * libs/Hook.h : Uses doubles instead of ints ( in v1 ) for some reason, should be fixed
  * modules/tools/drillingcycles : Port ( should be fairly simple )
- * modules/tools/extruder : Port
+ * modules/tools/extruder : Port Under way
  * modules/tools/filamentdetector : Port
  * modules/tools/filamentdetector : Get PWM to work
- * modules/tools/scaracal : Port
- * modules/tools/spindle : Port and get PWM to work
+ * modules/tools/spindle : Get PWM to work
  * modules/tools/temperaturecontrol : Finish porting, get the ADC to actually work, port the AD8495 temperature input
- * modules/tools/temperatureswitch : Port ( should be fairly easy )
- * modules/tools/toolmanager : Port ( should be trivial, is needed for Extruder )
- * modules/tools/touchprobe : Port ( could be quite easy )
  * modules/tools/zprobe : Port ( could be quite easy )
  * modules/tools/simpleshell : Port
 
