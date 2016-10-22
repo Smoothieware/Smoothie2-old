@@ -52,7 +52,7 @@ void Stepper::on_module_loaded()
     this->on_config_reload(this);
 
     // Acceleration ticker
-    THEKERNEL->step_ticker->register_acceleration_tick_handler([this]{trapezoid_generator_tick(); });
+    THEKERNEL->step_ticker->register_acceleration_tick_handler([this](){trapezoid_generator_tick(); });
 
     // Attach to the end_of_move stepper event
     for (auto actuator : THEKERNEL->robot->actuators)
