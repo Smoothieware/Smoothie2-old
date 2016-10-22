@@ -43,13 +43,15 @@ void Max31855::UpdateConfig(uint16_t module_checksum, uint16_t name_checksum)
     PinName miso;
     PinName mosi;
     PinName sclk;
+
     if(spi_channel == 0) {
-        // Channel 0
-        mosi=P1_2; miso=P1_1; sclk=P3_0;
+        mosi = SPI0_MOSI; miso = SPI0_MISO; sclk = SPI0_SCK;
+    } else if(spi_channel == 1) {
+        mosi = SPI1_MOSI; miso = SPI1_MISO; sclk = SPI1_SCK;
     } else {
-        // Channel 1
-        mosi=P1_4; miso=P1_3; sclk=PF_4;
-    } 
+        THEKERNEL->streams->printf("Temperaturecontrol ERROR: Unknown SPI Channel: %d\n", spi_channel);
+        return;
+    }
 
     delete spi;
     spi = new mbed::SPI(mosi, miso, sclk);
