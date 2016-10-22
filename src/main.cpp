@@ -5,10 +5,13 @@
 #include "Kernel.h"
 #include "SwitchPool.h"
 #include "TemperatureControlPool.h"
+//#include "RotaryDeltaCalibration.h"
 #include "Endstops.h"
 #include "Laser.h"
 #include "Config.h"
 #include "StreamOutputPool.h"
+#include "MotorDriverControl.h"
+#include "SEGGER_SYSVIEW.h"
 
 DigitalOut leds[4] = {
 		DigitalOut(LED1),
@@ -18,7 +21,7 @@ DigitalOut leds[4] = {
 };
 
 int main() {
-
+	SEGGER_SYSVIEW_Conf();
 	int cnt = 0;
 
 	// Kernel creates modules, and receives and dispatches events between them
@@ -30,6 +33,9 @@ int main() {
 	// Create and add main modules
 	kernel->add_module( new Endstops() );
 	kernel->add_module( new Laser() );
+	//kernel->add_module( new ZProbe() );
+	//kernel->add_module( new RotaryDeltaCalibration() );
+	kernel->add_module( new MotorDriverControl(0) );
 
 	// Create all Switch modules
 	SwitchPool *sp= new SwitchPool();

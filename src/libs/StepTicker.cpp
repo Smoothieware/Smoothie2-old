@@ -16,6 +16,8 @@
 //#include "system_LPC17xx.h" // mbed.h lib
 #include <math.h>
 #include <mri.h>
+#include "SEGGER_SYSVIEW.h"
+#include "SEGGER_RTT_Conf.h"
 
 #ifdef STEPTICKER_DEBUG_PIN
 #include "gpio.h"
@@ -154,30 +156,38 @@ inline void StepTicker::unstep_tick(){
 // Acceleration timer interrupt handler
 extern "C" void RITIMER_IRQHandler (void)
 {
+
 	LPC_RITIMER->CTRL |= 1L;
 	//LPC_TIMER2->IR |= 1 << 0;
 	StepTicker::global_step_ticker->acceleration_tick();
 	//NVIC_ClearPendingIRQ(TIMER2_IRQn);
 	LPC_RITIMER->COUNTER = 0;
+	SEGGER_SYSVIEW_RecordExitISR();
 }
 
 // Unstep timer interrupt handler
 extern "C" void TIMER1_IRQHandler (void)
 {
+//
 	LPC_TIMER1->IR |= 1 << 0;
 	StepTicker::global_step_ticker->unstep_tick();
 	NVIC_ClearPendingIRQ(TIMER1_IRQn);
+//	SEGGER_SYSVIEW_RecordExitISR();
 }
 
 // Step timer interrupt handler
 extern "C" void TIMER0_IRQHandler (void)
 {
+//	SEGGER_RTT_LOCK();
+//	SEGGER_SYSVIEW_RecordEnterISR();
 	LPC_TIMER0->IR |= 1 << 0;
 	StepTicker::global_step_ticker->step_tick();
 	NVIC_ClearPendingIRQ(TIMER0_IRQn);
+//	SEGGER_SYSVIEW_RecordExitISR();
+//	SEGGER_RTT_UNLOCK();
 }
 
-// RIT Timeer interrupt handler
+// RIT Timer interrupt handler
 void  StepTicker::acceleration_tick() {
     // call registered acceleration handlers
     for (size_t i = 0; i < acceleration_tick_handlers.size(); ++i) {

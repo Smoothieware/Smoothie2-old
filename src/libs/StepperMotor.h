@@ -78,7 +78,6 @@ class StepperMotor {
         float steps_per_mm;
         float max_rate; // this is not really rate it is in mm/sec, misnamed used in Robot and Extruder
         float minimum_step_rate; // this is the minimum step_rate in steps/sec for this motor for this block
-        static float default_minimum_actuator_rate;
 
         volatile int32_t current_position_steps;
         int32_t last_milestone_steps;
@@ -119,4 +118,3 @@ class StepperMotor {
 };
 
 #endif
-

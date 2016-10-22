@@ -22,7 +22,6 @@
 #define delta_mirror_xy_checksum        CHECKSUM("delta_mirror_xy")
 
 const static float pi     = 3.14159265358979323846;    // PI
-const static float two_pi = 2 * pi;
 const static float sin120 = 0.86602540378443864676372317075294; //sqrt3/2.0
 const static float cos120 = -0.5;
 const static float tan60  = 1.7320508075688772935274463415059; //sqrt3;

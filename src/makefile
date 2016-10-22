@@ -25,6 +25,8 @@ NO_FLOAT_SCANF      := 1
 NO_FLOAT_PRINTF     := 0
 LIBS_PREFIX         := configdefault.o
 MRI_SEMIHOST_STDIO  := 0
+MBED_LIBS           += USBHost
+#MBED_LIBS           += USBDevice
 
 # Use C++11 features for the checksums
 DEFINES += -DCHECKSUM_USE_CPP
@@ -79,6 +81,12 @@ else
 GCC4MBED_TYPE := Release
 endif
 
+# generate a git version string
+ifneq "$(OS)" "Windows_NT"
+DEFINES += -D__GITVERSIONSTRING__=\"$(shell ./generate-version.sh)\"
+else
+DEFINES += -D__GITVERSIONSTRING__=\"$(shell generate-version.bat)\"
+endif
 
 include $(GCC4MBED_DIR)/build/gcc4mbed.mk
 

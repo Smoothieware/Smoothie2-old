@@ -34,8 +34,10 @@ using namespace std;
 
 Stepper::Stepper()
 {
-    this->current_block = NULL;
+    this->current_block = nullptr;
     this->force_speed_update = false;
+    trapezoid_adjusted_rate = 0;
+    main_stepper = nullptr;
 }
 
 //Called when the module has just been loaded
@@ -50,7 +52,7 @@ void Stepper::on_module_loaded()
     this->on_config_reload(this);
 
     // Acceleration ticker
-    THEKERNEL->step_ticker->register_acceleration_tick_handler([this](){trapezoid_generator_tick(); });
+    THEKERNEL->step_ticker->register_acceleration_tick_handler([this]{trapezoid_generator_tick(); });
 
     // Attach to the end_of_move stepper event
     for (auto actuator : THEKERNEL->robot->actuators)

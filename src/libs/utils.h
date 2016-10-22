@@ -39,4 +39,6 @@ int append_parameters(char *buf, std::vector<std::pair<char,float>> params, size
 string wcs2gcode(int wcs);
 void safe_delay(uint32_t delay);
 
+#define confine(value, min, max) (((value) < (min))?(min):(((value) > (max))?(max):(value)))
+
 #endif

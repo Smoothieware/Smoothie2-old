@@ -30,6 +30,7 @@
 #include "StepTicker.h"
 #include "BaseSolution.h"
 #include "SerialMessage.h"
+#include "SEGGER_SYSVIEW.h"
 
 #include <ctype.h>
 
@@ -225,7 +226,7 @@ void Endstops::load_config()
     this->limit_enable[Y_AXIS] = THEKERNEL->config->value(beta_limit_enable_checksum)->by_default(false)->as_bool();
     this->limit_enable[Z_AXIS] = THEKERNEL->config->value(gamma_limit_enable_checksum)->by_default(false)->as_bool();
 
-    // set to true by default for deltas duwe to trim, false on cartesians
+    // set to true by default for deltas due to trim, false on cartesians
     this->move_to_origin_after_home = THEKERNEL->config->value(move_to_origin_checksum)->by_default(is_delta)->as_bool();
 
     if(this->limit_enable[X_AXIS] || this->limit_enable[Y_AXIS] || this->limit_enable[Z_AXIS]) {
@@ -320,7 +321,7 @@ void Endstops::back_off_home(char axes_to_move)
     this->status = BACK_OFF_HOME;
 
     // these are handled differently
-    if(is_delta) {
+    if(this->is_delta || this->is_rdelta) { //TODO changed from is_delta
         // Move off of the endstop using a regular relative move in Z only
         params.push_back({'Z', this->retract_mm[Z_AXIS] * (this->home_direction[Z_AXIS] ? 1 : -1)});
 
@@ -384,6 +385,7 @@ bool Endstops::wait_for_homed(char axes_to_move)
     bool running = true;
     unsigned int debounce[3] = {0, 0, 0};
     while (running) {
+    	SEGGER_SYSVIEW_Print("Endstop::wait_for_homed\n");
         running = false;
         THEKERNEL->call_event(ON_IDLE);
 
@@ -392,22 +394,31 @@ bool Endstops::wait_for_homed(char axes_to_move)
 
         for ( int c = X_AXIS; c <= Z_AXIS; c++ ) {
             if ( ( axes_to_move >> c ) & 1 ) {
+            	//SEGGER_SYSVIEW_PrintfHost("  debounce[%u] = %u\n",c,debounce[c]);
                 if ( this->pins[c + (this->home_direction[c] ? 0 : 3)].get() ) {
+                	//SEGGER_SYSVIEW_PrintfHost("A debounce[%u] = %u\n",c,debounce[c]);
                     if ( debounce[c] < debounce_count ) {
                         debounce[c]++;
                         running = true;
                     } else if ( STEPPER[c]->is_moving() ) {
-                        STEPPER[c]->move(0, 0);
+                    	SEGGER_SYSVIEW_PrintfHost("Reached endstop for %u\n",c);
+                        //STEPPER[c]->move(0, 0);
+                        STEPPER[c]->force_finish_move(); //TODO test
+                        SEGGER_SYSVIEW_PrintfHost("Axis to move a %u\n",axes_to_move);
                         axes_to_move &= ~(1 << c); // no need to check it again
+                        SEGGER_SYSVIEW_PrintfHost("Axis to move %u\n",axes_to_move);
                     }
                 } else {
                     // The endstop was not hit yet
+                	//SEGGER_SYSVIEW_PrintfHost("C debounce[%u] = %u\n",c,debounce[c]);
                     running = true;
                     debounce[c] = 0;
                 }
             }
         }
+        SEGGER_SYSVIEW_PrintfHost("%u,%u,%u\n",debounce[0],debounce[1],debounce[2]);
     }
+    SEGGER_SYSVIEW_Print("Endstop::wait_for_homed EXIT\n");
     return true;
 }
 

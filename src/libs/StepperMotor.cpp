@@ -13,9 +13,6 @@
 #include <math.h>
 #include "mbed.h"
 
-// in steps/sec the default minimum speed (was 20steps/sec hardcoded)
-float StepperMotor::default_minimum_actuator_rate= 20.0F;
-
 // A StepperMotor represents an actual stepper motor. It is used to generate steps that move the actual motor at a given speed
 
 StepperMotor::StepperMotor()
@@ -50,7 +47,6 @@ void StepperMotor::init()
 
     steps_per_mm         = 1.0F;
     max_rate             = 50.0F;
-    minimum_step_rate    = default_minimum_actuator_rate;
 
     last_milestone_steps = 0;
     last_milestone_mm    = 0.0F;
@@ -126,7 +122,6 @@ void StepperMotor::signal_move_finished()
     // work is done ! 8t
     this->moving = false;
     this->steps_to_move = 0;
-    this->minimum_step_rate = default_minimum_actuator_rate;
 
     // signal it to whatever cares
     // in this call a new block may start, new moves set and new speeds

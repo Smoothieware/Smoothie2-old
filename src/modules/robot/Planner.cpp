@@ -5,7 +5,6 @@
       You should have received a copy of the GNU General Public License along with Smoothie. If not, see <http://www.gnu.org/licenses/>.
 */
 
-using namespace std;
 #include <vector>
 
 #include "mri.h"
@@ -25,6 +24,8 @@ using namespace std;
 #include "ConfigValue.h"
 
 #include <math.h>
+
+using namespace std;
 
 #define acceleration_checksum          CHECKSUM("acceleration")
 #define z_acceleration_checksum        CHECKSUM("z_acceleration")
@@ -98,7 +99,6 @@ void Planner::append_block( ActuatorCoordinates &actuator_pos, float rate_mm_s, 
     block->millimeters = distance;
 
     // Calculate speed in mm/sec for each axis. No divide by zero due to previous checks.
-    // NOTE: Minimum stepper speed is limited by MINIMUM_STEPS_PER_MINUTE in stepper.c
     if( distance > 0.0F ) {
         block->nominal_speed = rate_mm_s;           // (mm/s) Always > 0
         block->nominal_rate = ceilf(block->steps_event_count * rate_mm_s / distance); // (step/s) Always > 0

@@ -26,7 +26,7 @@ public:
 	}
 
 	inline bool equals(const Pin& other) const {
-		//return (this->pin == other.pin) && (this->port == other.port);
+		//return (this->pin == other.pin) && (this->port == other.port); //TODO this needs to be fixed
 		return false;
 	}
 
@@ -87,12 +87,12 @@ public:
 	//getter to access to mbed pinName
 	PinName getPinName() {return pinName; }
 
+	int port_number;
+    int pin_number;
+
 private:
 	//Added pinName
 	PinName pinName;
 };
-
-
-
 
 #endif

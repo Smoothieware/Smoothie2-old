@@ -37,7 +37,7 @@ using std::string;
 #include "ConfigValue.h"
 #include "libs/StreamOutput.h"
 #include "StreamOutputPool.h"
-// TOADDBACK #include "ExtruderPublicAccess.h"
+#include "ExtruderPublicAccess.h"
 #include "GcodeDispatch.h"
 
 
@@ -558,9 +558,6 @@ void Robot::on_gcode_received(void *argument)
                     if (mps < 0.0F)
                         mps = 0.0F;
                     THEKERNEL->planner->minimum_planner_speed = mps;
-                }
-                if (gcode->has_letter('Y')) {
-                    actuators[0]->default_minimum_actuator_rate = gcode->get_value('Y');
                 }
                 break;
 
