@@ -28,9 +28,9 @@ src/Segger_SystemView/SEGGER_SYSVIEW_Config_NoOS.c
 You will need to make the following changes in src/Segger_SystemView/SEGGER_SYSVIEW_Config_NoOS.c
 
 old
-#define SYSVIEW_APP_NAME        "Demo Application"
+\#define SYSVIEW_APP_NAME        "Demo Application"
 new
-#define SYSVIEW_APP_NAME        "Smoothie2"
+\#define SYSVIEW_APP_NAME        "Smoothie2"
 
 old
 SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick");
@@ -40,9 +40,9 @@ SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick,I#27=acceleration_tick(),I#28=step_tick
 If you find that you are running out of buffering between the CPU and your PC, then change src/Segger_SystemView/SEGGER_SYSVIEW_ConfDefaults.h as follows
 
 old
-#define SEGGER_SYSVIEW_RTT_BUFFER_SIZE    1024
+\#define SEGGER_SYSVIEW_RTT_BUFFER_SIZE    1024
 new
-#define SEGGER_SYSVIEW_RTT_BUFFER_SIZE    4096
+\#define SEGGER_SYSVIEW_RTT_BUFFER_SIZE    4096
 
 Note: 4096 is the largest buffer size supported; you can also increase the speed of the JTAG interface to 15MHz when you start your JLinkGDBServer:
 
