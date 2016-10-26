@@ -11,7 +11,7 @@
 #include "Config.h"
 #include "checksumm.h"
 #include "ConfigValue.h"
-
+#include "StreamOutputPool.h"
 #include "max31855.h"
 
 // TOADDBACK #include "MRI_Hooks.h"
@@ -32,12 +32,11 @@ Max31855::~Max31855()
 // Get configuration from the config file
 void Max31855::UpdateConfig(uint16_t module_checksum, uint16_t name_checksum)
 {
-
     // Chip select
     this->spi_cs_pin.from_string(THEKERNEL->config->value(module_checksum, name_checksum, chip_select_checksum)->by_default("0.16")->as_string());
     this->spi_cs_pin.set(true);
     this->spi_cs_pin.as_output();
-    
+   
     // select which SPI channel to use
     int spi_channel = THEKERNEL->config->value(module_checksum, name_checksum, spi_channel_checksum)->by_default(0)->as_number();
     PinName miso;
@@ -58,7 +57,6 @@ void Max31855::UpdateConfig(uint16_t module_checksum, uint16_t name_checksum)
 
     // Spi settings: 1MHz (default), 16 bits, mode 0 (default)
     spi->format(16);  //TODO the robot.cpp uses spi at 8 bits for the tmc2130 stepper motor in StepperMotor.cpp so we need to perhaps change this to 8 bits
-
 }
 
 float Max31855::get_temperature()
@@ -96,7 +94,7 @@ float Max31855::read_temp()
 //	uint16_t data2 = spi->write(0);
 
     this->spi_cs_pin.set(true);
-    
+   
     float temperature;
 
     //Process temp
@@ -117,5 +115,5 @@ float Max31855::read_temp()
             temperature = ((data & 0x1FFF) + 1) / -4.f;
         }
     }
-    return temperature; 
+    return temperature;
 }

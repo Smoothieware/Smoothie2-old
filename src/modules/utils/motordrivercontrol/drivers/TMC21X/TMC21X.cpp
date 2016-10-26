@@ -1113,7 +1113,7 @@ void TMC21X::dumpStatus(StreamOutput *stream, bool readable)  //TODO Convert
         bool moving = THEKERNEL->robot->actuators[0]->is_moving();
         // dump out in the format that the processing script needs
         if (moving) {
-            stream->printf("#sg%d,p%lu,k%u,r,", getCurrentStallGuardReading(), THEKERNEL->robot->actuators[0]->get_stepped(), getCoolstepCurrent());
+            stream->printf("#sg%d,p%lu,k%u,r,", getCurrentStallGuardReading(), THEKERNEL->robot->actuators[0]->get_current_step(), getCoolstepCurrent());
         } else {
             readStatus(TMC21X_READOUT_POSITION); // get the status bits
             stream->printf("#s,");

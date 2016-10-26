@@ -22,7 +22,6 @@
 #include "modules/communication/GcodeDispatch.h"
 #include "modules/robot/Planner.h"
 #include "modules/robot/Robot.h"
-#include "modules/robot/Stepper.h"
 #include "modules/robot/Conveyor.h"
 #include "StepperMotor.h"
 #include "BaseSolution.h"
@@ -41,7 +40,6 @@
 
 #define base_stepping_frequency_checksum            CHECKSUM("base_stepping_frequency")
 #define microseconds_per_step_pulse_checksum        CHECKSUM("microseconds_per_step_pulse")
-#define acceleration_ticks_per_second_checksum      CHECKSUM("acceleration_ticks_per_second")
 #define disable_leds_checksum                       CHECKSUM("leds_disable")
 #define grbl_mode_checksum                          CHECKSUM("grbl_mode")
 #define ok_per_line_checksum                        CHECKSUM("ok_per_line")
@@ -84,23 +82,29 @@ Kernel::Kernel(){
 
     //some boards don't have leds.. TOO BAD!
     this->use_leds= !this->config->value( disable_leds_checksum )->by_default(false)->as_bool();
+
+    #ifdef CNC
+    this->grbl_mode= this->config->value( grbl_mode_checksum )->by_default(true)->as_bool();
+    #else
     this->grbl_mode= this->config->value( grbl_mode_checksum )->by_default(false)->as_bool();
+    #endif
+
+    // we exepct ok per line now not per G code, setting this to false will return to the old (incorrect) way of ok per G code
     this->ok_per_line= this->config->value( ok_per_line_checksum )->by_default(true)->as_bool();
 
     // Configure the step ticker
     this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
-    float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(5)->as_number();
-    this->acceleration_ticks_per_second = THEKERNEL->config->value(acceleration_ticks_per_second_checksum)->by_default(1000)->as_number();
+//    float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(5)->as_number();
+    //this->acceleration_ticks_per_second = THEKERNEL->config->value(acceleration_ticks_per_second_checksum)->by_default(1000)->as_number();
 
 
     this->step_ticker = new StepTicker();
 
     // Core modules
+    this->add_module( this->conveyor       = new Conveyor()      );
     this->add_module( this->gcode_dispatch = new GcodeDispatch() );
     this->add_module( this->robot          = new Robot()         );
-    this->add_module( this->stepper        = new Stepper()       );
-    this->add_module( this->conveyor       = new Conveyor()      );
-    // TOADDBACK this->add_module( this->simpleshell    = new SimpleShell()   );
+    //this->add_module( this->simpleshell    = new SimpleShell()   );
 
     this->planner = new Planner();
 
@@ -123,7 +127,7 @@ std::string Kernel::get_query_string()
         str.append("Home,");
     }else if(feed_hold) {
         str.append("Hold,");
-    }else if(this->conveyor->is_queue_empty()) {
+    }else if(this->conveyor->is_idle()) {
         str.append("Idle,");
     }else{
         running= true;
@@ -186,7 +190,7 @@ void Kernel::call_event(_EVENT_ENUM id_event, void * argument){
     bool was_idle= true;
     if(id_event == ON_HALT) {
         this->halted= (argument == nullptr);
-        was_idle= conveyor->is_queue_empty(); // see if we were doing anything like printing
+        was_idle= conveyor->is_idle(); // see if we were doing anything like printing
     }
 
     // send to all registered modules
@@ -208,3 +212,14 @@ bool Kernel::kernel_has_event(_EVENT_ENUM id_event, Module *mod)
     }
     return false;
 }
+
+void Kernel::unregister_for_event(_EVENT_ENUM id_event, Module *mod)
+{
+    for (auto i = hooks[id_event].begin(); i != hooks[id_event].end(); ++i) {
+        if(*i == mod) {
+            hooks[id_event].erase(i);
+            return;
+        }
+    }
+}
+

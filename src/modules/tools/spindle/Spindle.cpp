@@ -97,6 +97,7 @@ void Spindle::on_module_loaded()
             PinName pinname = port_pin((PortName)smoothie_pin->port_number, smoothie_pin->pin_number);
             feedback_pin = new InterruptIn(pinname);
             //feedback_pin.rise(&on_pin_rise); // TODO need to assign interrupt routine
+	      //NVIC_SetPriority(EINT3_IRQn, 16); //TODO Need to set to low priority
         } else {
             THEKERNEL->streams->printf("Error: Spindle feedback pin has to be on P0 or P2.\n");
             delete this;
@@ -187,7 +188,7 @@ void Spindle::on_gcode_received(void* argument)
             THEKERNEL->streams->printf("P: %0.6f I: %0.6f D: %0.6f\n",
                                        control_P_term, control_I_term, control_D_term);
         } else if (gcode->m == 3) {
-            THEKERNEL->conveyor->wait_for_empty_queue();
+            THEKERNEL->conveyor->wait_for_idle();
 
             // M3: Spindle on
             spindle_on = true;
@@ -197,13 +198,13 @@ void Spindle::on_gcode_received(void* argument)
             }
 
         } else if (gcode->m == 5) {
-            THEKERNEL->conveyor->wait_for_empty_queue();
+            THEKERNEL->conveyor->wait_for_idle();
             spindle_on = false;
         }
 
     }else if(!gcode->has_m && !gcode->has_g && gcode->has_letter('S')) {
         // special case S on its own
-        THEKERNEL->conveyor->wait_for_empty_queue();
+        THEKERNEL->conveyor->wait_for_idle();
         target_rpm = gcode->get_value('S');
     }
 }

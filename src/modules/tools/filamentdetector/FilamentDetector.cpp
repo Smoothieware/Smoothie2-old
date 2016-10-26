@@ -74,11 +74,12 @@ void FilamentDetector::on_module_loaded()
         return;
     }
 
-    //only monitor the encoder if we are using the encodeer.
+    //only monitor the encoder if we are using the encoder.
     if (this->encoder_pin != nullptr) {
         // set interrupt on rising edge
         this->encoder_pin->rise(this, &FilamentDetector::on_pin_rise);
-        NVIC_SetPriority(EINT3_IRQn, 16); // set to low priority
+        //NVIC_SetPriority(EINT3_IRQn, 16); // set to low priority
+//TODO We need to fix the interrupts, something like the following NVIC_SetPriority(PORTA_IRQn, 0x1);
     }
 
 

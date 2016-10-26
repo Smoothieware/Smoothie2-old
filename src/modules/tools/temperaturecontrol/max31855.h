@@ -23,7 +23,7 @@ public:
     float get_temperature();
 
 private:
-	float read_temp();
+    float read_temp();
     Pin spi_cs_pin;
     mbed::SPI *spi;
     RingBuffer<float,16> readings;

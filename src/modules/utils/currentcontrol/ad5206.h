@@ -11,8 +11,9 @@
 class AD5206 : public DigipotBase {
     public:
         AD5206(){
-        	//SPI0_SCK
-        	//this->spi= new mbed::SPI(P0_9,P0_8,P0_7); //should be able to set those pins in config
+	    //TODO convert to use SPI channels
+            //SPI0_SCK
+            //this->spi= new mbed::SPI(P0_9,P0_8,P0_7); //should be able to set those pins in config
             this->spi= new mbed::SPI(SPI0_MOSI,SPI0_MISO,SPI0_SCK); //should be able to set those pins in config
             cs.from_string("4.29")->as_output(); //this also should be configurable
             cs.set(1);

@@ -24,7 +24,10 @@
 
 #include "PwmOut.h"
 
-#define    switch_checksum              CHECKSUM("switch")
+//TODO ADDBACK #include "MRI_Hooks.h"
+
+#include <algorithm>
+
 #define    startup_state_checksum       CHECKSUM("startup_state")
 #define    startup_value_checksum       CHECKSUM("startup_value")
 #define    input_pin_checksum           CHECKSUM("input_pin")
@@ -103,9 +106,9 @@ void Switch::on_config_reload(void *argument)
         this->sigmadelta_pin->from_string(THEKERNEL->config->value(switch_checksum, this->name_checksum, output_pin_checksum )->by_default("nc")->as_string())->as_output();
         if(this->sigmadelta_pin->connected()) {
             if(failsafe == 1) {
-                // TOADDBACK set_high_on_debug(sigmadelta_pin->port_number, sigmadelta_pin->pin);
+                //TODO ADDBACK set_high_on_debug(sigmadelta_pin->port_number, sigmadelta_pin->pin);
             }else{
-                // TOADDBACK set_low_on_debug(sigmadelta_pin->port_number, sigmadelta_pin->pin);
+                //TODO ADDBACK set_low_on_debug(sigmadelta_pin->port_number, sigmadelta_pin->pin);
             }
         }else{
             this->output_type= NONE;
@@ -119,9 +122,9 @@ void Switch::on_config_reload(void *argument)
         this->digital_pin->from_string(THEKERNEL->config->value(switch_checksum, this->name_checksum, output_pin_checksum )->by_default("nc")->as_string())->as_output();
         if(this->digital_pin->connected()) {
             if(failsafe == 1) {
-                //TOADDBACK set_high_on_debug(digital_pin->port_number, digital_pin->pin);
+                //TODO ADDBACK set_high_on_debug(digital_pin->port_number, digital_pin->pin);
             }else{
-                //TOADDBACK set_low_on_debug(digital_pin->port_number, digital_pin->pin);
+                //TODO ADDBACK set_low_on_debug(digital_pin->port_number, digital_pin->pin);
             }
         }else{
             this->output_type= NONE;
@@ -135,9 +138,9 @@ void Switch::on_config_reload(void *argument)
         pin->from_string(THEKERNEL->config->value(switch_checksum, this->name_checksum, output_pin_checksum )->by_default("nc")->as_string())->as_output();
         this->pwm_pin= pin->hardware_pwm();
         if(failsafe == 1) {
-            //TOADDBACK set_high_on_debug(pin->port_number, pin->pin);
+            //TODO ADDBACK set_high_on_debug(pin->port_number, pin->pin);
         }else{
-            //TOADDBACK set_low_on_debug(pin->port_number, pin->pin);
+            //TODO ADDBACK set_low_on_debug(pin->port_number, pin->pin);
         }
         delete pin;
         if(this->pwm_pin == nullptr) {
@@ -246,20 +249,20 @@ void Switch::on_gcode_received(void *argument)
                 int v = roundf(gcode->get_value('S') * sigmadelta_pin->max_pwm() / 255.0F); // scale by max_pwm so input of 255 and max_pwm of 128 would set value to 128
                 if(v != this->sigmadelta_pin->get_pwm()){ // optimize... ignore if already set to the same pwm
                     // drain queue
-                    THEKERNEL->conveyor->wait_for_empty_queue();
+                    THEKERNEL->conveyor->wait_for_idle();
                     this->sigmadelta_pin->pwm(v);
                     this->switch_state= (v > 0);
                 }
             } else {
                 // drain queue
-                THEKERNEL->conveyor->wait_for_empty_queue();
+                THEKERNEL->conveyor->wait_for_idle();
                 this->sigmadelta_pin->pwm(this->switch_value);
                 this->switch_state= (this->switch_value > 0);
             }
 
         } else if (this->output_type == HWPWM) {
             // drain queue
-            THEKERNEL->conveyor->wait_for_empty_queue();
+            THEKERNEL->conveyor->wait_for_idle();
             // PWM output pin set duty cycle 0 - 100
             if(gcode->has_letter('S')) {
                 float v = gcode->get_value('S');
@@ -274,7 +277,7 @@ void Switch::on_gcode_received(void *argument)
 
         } else if (this->output_type == DIGITAL) {
             // drain queue
-            THEKERNEL->conveyor->wait_for_empty_queue();
+            THEKERNEL->conveyor->wait_for_idle();
             // logic pin turn on
             this->digital_pin->set(true);
             this->switch_state = true;
@@ -282,7 +285,7 @@ void Switch::on_gcode_received(void *argument)
 
     } else if(match_input_off_gcode(gcode)) {
         // drain queue
-        THEKERNEL->conveyor->wait_for_empty_queue();
+        THEKERNEL->conveyor->wait_for_idle();
         this->switch_state = false;
         if (this->output_type == SIGMADELTA) {
             // SIGMADELTA output pin

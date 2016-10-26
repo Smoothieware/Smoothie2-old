@@ -160,6 +160,7 @@ int BurstADC::_pin_to_channel(PinName pin) {
 
 PinName BurstADC::channel_to_pin(int chan) {
 	//LPC43xx has 2 ADC with 8 pins each + 8 adc only pins. Current structure of this function is not suitable
+	//TODO We need to fix this routine
 	PinName a;
 	return a;
 }
