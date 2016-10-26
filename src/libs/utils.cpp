@@ -152,6 +152,23 @@ bool file_exists( const string file_name )
     return exists;
 }
 
+/*
+//TODO Add watchdog timer support
+// Prepares and executes a watchdog reset for dfu or reboot
+void system_reset( bool dfu )
+{
+    if(dfu) {
+        LPC_WDT->WDCLKSEL = 0x1;                // Set CLK src to PCLK
+        uint32_t clk = SystemCoreClock / 16;    // WD has a fixed /4 prescaler, PCLK default is /4
+        LPC_WDT->WDTC = 1 * (float)clk;         // Reset in 1 second
+        LPC_WDT->WDMOD = 0x3;                   // Enabled and Reset
+        LPC_WDT->WDFEED = 0xAA;                 // Kick the dog!
+        LPC_WDT->WDFEED = 0x55;
+    } else {
+        NVIC_SystemReset();
+    }
+}
+*/
 // Convert a path indication ( absolute or relative ) into a path ( absolute )
 string absolute_from_relative( string path )
 {
@@ -246,13 +263,18 @@ string wcs2gcode(int wcs) {
     return str;
 }
 
-void safe_delay(uint32_t delayms)
+void safe_delay_ms(uint32_t delay)
 {
-    uint32_t dus= delayms*1000; //convert ms to us
-    uint32_t counter = 0;
-    while( counter < dus ){
+    safe_delay_us(delay*1000);
+}
+
+void safe_delay_us(uint32_t dus)
+{
+    uint32_t start = us_ticker_read();
+    while ((us_ticker_read() - start) < dus) {
         THEKERNEL->call_event(ON_IDLE);
-        counter++;
-	wait_us(1);
+//TODO determine if below code is still necessary
+//        counter++;
+//	wait_us(1);
     }
 }

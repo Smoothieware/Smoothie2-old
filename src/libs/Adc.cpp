@@ -3,7 +3,7 @@
       Smoothie is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
       Smoothie is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
       You should have received a copy of the GNU General Public License along with Smoothie. If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 #include "Adc.h"
 #include "libs/nuts_bolts.h"
@@ -87,8 +87,8 @@ unsigned int Adc::read(Pin *pin)
 	__enable_irq();
 
 #ifdef USE_MEDIAN_FILTER
-	// returns the median value of the last 8 samples
-	return median_buffer[quick_median(median_buffer, num_samples)];
+    // returns the median value of the last 8 samples
+    return median_buffer[quick_median(median_buffer, num_samples)];
 
 #elif defined(OVERSAMPLE)
 	// Oversample to get 2 extra bits of resolution
@@ -98,7 +98,7 @@ unsigned int Adc::read(Pin *pin)
 	std::sort(median_buffer, median_buffer + num_samples);
 	uint32_t sum = 0;
 	for (int i = num_samples / 4; i < (num_samples - (num_samples / 4)); ++i) {
-		sum += median_buffer[i];
+	    sum += median_buffer[i];
 	}
 	// this slows down the rate of change a little bit
 	ave_buf[channel][3]= ave_buf[channel][2];
@@ -111,13 +111,13 @@ unsigned int Adc::read(Pin *pin)
 	return tValue;
 
 #else
-	// sort the 8 readings and return the average of the middle 4
-	std::sort(median_buffer, median_buffer + num_samples);
-	int sum = 0;
-	for (int i = num_samples / 4; i < (num_samples - (num_samples / 4)); ++i) {
-		sum += median_buffer[i];
-	}
-	return sum / (num_samples / 2);
+    // sort the 8 readings and return the average of the middle 4
+    std::sort(median_buffer, median_buffer + num_samples);
+    int sum = 0;
+    for (int i = num_samples / 4; i < (num_samples - (num_samples / 4)); ++i) {
+        sum += median_buffer[i];
+    }
+    return sum / (num_samples / 2);
 
 #endif
 }
