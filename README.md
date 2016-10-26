@@ -4,7 +4,7 @@ A Smoothie firmware port to the Bambino210E board ahead of making changes to sup
 
 There are no guarantees that this code works, won't burn down your house or destroy your electronics or hardware, use entirely at your own risk.
 
-There are a lot of bugs in the code and it is very much a work in progress, the reason it is published is to allow others to contriute before it is folded back into the Smoothie2 main repo. 
+There are a lot of bugs in the code and it is very much a work in progress, the reason it is published is to allow others to contribute before it is folded back into the Smoothie2 main repo. 
 
 #IF YOU ARE NOT A CODER / WORKING ON THIS CODE BASE DO NOT TRY TO USE THIS UNTIL THE CODE HAS BEEN FULLY PORTED AND TESTED
 
