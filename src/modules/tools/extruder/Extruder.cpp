@@ -14,7 +14,6 @@
 #include "modules/robot/Block.h"
 #include "StepperMotor.h"
 #include "SlowTicker.h"
-#include "StepTicker.h"
 #include "Config.h"
 #include "StepperMotor.h"
 #include "Robot.h"
@@ -25,7 +24,6 @@
 #include "PublicDataRequest.h"
 #include "StreamOutputPool.h"
 #include "ExtruderPublicAccess.h"
-#include "nuts_bolts.h"
 
 #include <mri.h>
 
@@ -109,7 +107,7 @@ void Extruder::config_load()
     en_pin.from_string(   THEKERNEL->config->value(extruder_checksum, this->identifier, en_pin_checksum            )->by_default("nc" )->as_string())->as_output();
 
     float steps_per_millimeter = THEKERNEL->config->value(extruder_checksum, this->identifier, steps_per_mm_checksum)->by_default(1)->as_number();
-//TODO Is this still needed    float acceleration         = THEKERNEL->config->value(extruder_checksum, this->identifier, acceleration_checksum)->by_default(1000)->as_number();
+    float acceleration         = THEKERNEL->config->value(extruder_checksum, this->identifier, acceleration_checksum)->by_default(1000)->as_number();
 
     this->offset[X_AXIS] = THEKERNEL->config->value(extruder_checksum, this->identifier, x_offset_checksum          )->by_default(0)->as_number();
     this->offset[Y_AXIS] = THEKERNEL->config->value(extruder_checksum, this->identifier, y_offset_checksum          )->by_default(0)->as_number();
@@ -129,28 +127,27 @@ void Extruder::config_load()
 
     // Stepper motor object for the extruder
     stepper_motor = new StepperMotor(step_pin, dir_pin, en_pin);
-    //motor_id = THEROBOT->register_motor(stepper_motor);
-    motor_id = THEKERNEL->step_ticker->register_motor(stepper_motor);
+    motor_id = THEROBOT->register_motor(stepper_motor);
 
     stepper_motor->set_max_rate(THEKERNEL->config->value(extruder_checksum, this->identifier, max_speed_checksum)->by_default(1000)->as_number());
-//TODO is this still required    stepper_motor->set_acceleration(acceleration);
+    stepper_motor->set_acceleration(acceleration);
     stepper_motor->change_steps_per_mm(steps_per_millimeter);
-//TODO is this still required    stepper_motor->set_selected(false); // not selected by default
+    stepper_motor->set_selected(false); // not selected by default
 }
 
 void Extruder::select()
 {
     selected = true;
-//TODO is this still required    stepper_motor->set_selected(true);
+    stepper_motor->set_selected(true);
     // set the function pointer to return the current scaling
-//TODO is this still required   THEROBOT->get_e_scale_fnc = std::bind(&Extruder::get_e_scale, this);
+    THEROBOT->get_e_scale_fnc = std::bind(&Extruder::get_e_scale, this);
 }
 
 void Extruder::deselect()
 {
     selected = false;
-//TODO is this still required    stepper_motor->set_selected(false);
-//TODO is this still required    THEROBOT->get_e_scale_fnc = nullptr;
+    stepper_motor->set_selected(false);
+    THEROBOT->get_e_scale_fnc = nullptr;
 }
 
 void Extruder::on_get_public_data(void *argument)
@@ -166,7 +163,7 @@ void Extruder::on_get_public_data(void *argument)
     e->steps_per_mm = stepper_motor->get_steps_per_mm();
     e->filament_diameter = this->filament_diameter;
     e->flow_rate = this->extruder_multiplier;
-//TODO is this still required    e->accleration = stepper_motor->get_acceleration();
+    e->accleration = stepper_motor->get_acceleration();
     e->retract_length = this->retract_length;
     e->current_position = stepper_motor->get_current_position();
     pdr->set_taken();
@@ -210,13 +207,13 @@ void Extruder::on_set_public_data(void *argument)
 void Extruder::save_position()
 {
     // we need to save these separately as they may have been scaled
-//TODO is this still required    this->saved_position = std::make_tuple(THEKERNEL->robot->get_axis_position(motor_id), stepper_motor->get_last_milestone(), stepper_motor->get_last_milestone_steps());
+    this->saved_position = std::make_tuple(THEROBOT->get_axis_position(motor_id), stepper_motor->get_last_milestone(), stepper_motor->get_last_milestone_steps());
 }
 
 void Extruder::restore_position()
 {
-	//TODO is this still required	THEKERNEL->robot->->reset_axis_position(std::get<0>(this->saved_position), motor_id);
-//TODO is this still required    stepper_motor->set_last_milestones(std::get<1>(this->saved_position), std::get<2>(this->saved_position));
+    THEROBOT->reset_axis_position(std::get<0>(this->saved_position), motor_id);
+    stepper_motor->set_last_milestones(std::get<1>(this->saved_position), std::get<2>(this->saved_position));
 }
 
 // check against maximum speeds and return the rate modifier
@@ -247,9 +244,9 @@ void Extruder::on_gcode_received(void *argument)
         if (gcode->m == 114 && this->selected) {
             char buf[16];
             if(gcode->subcode == 0) {
-//TODO ADDBACK            	float pos = THEKERNEL->robot->get_axis_position(motor_id);
-//TODO ADDBACK                int n = snprintf(buf, sizeof(buf), " E:%1.3f ", pos);
-//TODO ADDBACK                gcode->txt_after_ok.append(buf, n);
+                float pos = THEROBOT->get_axis_position(motor_id);
+                int n = snprintf(buf, sizeof(buf), " E:%1.3f ", pos);
+                gcode->txt_after_ok.append(buf, n);
 
             } else if(gcode->subcode == 1) { // realtime position
                 int n = snprintf(buf, sizeof(buf), " E:%1.3f ", stepper_motor->get_current_position() / get_e_scale());
@@ -313,7 +310,7 @@ void Extruder::on_gcode_received(void *argument)
         } else if (gcode->m == 204 && gcode->has_letter('E') &&
                    ( (this->selected && !gcode->has_letter('P')) || (gcode->has_letter('P') && gcode->get_value('P') == this->identifier)) ) {
             // extruder acceleration M204 Ennn mm/sec^2 (Pnnn sets the specific extruder for M500)
-//TODO is this still required            stepper_motor->set_acceleration(gcode->get_value('E'));
+            stepper_motor->set_acceleration(gcode->get_value('E'));
 
         } else if (gcode->m == 207 && ( (this->selected && !gcode->has_letter('P')) || (gcode->has_letter('P') && gcode->get_value('P') == this->identifier)) ) {
             // M207 - set retract length S[positive mm] F[feedrate mm/min] Z[additional zlift/hop] Q[zlift feedrate mm/min]
@@ -347,7 +344,7 @@ void Extruder::on_gcode_received(void *argument)
             gcode->stream->printf(";E Filament diameter:\nM200 D%1.4f P%d\n", this->filament_diameter, this->identifier);
             gcode->stream->printf(";E retract length, feedrate:\nM207 S%1.4f F%1.4f Z%1.4f Q%1.4f P%d\n", this->retract_length, this->retract_feedrate * 60.0F, this->retract_zlift_length, this->retract_zlift_feedrate * 60.0F, this->identifier);
             gcode->stream->printf(";E retract recover length, feedrate:\nM208 S%1.4f F%1.4f P%d\n", this->retract_recover_length, this->retract_recover_feedrate * 60.0F, this->identifier);
-//TODO is this still required            gcode->stream->printf(";E acceleration mm/sec²:\nM204 E%1.4f P%d\n", stepper_motor->get_acceleration(), this->identifier);
+            gcode->stream->printf(";E acceleration mm/sec²:\nM204 E%1.4f P%d\n", stepper_motor->get_acceleration(), this->identifier);
             gcode->stream->printf(";E max feed rate mm/sec:\nM203 E%1.4f P%d\n", stepper_motor->get_max_rate(), this->identifier);
             if(this->max_volumetric_rate > 0) {
                 gcode->stream->printf(";E max volumetric rate mm³/sec:\nM203 V%1.4f P%d\n", this->max_volumetric_rate, this->identifier);
@@ -376,12 +373,12 @@ void Extruder::on_gcode_received(void *argument)
                 }
 
                 delta[motor_id] = -retract_length / get_e_scale(); // convert from mm to mm³, and unapply flow_rate
-                THEKERNEL->robot->delta_move(delta, retract_feedrate, motor_id + 1);
+                THEROBOT->delta_move(delta, retract_feedrate, motor_id + 1);
 
                 // zlift
                 if(retract_zlift_length > 0) {
                     float delta[3] {0, 0, retract_zlift_length};
-                    THEKERNEL->robot->delta_move(delta, retract_zlift_feedrate, 3);
+                    THEROBOT->delta_move(delta, retract_zlift_feedrate, 3);
                 }
 
             } else if(gcode->g == 11) {
@@ -390,7 +387,7 @@ void Extruder::on_gcode_received(void *argument)
                     // reverse zlift happens before unretract
                     // NOTE we do not do this if cancel_zlift_restore is set to true, which happens if there is an absolute Z move inbetween G10 and G11
                     float delta[3] {0, 0, -retract_zlift_length};
-                    THEKERNEL->robot->delta_move(delta, retract_zlift_feedrate, 3);
+                    THEROBOT->delta_move(delta, retract_zlift_feedrate, 3);
                 }
 
                 float delta[motor_id + 1];
@@ -403,7 +400,7 @@ void Extruder::on_gcode_received(void *argument)
                 // however this is not fatal for an extruder
                 if(g92e0_detected) save_position();
                 delta[motor_id] = (retract_length + retract_recover_length) / get_e_scale(); // convert from mm to mm³, and unapply flow_rate
-                THEKERNEL->robot->delta_move(delta, retract_recover_feedrate, motor_id + 1);
+                THEROBOT->delta_move(delta, retract_recover_feedrate, motor_id + 1);
                 if(g92e0_detected) restore_position();
             }
 

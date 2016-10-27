@@ -97,7 +97,7 @@ void Spindle::on_module_loaded()
             PinName pinname = port_pin((PortName)smoothie_pin->port_number, smoothie_pin->pin_number);
             feedback_pin = new InterruptIn(pinname);
             //feedback_pin.rise(&on_pin_rise); // TODO need to assign interrupt routine
-	      //NVIC_SetPriority(EINT3_IRQn, 16); //TODO Need to set to low priority
+	    //NVIC_SetPriority(EINT3_IRQn, 16); //TODO Need to set to low priority
         } else {
             THEKERNEL->streams->printf("Error: Spindle feedback pin has to be on P0 or P2.\n");
             delete this;

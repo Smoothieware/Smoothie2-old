@@ -18,7 +18,8 @@
 
 #include "device.h"
 
-#if DEVICE_SLEEP
+//#if DEVICE_SLEEP //TODO THIS WAS THE ORIGINAL BUT CONFLICTS WITH OTHER DEFINITION OF SLEEP
+#ifndef DEVICE_SLEEP
 
 #ifdef __cplusplus
 extern "C" {

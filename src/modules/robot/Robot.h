@@ -143,10 +143,9 @@ class Robot : public Module {
         // computational efficiency of generating arcs.
         int arc_correction;                                  // Setting : how often to rectify arc computation
         float max_speeds[3];                                 // Setting : max allowable speed in mm/s for each axis
-	
-	uint8_t selected_extruder;
-        uint8_t n_motors;                                    //count
 
+        uint8_t selected_extruder;
+        uint8_t n_motors;                                    //count of the motors/axis registered
 
         //used to initialize the TMC2130 stepper motor driver if present
         mbed::SPI *spi;

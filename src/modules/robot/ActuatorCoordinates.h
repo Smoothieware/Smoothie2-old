@@ -5,8 +5,8 @@
       You should have received a copy of the GNU General Public License along with Smoothie. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ACTUATOR_COORDINATES_H
-#define ACTUATOR_COORDINATES_H
+#pragma once
+
 #include <array>
 
 #ifndef MAX_ROBOT_ACTUATORS
@@ -17,5 +17,3 @@
 //Keep MAX_ROBOT_ACTUATORS as small as practical it impacts block size and therefore free memory.
 const size_t k_max_actuators = MAX_ROBOT_ACTUATORS;
 typedef struct std::array<float, k_max_actuators> ActuatorCoordinates;
-
-#endif

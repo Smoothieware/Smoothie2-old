@@ -38,7 +38,6 @@
 #include "Config.h"
 #include "checksumm.h"
 
-
 #define motor_driver_control_checksum  CHECKSUM("motor_driver_control")
 #define sense_resistor_checksum        CHECKSUM("sense_resistor")
 

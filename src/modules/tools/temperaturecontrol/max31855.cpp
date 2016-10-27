@@ -36,7 +36,7 @@ void Max31855::UpdateConfig(uint16_t module_checksum, uint16_t name_checksum)
     this->spi_cs_pin.from_string(THEKERNEL->config->value(module_checksum, name_checksum, chip_select_checksum)->by_default("0.16")->as_string());
     this->spi_cs_pin.set(true);
     this->spi_cs_pin.as_output();
-   
+
     // select which SPI channel to use
     int spi_channel = THEKERNEL->config->value(module_checksum, name_checksum, spi_channel_checksum)->by_default(0)->as_number();
     PinName miso;
@@ -94,7 +94,7 @@ float Max31855::read_temp()
 //	uint16_t data2 = spi->write(0);
 
     this->spi_cs_pin.set(true);
-   
+
     float temperature;
 
     //Process temp

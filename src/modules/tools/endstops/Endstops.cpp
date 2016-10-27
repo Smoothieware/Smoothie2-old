@@ -29,7 +29,6 @@
 #include "StepTicker.h"
 #include "BaseSolution.h"
 #include "SerialMessage.h"
-#include "SEGGER_SYSVIEW.h"
 
 #include <ctype.h>
 
@@ -651,6 +650,16 @@ void Endstops::process_home_command(Gcode* gcode)
             }
             // check if on_halt (eg kill)
             if(THEKERNEL->is_halted()) break;
+        }
+
+    } else if(is_corexy) {
+        // corexy must home each axis individually
+        for (int a = X_AXIS; a <= Z_AXIS; ++a) {
+            if(haxis[a]) {
+                std::bitset<3> bs;
+                bs.set(a);
+                home(bs);
+            }
         }
 
     } else {

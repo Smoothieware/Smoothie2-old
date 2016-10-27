@@ -1,6 +1,6 @@
 
-#DIRS = gcc4mbed src
-DIRS = src
+DIRS = gcc4mbed src
+#DIRS = src
 DIRSCLEAN = $(addsuffix .clean,$(DIRS))
 
 all:

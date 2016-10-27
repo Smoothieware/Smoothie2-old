@@ -26,3 +26,4 @@ protected:
     float offset[3];
     uint16_t identifier;
 };
+
