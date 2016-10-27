@@ -48,6 +48,8 @@ Kernel* Kernel::instance;
 
 // The kernel is the central point in Smoothie : it stores modules, and handles event calls
 Kernel::Kernel(){
+
+	debug = false;
     halted= false;
     feed_hold= false;
 
@@ -56,15 +58,19 @@ Kernel::Kernel(){
     // All streams register to the Kernel so we can broadcast messages
     this->streams = new StreamOutputPool();
 
+    this->serial = nullptr;
+    this->secondary_serial = nullptr;
+
     // Create the default UART Serial Console interface
-    if (SMOOTHIE_UART_PRIMARY_ENABLE) {
+#ifdef SMOOTHIE_UART_PRIMARY_ENABLE
         this->serial = new SerialConsole(SMOOTHIE_UART_PRIMARY_TX, SMOOTHIE_UART_PRIMARY_RX, 9600);
         this->add_module( this->serial );
-    }
-    if (SMOOTHIE_UART_SECONDARY_ENABLE) {
+#endif
+
+#ifdef SMOOTHIE_UART_SECONDARY_ENABLE
         this->secondary_serial = new SerialConsole(SMOOTHIE_UART_SECONDARY_TX, SMOOTHIE_UART_SECONDARY_RX, 9600);
         this->add_module( this->secondary_serial );
-    }
+#endif
 
     // Config next, but does not load cache yet
     this->config = new Config();
