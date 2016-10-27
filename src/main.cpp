@@ -9,6 +9,25 @@
 #include "Endstops.h"
 #include "Laser.h"
 #include "Config.h"
+#include "checksumm.h"
+#include "ConfigValue.h"
+#include "StepTicker.h"
+#include "SlowTicker.h"
+#include "Robot.h"
+
+// #include "libs/ChaNFSSD/SDFileSystem.h"
+#include "libs/nuts_bolts.h"
+#include "libs/utils.h"
+
+// Debug
+#include "libs/SerialMessage.h"
+
+//#include "libs/USBDevice/USB.h"
+//#include "libs/USBDevice/USBMSD/USBMSD.h"
+//#include "libs/USBDevice/USBMSD/SDCard.h"
+//#include "libs/USBDevice/USBSerial/USBSerial.h"
+//#include "libs/USBDevice/DFU.h"
+//#include "libs/SDFAT.h"
 #include "StreamOutputPool.h"
 #include "MotorDriverControl.h"
 #include "SEGGER_SYSVIEW.h"
