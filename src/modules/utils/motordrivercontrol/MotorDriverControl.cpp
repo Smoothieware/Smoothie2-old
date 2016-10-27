@@ -47,6 +47,22 @@ MotorDriverControl::MotorDriverControl(uint8_t id) : id(id)
     enable_event= false;
     current_override= false;
     microstep_override= false;
+    chip = TMC2130;
+    if (chip==TMC2130) {
+    	current = 31;   // 31/31 ration driven
+    } else {
+    	current = 1000; // 1000 mA
+    }
+    switch(chip) {
+        case DRV8711: max_current= DRV8711_max_current; break;
+        case TMC2660: max_current= TMC2660_max_current; break;
+        case TMC2130: max_current= TMC2130_max_current; break;  //TMC2130 only allows a ratio of 0..31 which represents 1/32 .. 32/32
+    }
+	current = max_current;
+	hold_current = max_current;
+	microsteps = 16;
+	designator = '0';
+	spi = nullptr;
 }
 
 MotorDriverControl::~MotorDriverControl()
@@ -189,7 +205,7 @@ bool MotorDriverControl::config_module(uint16_t cs)
         // enable alarm monitoring for the chip
         this->register_for_event(ON_SECOND_TICK);
     }
-//TODO fix below to actuall print out the human readable MBED pin name, e.e P3_0 rather than its address
+//TODO fix below to actually print out the human readable MBED pin name, e.e P3_0 rather than its address
     THEKERNEL->streams->printf("MotorDriverControl INFO: configured motor %c (%d): as %s, cs: %04X\n", designator, id, chip==TMC2660?"TMC2660":chip==DRV8711?"DRV8711":chip==TMC2130?"TMC2130":"UNKNOWN", spi_cs_pin.getPinName());
 
     return true;

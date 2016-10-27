@@ -32,6 +32,7 @@ class Adc;
 class PublicData;
 //TOADDBACK class SimpleShell;
 //TOADDBACK class Configurator;
+using namespace std;
 
 class Kernel {
     public:

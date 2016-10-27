@@ -80,35 +80,6 @@ Kernel::Kernel(){
 
     this->current_path   = "/";
 
-
-/*
-//TODO Need to add back as part of MRI and remove the AHB0 for the serial console
-    // Configure UART depending on MRI config
-    // Match up the SerialConsole to MRI UART. This makes it easy to use only one UART for both debug and actual commands.
-    NVIC_SetPriorityGrouping(0);
-
-#if MRI_ENABLE != 0
-    switch( __mriPlatform_CommUartIndex() ) {
-        case 0:
-            this->serial = new(AHB0) SerialConsole(USBTX, USBRX, this->config->value(uart0_checksum,baud_rate_setting_checksum)->by_default(DEFAULT_SERIAL_BAUD_RATE)->as_number());
-            break;
-        case 1:
-            this->serial = new(AHB0) SerialConsole(  p13,   p14, this->config->value(uart0_checksum,baud_rate_setting_checksum)->by_default(DEFAULT_SERIAL_BAUD_RATE)->as_number());
-            break;
-        case 2:
-            this->serial = new(AHB0) SerialConsole(  p28,   p27, this->config->value(uart0_checksum,baud_rate_setting_checksum)->by_default(DEFAULT_SERIAL_BAUD_RATE)->as_number());
-            break;
-        case 3:
-            this->serial = new(AHB0) SerialConsole(   p9,   p10, this->config->value(uart0_checksum,baud_rate_setting_checksum)->by_default(DEFAULT_SERIAL_BAUD_RATE)->as_number());
-            break;
-    }
-#endif
-    // default
-    if(this->serial == NULL) {
-        this->serial = new(AHB0) SerialConsole(USBTX, USBRX, this->config->value(uart0_checksum,baud_rate_setting_checksum)->by_default(DEFAULT_SERIAL_BAUD_RATE)->as_number());
-    }
-
-*/
     //some boards don't have leds.. TOO BAD!
     this->use_leds= !this->config->value( disable_leds_checksum )->by_default(false)->as_bool();
 
@@ -121,41 +92,6 @@ Kernel::Kernel(){
     // we exepct ok per line now not per G code, setting this to false will return to the old (incorrect) way of ok per G code
     this->ok_per_line= this->config->value( ok_per_line_checksum )->by_default(true)->as_bool();
 
-    this->add_module( this->serial );
-
-    // HAL stuff
-    add_module( this->slow_ticker = new SlowTicker());
-
-    this->step_ticker = new StepTicker();
-    this->adc = new Adc();
-
-    // TODO : These should go into platform-specific files
-    // LPC17xx-specific
-    //NVIC_SetPriorityGrouping(0);
-    NVIC_SetPriority(TIMER0_IRQn, 2);
-    NVIC_SetPriority(TIMER1_IRQn, 1);
-    //NVIC_SetPriority(TIMER2_IRQn, 4);
-    NVIC_SetPriority(PendSV_IRQn, 3);
-
-    // Set other priorities lower than the timers
-    //NVIC_SetPriority(ADC_IRQn, 5);
-    //NVIC_SetPriority(USB_IRQn, 5);
-
-/*
-//TODO Need to add back as part of MRI and remove the AHB0 for the serial console
-    // If MRI is enabled
-    if( MRI_ENABLE ){
-        if( NVIC_GetPriority(UART0_IRQn) > 0 ){ NVIC_SetPriority(UART0_IRQn, 5); }
-        if( NVIC_GetPriority(UART1_IRQn) > 0 ){ NVIC_SetPriority(UART1_IRQn, 5); }
-        if( NVIC_GetPriority(UART2_IRQn) > 0 ){ NVIC_SetPriority(UART2_IRQn, 5); }
-        if( NVIC_GetPriority(UART3_IRQn) > 0 ){ NVIC_SetPriority(UART3_IRQn, 5); }
-    }else{
-        NVIC_SetPriority(UART0_IRQn, 5);
-        NVIC_SetPriority(UART1_IRQn, 5);
-        NVIC_SetPriority(UART2_IRQn, 5);
-        NVIC_SetPriority(UART3_IRQn, 5);
-    }
-*/
     // Configure the step ticker
     this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
 //    float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(5)->as_number();
