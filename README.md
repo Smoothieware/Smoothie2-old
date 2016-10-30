@@ -14,6 +14,7 @@ Current status as at 2016-10-31:
 * This code base is equivalent to Smoothie V1 as at 2016-10-18.
 * The code that relies on the priority setting of GPIO interrupts has not had this feature migrated (e.g. laser)
 * Some major lower level things need implementation ( USB, Ethernet, SDIO ).  
+* There some changes in `gcc4mbed/external/mbed/libraries/mbed/hal/sleep_api.h` which appear to be driven by Silicon Labs changes to support their EFM32 range of ARM processor's lower power modes.  This causes conflicts with `sleep` and I have had to slightly modify this file to get our code to compile and work properly.  I don't have time to go back and investigate this at this time.
 
 # Compiling
 
