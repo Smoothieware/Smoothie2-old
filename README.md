@@ -8,12 +8,11 @@ There are a lot of bugs in the code and it is very much a work in progress, the 
 
 #IF YOU ARE NOT A CODER / WORKING ON THIS CODE BASE DO NOT TRY TO USE THIS UNTIL THE CODE HAS BEEN FULLY PORTED AND TESTED
 
-Current status as at 2016-10-27: 
+Current status as at 2016-10-31: 
 * Issue: HardFault in `planner.cpp` on line 71 `block->steps[i] = labs(steps);`
 * Issue: No initial serial output on `main.ccp` on line 50 `kernel->streams->printf("Smoothie2 dev\n");` 
 * This code base is equivalent to Smoothie V1 as at 2016-10-18.
 * The code that relies on the priority setting of GPIO interrupts has not had this feature migrated (e.g. laser)
-* More code porting underway, expected completion is 2016-10-31
 * Some major lower level things need implementation ( USB, Ethernet, SDIO ).  
 
 # Compiling
@@ -60,7 +59,7 @@ TODO functionality to port from v1 in more detail :
  * modules/tools/filamentdetector : Get PWM to work
  * modules/tools/spindle : Get PWM to work
  * modules/tools/temperaturecontrol : Finish porting, get the ADC to actually work, I cannot test the AD8495 temperature inputs as I don't have one of these!
- * modules/tools/zprobe : Port
+ * modules/tools/zprobe : Test
  * modules/tools/simpleshell : Port
 
  * The FPGA requires a SGPIO spi library
@@ -68,7 +67,6 @@ TODO functionality to port from v1 in more detail :
 
 Things that are broken during the port and should be added back as things progress ( some things might be missing here. I try to use the TOADDBACK label when commenting things so search for that too ) : 
 
-* In GcodeDispatch.cpp : Removed dependency to Pauser.h
 * In Switch.cpp : Commented out all of the set_low_on_debug stuff; do we still need this?
 * In SlowTicker.h and Hook.h : Using doubles instead of ints for intervals/frequencies and counting down. Done to accomodate mBed, but dirty costly hack
 * In RingBuffer.h : Removed the irq stuff
