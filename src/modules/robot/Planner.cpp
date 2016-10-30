@@ -68,6 +68,8 @@ bool Planner::append_block( ActuatorCoordinates &actuator_pos, uint8_t n_motors,
         // find direction
         block->direction_bits[i] = (steps < 0) ? 1 : 0;
         // save actual steps in block
+        uint32_t a = labs(steps);
+        block->steps[i] = a;
         block->steps[i] = labs(steps);
     }
 

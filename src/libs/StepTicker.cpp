@@ -20,6 +20,9 @@
 #include <math.h>
 #include <mri.h>
 
+#include "SEGGER_SYSVIEW.h"
+#include "SEGGER_RTT_Conf.h"
+
 #ifdef STEPTICKER_DEBUG_PIN
 // debug pins, only used if defined in src/makefile
 #include "gpio.h"
@@ -71,6 +74,8 @@ StepTicker::StepTicker()
 
     this->running = false;
     this->current_block = nullptr;
+
+    this->start();
 
     #ifdef STEPTICKER_DEBUG_PIN
     // setup debug pin if defined
@@ -127,17 +132,25 @@ void StepTicker::unstep_tick()
 // Unstep timer interrupt handler
 extern "C" void TIMER1_IRQHandler (void)
 {
+//	SEGGER_RTT_LOCK();
+//	SEGGER_SYSVIEW_RecordEnterISR();
 	LPC_TIMER1->IR |= 1 << 0;
 	StepTicker::getInstance()->unstep_tick();
 	NVIC_ClearPendingIRQ(TIMER1_IRQn);
+//	SEGGER_SYSVIEW_RecordExitISR();
+//	SEGGER_RTT_UNLOCK();
 }
 
 // Step timer interrupt handler
 extern "C" void TIMER0_IRQHandler (void)
 {
+//	SEGGER_RTT_LOCK();
+//	SEGGER_SYSVIEW_RecordEnterISR();
 	LPC_TIMER0->IR |= 1 << 0;
 	StepTicker::getInstance()->step_tick();
 	NVIC_ClearPendingIRQ(TIMER0_IRQn);
+//	SEGGER_SYSVIEW_RecordExitISR();
+//	SEGGER_RTT_UNLOCK();
 }
 
 extern "C" void PendSV_Handler(void)

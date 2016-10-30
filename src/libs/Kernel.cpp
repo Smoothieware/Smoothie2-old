@@ -136,7 +136,7 @@ Kernel::Kernel(){
     add_module( this->slow_ticker = new SlowTicker());
 
     this->step_ticker = new StepTicker();
-    this->adc = new Adc();
+//TODO ADDBACK    this->adc = new Adc();
 
     // TODO : These should go into platform-specific files
     // TODO THIS NEEDS TO BE UPDATED FOR LPC4330
