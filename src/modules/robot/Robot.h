@@ -18,8 +18,6 @@ using std::string;
 #include "libs/Module.h"
 #include "ActuatorCoordinates.h"
 #include "nuts_bolts.h"
-#include "Pin.h"
-#include <mbed.h>
 
 class Gcode;
 class BaseSolution;
@@ -147,19 +145,8 @@ class Robot : public Module {
         uint8_t selected_extruder;
         uint8_t n_motors;                                    //count of the motors/axis registered
 
-        //used to initialize the TMC2130 stepper motor driver if present
-        mbed::SPI *spi;
-        Pin spi_sck_pin;
-        Pin spi_mosi_pin;
-        Pin spi_miso_pin;
-        //Note the spi_cs pin is read per stepper from the config file, for example for a Bamabino210[E] board:
-        //alpha_spi_cs_pin				7.4		  # Pin for alpha SilentStepStick SPI Enable pin
-        //beta_spi_cs_pin				7.5		  # Pin for beta SilentStepStick SPI Enable pin
-        //gamma_spi_cs_pin				4.1		  # Pin for gamma SilentStepStick SPI Enable pin
-
-        // Used by Stepper, Planner
+        // Used by Planner
         friend class Planner;
-        friend class Stepper;
 };
 
 

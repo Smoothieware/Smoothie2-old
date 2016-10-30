@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef LINEARDELTASOLUTION_H
+#define LINEARDELTASOLUTION_H
 #include "libs/Module.h"
 #include "BaseSolution.h"
 
@@ -8,11 +8,11 @@ class Config;
 class LinearDeltaSolution : public BaseSolution {
     public:
         LinearDeltaSolution(Config*);
-        void cartesian_to_actuator(const float[], ActuatorCoordinates &) const override;
-        void actuator_to_cartesian(const ActuatorCoordinates &, float[] ) const override;
+        void cartesian_to_actuator(const float[], ActuatorCoordinates &) override;
+        void actuator_to_cartesian(const ActuatorCoordinates &, float[] ) override;
 
         bool set_optional(const arm_options_t& options) override;
-        bool get_optional(arm_options_t& options, bool force_all) const override;
+        bool get_optional(arm_options_t& options, bool force_all) override;
 
     private:
         void init();
@@ -34,3 +34,4 @@ class LinearDeltaSolution : public BaseSolution {
         float tower2_angle;
         float tower3_angle;
 };
+#endif // LINEARDELTASOLUTION_H

@@ -1001,7 +1001,6 @@ bool Robot::append_milestone(const float target[], float rate_mm_s)
     // as the last milestone won't be updated we do not actually lose any moves as they will be accounted for in the next move
     if(!auxilliary_move && distance < 0.00001F) return false;
 
-
     if(!auxilliary_move) {
          for (size_t i = X_AXIS; i <= Z_AXIS; i++) {
             // find distance unit vector for primary axis only

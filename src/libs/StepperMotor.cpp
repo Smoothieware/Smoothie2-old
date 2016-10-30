@@ -6,8 +6,7 @@
 */
 #include "StepperMotor.h"
 
-#include "libs/Module.h"
-#include "libs/Kernel.h"
+#include "Kernel.h"
 //#include "MRI_Hooks.h"
 #include "StepTicker.h"
 
@@ -16,6 +15,7 @@
 
 StepperMotor::StepperMotor(Pin &step, Pin &dir, Pin &en) : step_pin(step), dir_pin(dir), en_pin(en)
 {
+    //TODO ADDBACK set_high_on_debug(en.port_number, en.pin_number);
 
     steps_per_mm         = 1.0F;
     max_rate             = 50.0F;
@@ -29,7 +29,7 @@ StepperMotor::StepperMotor(Pin &step, Pin &dir, Pin &en) : step_pin(step), dir_p
 
     enable(false);
     unstep(); // initialize step pin
-    set_direction(false); // initialize direction pin
+    set_direction(false); // initialize dor pin
 
     this->register_for_event(ON_HALT);
     this->register_for_event(ON_ENABLE);
@@ -93,4 +93,28 @@ int32_t StepperMotor::steps_to_target(float target)
 {
     int32_t target_steps = lroundf(target * steps_per_mm);
     return target_steps - last_milestone_steps;
+}
+
+// Does a manual step pulse, used for direct encoder control of a stepper
+// NOTE this is experimental and may change and/or be reomved in the future, it is an unsupported feature.
+// use at your own risk
+void StepperMotor::manual_step(bool dir)
+{
+    if(!is_enabled()) enable(true);
+
+    // set direction if needed
+    if(this->direction != dir) {
+        this->direction= dir;
+        this->dir_pin.set(dir);
+        wait_us(1);
+    }
+
+    // pulse step pin
+    this->step_pin.set(1);
+    wait_us(3);
+    this->step_pin.set(0);
+
+
+    // keep track of actuators actual position in steps
+    this->current_position_steps += (dir ? -1 : 1);
 }

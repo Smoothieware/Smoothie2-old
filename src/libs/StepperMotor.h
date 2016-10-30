@@ -9,12 +9,9 @@
 
 #include "Module.h"
 #include "Pin.h"
-#include <atomic>
-#include <functional>
 
 class StepperMotor  : public Module {
     public:
-        StepperMotor();
         StepperMotor(Pin& step, Pin& dir, Pin& en);
         ~StepperMotor();
 
@@ -29,7 +26,7 @@ class StepperMotor  : public Module {
         inline void set_direction(bool f) { dir_pin.set(f); direction= f; }
 
         void enable(bool state) { en_pin.set(!state); };
-        //bool is_enabled() const { return !en_pin.get(); };
+        bool is_enabled() { return !en_pin.get(); };
         bool is_moving() const { return moving; };
         void start_moving() { moving= true; }
         void stop_moving() { moving= false; }
@@ -57,6 +54,7 @@ class StepperMotor  : public Module {
 
         int32_t steps_to_target(float);
 
+
     private:
         void on_halt(void *argument);
         void on_enable(void *argument);
@@ -73,17 +71,6 @@ class StepperMotor  : public Module {
         volatile int32_t current_position_steps;
         int32_t last_milestone_steps;
         float   last_milestone_mm;
-
-        uint32_t steps_to_move;
-        uint32_t stepped;
-        uint32_t last_step_tick;
-        uint32_t signal_step;
-
-        // set to 32 bit fixed point, 18:14 bits fractional
-        static const uint32_t fx_shift= 14;
-        static const uint32_t fx_increment= ((uint32_t)1<<fx_shift);
-        uint32_t fx_counter;
-        uint32_t fx_ticks_per_step;
 
         volatile struct {
             uint8_t motor_id:8;

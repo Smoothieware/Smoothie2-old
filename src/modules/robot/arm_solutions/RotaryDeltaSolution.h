@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef RotaryDeltaSolution_H
+#define RotaryDeltaSolution_H
 #include "libs/Module.h"
 #include "BaseSolution.h"
 
@@ -8,16 +8,16 @@ class Config;
 class RotaryDeltaSolution : public BaseSolution {
     public:
         RotaryDeltaSolution(Config*);
-        void cartesian_to_actuator(const float[], ActuatorCoordinates &) const override;
-        void actuator_to_cartesian(const ActuatorCoordinates &, float[] ) const override;
+        void cartesian_to_actuator(const float[], ActuatorCoordinates &) override;
+        void actuator_to_cartesian(const ActuatorCoordinates &, float[] ) override;
 
         bool set_optional(const arm_options_t& options) override;
-        bool get_optional(arm_options_t& options, bool force_all) const override;
+        bool get_optional(arm_options_t& options, bool force_all) override;
 
     private:
         void init();
-        int delta_calcAngleYZ(float x0, float y0, float z0, float &theta) const;
-        int delta_calcForward(float theta1, float theta2, float theta3, float &x0, float &y0, float &z0) const;
+        int delta_calcAngleYZ(float x0, float y0, float z0, float &theta);
+        int delta_calcForward(float theta1, float theta2, float theta3, float &x0, float &y0, float &z0);
 
         float delta_e;			// End effector length
         float delta_f;			// Base length
@@ -35,3 +35,4 @@ class RotaryDeltaSolution : public BaseSolution {
             bool mirror_xy:1;
         };
 };
+#endif // RotaryDeltaSolution_H

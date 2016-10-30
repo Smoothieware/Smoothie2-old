@@ -38,15 +38,14 @@ ExperimentalDeltaSolution::ExperimentalDeltaSolution(Config* config)
     arm_length_squared = powf(arm_length, 2);
 }
 
-void ExperimentalDeltaSolution::cartesian_to_actuator(const float cartesian_mm[], ActuatorCoordinates &actuator_mm ) const
-{
+void ExperimentalDeltaSolution::cartesian_to_actuator(const float cartesian_mm[], ActuatorCoordinates &actuator_mm ){
     float alpha_rotated[3], rotated[3];
 
-    if( sin_alpha == 0 && cos_alpha == 1) {
+    if( sin_alpha == 0 && cos_alpha == 1){
         alpha_rotated[X_AXIS] = cartesian_mm[X_AXIS];
         alpha_rotated[Y_AXIS] = cartesian_mm[Y_AXIS];
         alpha_rotated[Z_AXIS] = cartesian_mm[Z_AXIS];
-    } else {
+    }else{
         rotate( cartesian_mm, alpha_rotated, sin_alpha, cos_alpha );
     }
     actuator_mm[ALPHA_STEPPER] = solve_arm( alpha_rotated );
@@ -58,18 +57,15 @@ void ExperimentalDeltaSolution::cartesian_to_actuator(const float cartesian_mm[]
     actuator_mm[GAMMA_STEPPER] = solve_arm( rotated );
 }
 
-void ExperimentalDeltaSolution::actuator_to_cartesian(const ActuatorCoordinates &actuator_mm, float cartesian_mm[] ) const
-{
+void ExperimentalDeltaSolution::actuator_to_cartesian(const ActuatorCoordinates &actuator_mm, float cartesian_mm[] ){
     // unimplemented
 }
 
-float ExperimentalDeltaSolution::solve_arm( float cartesian_mm[]) const
-{
+float ExperimentalDeltaSolution::solve_arm( float cartesian_mm[]) {
     return sqrtf(arm_length_squared - powf(cartesian_mm[X_AXIS] - arm_radius, 2) - powf(cartesian_mm[Y_AXIS], 2)) + cartesian_mm[Z_AXIS];
 }
 
-void ExperimentalDeltaSolution::rotate(const float in[], float out[], float sin, float cos ) const
-{
+void ExperimentalDeltaSolution::rotate(const float in[], float out[], float sin, float cos ){
     out[X_AXIS] = cos * in[X_AXIS] - sin * in[Y_AXIS];
     out[Y_AXIS] = sin * in[X_AXIS] + cos * in[Y_AXIS];
     out[Z_AXIS] = in[Z_AXIS];

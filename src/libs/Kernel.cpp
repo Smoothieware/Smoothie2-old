@@ -26,7 +26,7 @@
 #include "StepperMotor.h"
 #include "BaseSolution.h"
 #include "EndstopsPublicAccess.h"
-//#include "Configurator.h"
+#include "Configurator.h"
 //#include "SimpleShell.h"
 
 //#include "platform_memory.h"
@@ -48,8 +48,6 @@ Kernel* Kernel::instance;
 
 // The kernel is the central point in Smoothie : it stores modules, and handles event calls
 Kernel::Kernel(){
-
-	debug = false;
     halted= false;
     feed_hold= false;
 
@@ -58,19 +56,28 @@ Kernel::Kernel(){
     // All streams register to the Kernel so we can broadcast messages
     this->streams = new StreamOutputPool();
 
-    this->serial = nullptr;
-    this->secondary_serial = nullptr;
+#ifndef SMOOTHIE_UART_PRIMARY_ENABLE
+#define SMOOTHIE_UART_PRIMARY_ENABLE 0
+#endif
+
+#ifndef SMOOTHIE_UART_SECONDARY_ENABLE
+#define SMOOTHIE_UART_SECONDARY_ENABLE 0
+#endif
+
+#ifndef DEFAULT_SERIAL_BAUD_RATE
+#define DEFAULT_SERIAL_BAUD_RATE 9600
+#endif
+
 
     // Create the default UART Serial Console interface
-#ifdef SMOOTHIE_UART_PRIMARY_ENABLE
-        this->serial = new SerialConsole(SMOOTHIE_UART_PRIMARY_TX, SMOOTHIE_UART_PRIMARY_RX, 9600);
+    if (SMOOTHIE_UART_PRIMARY_ENABLE) {
+        this->serial = new SerialConsole(SMOOTHIE_UART_PRIMARY_TX, SMOOTHIE_UART_PRIMARY_RX, DEFAULT_SERIAL_BAUD_RATE);
         this->add_module( this->serial );
-#endif
-
-#ifdef SMOOTHIE_UART_SECONDARY_ENABLE
-        this->secondary_serial = new SerialConsole(SMOOTHIE_UART_SECONDARY_TX, SMOOTHIE_UART_SECONDARY_RX, 9600);
+    }
+    if (SMOOTHIE_UART_SECONDARY_ENABLE) {
+        this->secondary_serial = new SerialConsole(SMOOTHIE_UART_SECONDARY_TX, SMOOTHIE_UART_SECONDARY_RX, DEFAULT_SERIAL_BAUD_RATE);
         this->add_module( this->secondary_serial );
-#endif
+    }
 
     // Config next, but does not load cache yet
     this->config = new Config();
@@ -78,13 +85,38 @@ Kernel::Kernel(){
     // Pre-load the config cache, do after setting up serial so we can report errors to serial
     this->config->config_cache_load();
 
-    // ADC reading
-    this->adc = new Adc();
+    // now config is loaded we can do normal setup for serial based on config
+    delete this->serial;
+    this->serial= NULL;
 
-    // For slow repeteative tasks
-    this->add_module( this->slow_ticker = new SlowTicker());
+    this->streams = new StreamOutputPool();
 
     this->current_path   = "/";
+
+    // Configure UART depending on MRI config
+    // Match up the SerialConsole to MRI UART. This makes it easy to use only one UART for both debug and actual commands.
+    NVIC_SetPriorityGrouping(0);
+
+#if MRI_ENABLE != 0
+    switch( __mriPlatform_CommUartIndex() ) {
+        case 0:
+            this->serial = new (SerialConsole(USBTX, USBRX, this->config->value(uart0_checksum,baud_rate_setting_checksum)->by_default(DEFAULT_SERIAL_BAUD_RATE)->as_number());
+            break;
+        case 1:
+            this->serial = new SerialConsole(  p13,   p14, this->config->value(uart0_checksum,baud_rate_setting_checksum)->by_default(DEFAULT_SERIAL_BAUD_RATE)->as_number());
+            break;
+        case 2:
+            this->serial = new SerialConsole(  p28,   p27, this->config->value(uart0_checksum,baud_rate_setting_checksum)->by_default(DEFAULT_SERIAL_BAUD_RATE)->as_number());
+            break;
+        case 3:
+            this->serial = new SerialConsole(   p9,   p10, this->config->value(uart0_checksum,baud_rate_setting_checksum)->by_default(DEFAULT_SERIAL_BAUD_RATE)->as_number());
+            break;
+    }
+#endif
+    // default
+    if(this->serial == nullptr) {
+        this->serial = new SerialConsole(USBTX, USBRX, this->config->value(uart0_checksum,baud_rate_setting_checksum)->by_default(DEFAULT_SERIAL_BAUD_RATE)->as_number());
+    }
 
     //some boards don't have leds.. TOO BAD!
     this->use_leds= !this->config->value( disable_leds_checksum )->by_default(false)->as_bool();
@@ -98,23 +130,56 @@ Kernel::Kernel(){
     // we exepct ok per line now not per G code, setting this to false will return to the old (incorrect) way of ok per G code
     this->ok_per_line= this->config->value( ok_per_line_checksum )->by_default(true)->as_bool();
 
-    // Configure the step ticker
-    this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
-//    float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(5)->as_number();
-    //this->acceleration_ticks_per_second = THEKERNEL->config->value(acceleration_ticks_per_second_checksum)->by_default(1000)->as_number();
+    this->add_module( this->serial );
 
+    // HAL stuff
+    add_module( this->slow_ticker = new SlowTicker());
 
     this->step_ticker = new StepTicker();
+    this->adc = new Adc();
+
+    // TODO : These should go into platform-specific files
+    // TODO THIS NEEDS TO BE UPDATED FOR LPC4330
+/*
+    NVIC_SetPriorityGrouping(0);
+    NVIC_SetPriority(TIMER0_IRQn, 2);
+    NVIC_SetPriority(TIMER1_IRQn, 1);
+    NVIC_SetPriority(TIMER2_IRQn, 4);
+    NVIC_SetPriority(PendSV_IRQn, 3);
+
+    // Set other priorities lower than the timers
+    NVIC_SetPriority(ADC_IRQn, 5);
+    NVIC_SetPriority(USB_IRQn, 5);
+
+    // If MRI is enabled
+    if( MRI_ENABLE ){
+        if( NVIC_GetPriority(UART0_IRQn) > 0 ){ NVIC_SetPriority(UART0_IRQn, 5); }
+        if( NVIC_GetPriority(UART1_IRQn) > 0 ){ NVIC_SetPriority(UART1_IRQn, 5); }
+        if( NVIC_GetPriority(UART2_IRQn) > 0 ){ NVIC_SetPriority(UART2_IRQn, 5); }
+        if( NVIC_GetPriority(UART3_IRQn) > 0 ){ NVIC_SetPriority(UART3_IRQn, 5); }
+    }else{
+        NVIC_SetPriority(UART0_IRQn, 5);
+        NVIC_SetPriority(UART1_IRQn, 5);
+        NVIC_SetPriority(UART2_IRQn, 5);
+        NVIC_SetPriority(UART3_IRQn, 5);
+    }
+*/
+    // Configure the step ticker
+    this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
+    float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(1)->as_number();
+
+    // Configure the step ticker
+    this->step_ticker->set_frequency( this->base_stepping_frequency );
+    this->step_ticker->set_unstep_time( microseconds_per_step_pulse );
 
     // Core modules
     this->add_module( this->conveyor       = new Conveyor()      );
     this->add_module( this->gcode_dispatch = new GcodeDispatch() );
     this->add_module( this->robot          = new Robot()         );
-    //this->add_module( this->simpleshell    = new SimpleShell()   );
+    // TOADDBACK this->add_module( this->simpleshell    = new SimpleShell()   );
 
     this->planner = new Planner();
-
-    // TOADDBACK this->configurator   = new Configurator();
+    this->configurator = new Configurator();
 }
 
 // return a GRBL-like query string for serial ?
@@ -196,7 +261,7 @@ void Kernel::call_event(_EVENT_ENUM id_event, void * argument){
     bool was_idle= true;
     if(id_event == ON_HALT) {
         this->halted= (argument == nullptr);
-        was_idle= conveyor->is_idle(); // see if we were doing anything like printing
+        was_idle= conveyor->is_queue_empty(); // see if we were doing anything like printing
     }
 
     // send to all registered modules

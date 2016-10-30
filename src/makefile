@@ -91,6 +91,10 @@ else
 GCC4MBED_TYPE := Release
 endif
 
+# this is the default UART baud rate used if it is not set in config
+# it is also the baud rate used to report any errors found while parsing the config file
+DEFAULT_SERIAL_BAUD_RATE?=9600
+
 # generate a git version string
 ifneq "$(OS)" "Windows_NT"
 DEFINES += -D__GITVERSIONSTRING__=\"$(shell ./generate-version.sh)\"

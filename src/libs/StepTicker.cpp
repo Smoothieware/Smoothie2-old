@@ -19,8 +19,6 @@
 //#include "system_LPC17xx.h" // mbed.h lib
 #include <math.h>
 #include <mri.h>
-#include "SEGGER_SYSVIEW.h"
-#include "SEGGER_RTT_Conf.h"
 
 #ifdef STEPTICKER_DEBUG_PIN
 // debug pins, only used if defined in src/makefile
@@ -56,7 +54,8 @@ StepTicker::StepTicker()
     LPC_CCU1->CLKCCU[CLK_MX_TIMER1].CFG |= 1;
     LPC_RGU->RESET_CTRL1 = 1 << (RGU_TIMER1_RST & 31);	//Trigger a peripheral reset for the timer
     while (!(LPC_RGU->RESET_ACTIVE_STATUS1 & (1 << (RGU_TIMER1_RST & 31)))){}
-    /* Configure Timer 0 */
+	
+    /* Configure Timer 1 */
     LPC_TIMER1->CTCR = 0x0;    // timer mode
     LPC_TIMER1->TCR = 0;    // Disable interrupt
     LPC_TIMER1->PR = prescale - 1;
@@ -65,8 +64,7 @@ StepTicker::StepTicker()
 
     // Default start values
     this->set_frequency(100000);
-    this->set_reset_delay(5);
-    //TODO REMOVE this->set_unstep_time(100);
+    this->set_unstep_time(100);
 
     this->unstep.reset();
     this->num_motors = 0;
@@ -81,7 +79,8 @@ StepTicker::StepTicker()
     #endif
 }
 
-StepTicker::~StepTicker() {
+StepTicker::~StepTicker()
+{
 }
 
 //called when everything is setup and interrupts can start
@@ -100,12 +99,12 @@ void StepTicker::set_frequency( float frequency )
 
     /* Update Timer 0 Match register and reset timer */
     LPC_TIMER0->MR[0] = this->period_us;
-    LPC_TIMER0->TCR = 3;  // Reset
+    LPC_TIMER0->TCR = 3; // Reset
     LPC_TIMER0->TCR = 1; // start
 }
 
 // Set the reset delay
-void StepTicker::set_reset_delay( float microseconds ){
+void StepTicker::set_unstep_time( float microseconds ){
     this->reset_delay_us = (int)lrint(microseconds);
     /* Update Timer 1 Match register */
     LPC_TIMER1->MR[0] = this->reset_delay_us;
@@ -116,10 +115,8 @@ void StepTicker::set_reset_delay( float microseconds ){
 // Reset step pins on any motor that was stepped
 void StepTicker::unstep_tick()
 {
-    for (int i = 0; i < num_motors; i++)
-    {
-        if(this->unstep[i])
-	{
+    for (int i = 0; i < num_motors; i++) {
+        if(this->unstep[i]) {
             this->motor[i]->unstep();
         }
     }
@@ -130,23 +127,17 @@ void StepTicker::unstep_tick()
 // Unstep timer interrupt handler
 extern "C" void TIMER1_IRQHandler (void)
 {
-//
 	LPC_TIMER1->IR |= 1 << 0;
 	StepTicker::getInstance()->unstep_tick();
 	NVIC_ClearPendingIRQ(TIMER1_IRQn);
-//	SEGGER_SYSVIEW_RecordExitISR();
 }
 
-// The actual interrupt handler where we do all the work - the step_tick
+// Step timer interrupt handler
 extern "C" void TIMER0_IRQHandler (void)
 {
-//	SEGGER_RTT_LOCK();
-//	SEGGER_SYSVIEW_RecordEnterISR();
 	LPC_TIMER0->IR |= 1 << 0;
 	StepTicker::getInstance()->step_tick();
 	NVIC_ClearPendingIRQ(TIMER0_IRQn);
-//	SEGGER_SYSVIEW_RecordExitISR();
-//	SEGGER_RTT_UNLOCK();
 }
 
 extern "C" void PendSV_Handler(void)
@@ -248,6 +239,7 @@ void StepTicker::step_tick (void)
     	LPC_TIMER1->TCR = 0x3;  // reset
     	LPC_TIMER1->TCR = 1; // enable = 1, reset = 0
     }
+
 
     // see if any motors are still moving
     if(!still_moving) {

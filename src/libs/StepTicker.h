@@ -18,8 +18,6 @@
 #include "ActuatorCoordinates.h"
 #include "TSRingBuffer.h"
 
-#include "mbed.h"
-
 class StepperMotor;
 class Block;
 
@@ -33,8 +31,7 @@ class StepTicker{
         StepTicker();
         ~StepTicker();
         void set_frequency( float frequency );
-	void set_reset_delay( float seconds );
-        //TODO REMOVE void set_unstep_time( float microseconds );
+        void set_unstep_time( float microseconds );
         int register_motor(StepperMotor* motor);
         float get_frequency() const { return frequency; }
         void unstep_tick();
@@ -48,15 +45,18 @@ class StepTicker{
         std::function<void()> finished_fnc{nullptr};
 
         static StepTicker *getInstance() { return instance; }
-	uint32_t reset_delay_us;
 
+        // TOADDBACK was private
+        volatile uint32_t tick_cnt;
+        uint32_t period_us;
+        uint32_t reset_delay_us;
     private:
         static StepTicker *instance;
 
         bool start_next_block();
 
         float frequency;
-        uint32_t period_us;
+        uint32_t period;
         std::array<StepperMotor*, k_max_actuators> motor;
         std::bitset<k_max_actuators> unstep;
 

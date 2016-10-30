@@ -200,7 +200,7 @@ try_again:
                                 }
                             }
                             // makes it handle the parameters as a machine position
-                            THEKERNEL->robot->next_command_is_MCS= true;
+                            THEROBOT->next_command_is_MCS= true;
 
                         }
 
@@ -270,7 +270,8 @@ try_again:
 
                                 delete gcode;
 				// TODO : TOADDBACK When Simpleshell is added back in
-                                /*if(str.empty()) {
+                                /*
+                                if(str.empty()) {
                                     SimpleShell::parse_command("help", "", new_message.stream);
 
                                 }else{
@@ -312,8 +313,8 @@ try_again:
                                     string arg= get_arguments(single_command + possible_command); // rest of line is filename
                                     if(arg.empty()) arg= "/sd/config-override";
                                     else arg= "/sd/config-override." + arg;
-                                    new_message.stream->printf("args: <%s>\n", arg.c_str());
-                                    //TOADDBACK : SimpleShell::parse_command((gcode->m == 501) ? "load_command" : "save_command", arg, new_message.stream);
+                                    //new_message.stream->printf("args: <%s>\n", arg.c_str());
+                                    //TODO ADDBACK SimpleShell::parse_command((gcode->m == 501) ? "load_command" : "save_command", arg, new_message.stream);
                                 }
                                 delete gcode;
                                 new_message.stream->printf("ok\r\n");

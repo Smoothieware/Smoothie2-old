@@ -1,4 +1,5 @@
-#pragma once
+#ifndef EXPERIMENTALDELTASOLUTION_H
+#define EXPERIMENTALDELTASOLUTION_H
 
 #include "BaseSolution.h"
 
@@ -7,12 +8,12 @@ class Config;
 class ExperimentalDeltaSolution : public BaseSolution {
     public:
         ExperimentalDeltaSolution(Config*);
-        void cartesian_to_actuator(const float[], ActuatorCoordinates &) const override;
-        void actuator_to_cartesian(const ActuatorCoordinates &, float[] ) const override;
+        void cartesian_to_actuator(const float[], ActuatorCoordinates &) override;
+        void actuator_to_cartesian(const ActuatorCoordinates &, float[] ) override;
 
     private:
-        float solve_arm( float millimeters[] ) const ;
-        void rotate(const float in[], float out[], float sin, float cos ) const ;
+        float solve_arm( float millimeters[] );
+        void rotate(const float in[], float out[], float sin, float cos );
 
         float arm_length;
         float arm_radius;
@@ -25,3 +26,10 @@ class ExperimentalDeltaSolution : public BaseSolution {
         float sin_gamma;
         float cos_gamma;
 };
+
+
+
+
+
+
+#endif // EXPERIMENTALDELTASOLUTION_H
