@@ -26,7 +26,7 @@ StepperMotor::StepperMotor(Pin &step, Pin &dir, Pin &en) : step_pin(step), dir_p
 {
     init();
     enable(false);
-    set_high_on_debug(en.port_number, en.pin);
+    //set_high_on_debug(en.port_number, en.pin);
 }
 
 StepperMotor::~StepperMotor()
