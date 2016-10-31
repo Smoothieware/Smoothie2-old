@@ -1,12 +1,13 @@
 /**
  * HardFaultHandler_C:
  *
- * This is called from the HardFault_HandlerAsm with a pointer the Fault stack
- * as the parameter. We can then read the values from the stack and place them
- * into local variables for ease of reading.
+ * This is called from the HardFault_Handler which over-rides the WEAK definition of HardFault_Handler with a pointer the
+ * Fault Stack as the parameter.
  *
- * We then read the various Fault Status and Address Registers to help decode
- * cause of the fault.
+ * Then this code reads the values from the stack and places them into local variables so they can be examined.
+ *
+ * There are various Fault Status and Address Registers to help decode the cause of the fault.
+ *
  * The function ends with a BKPT instruction to force control back into the debugger
  *
  * Refer to http://support.code-red-tech.com/CodeRedWiki/DebugHardFault
@@ -14,14 +15,13 @@
  * And to http://www.freertos.org/Debugging-Hard-Faults-On-Cortex-M-Microcontrollers.html
  *
  * Also refer to:
- * Cortex M4 exception handling
- * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0439b/ch03s09s01.html
- * Cortex M0 exception handing
- * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0497a/BABBFABJ.html
+ * Cortex M4 exception handling: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0439b/ch03s09s01.html
+ * Cortex M0 exception handing:  http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0497a/BABBFABJ.html
  *
  * The first register of interest is the program counter.
  *
- * In the code, the variable stacked_pc contains the program counter value.
+ * In the code, below the variable stacked_pc contains the program counter value.
+ *
  * When the fault is a precise fault, the stacked_pc holds the address of the instruction that was executing when the hard fault
  * (or other fault) occurred. When the fault is an imprecise fault, then additional steps are required to find the address of the
  * instruction that caused the fault.
@@ -59,6 +59,11 @@
  * re-run the test and then the imprecise fault becoming a precise fault, which makes the fault easier to debug.
  *
  *  Note: this will come at the cost of slower program execution.
+ *
+ *  I hope this helps you track down this hard to find HardFaults
+ *
+ *  Douglas.Pearless@gmail.com
+ *
  */
 
 // This overrides the WEAK definition of HardFault_Handler
