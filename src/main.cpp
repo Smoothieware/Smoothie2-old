@@ -181,11 +181,11 @@ bool sdok= false; //TODO remove once SD Card code is working
 
 //    kernel->add_module( &usbserial );
 //    if( kernel->config->value( second_usb_serial_enable_checksum )->by_default(false)->as_bool() ){
-//        kernel->add_module( new(AHB0) USBSerial(&u) );
+//        kernel->add_module( new USBSerial(&u) );
 //    }
 
 //    if( kernel->config->value( dfu_enable_checksum )->by_default(false)->as_bool() ){
-//        kernel->add_module( new(AHB0) DFU(&u));
+//        kernel->add_module( new DFU(&u));
 //    }
 
 //    // 10 second watchdog timeout (or config as seconds)
