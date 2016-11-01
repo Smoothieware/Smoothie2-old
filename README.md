@@ -12,7 +12,7 @@ Current status as at 2016-10-31:
 * Issue: HardFault in `planner.cpp` on line 71 `block->steps[i] = labs(steps);`  *FIXED*
 * Issue: The HardFault_Handler was not being correctly called *FIXED*
 * Issue: No initial serial output on `main.ccp` on line 50 `kernel->streams->printf("Smoothie2 dev\n");` 
-* Issue: The G28 Homing only moves a short distance then stops.
+* Issue: Movement (G0 Zn, G28 Homing) only moves a short distance then stops *CURRENTLY UNDER INVESTIGATION 2016-10-31*
 * This code base is equivalent to Smoothie V1 as at 2016-10-18.
 * The code that relies on the priority setting of GPIO interrupts has not had this feature migrated (e.g. laser)
 * Some major lower level things need implementation ( USB, Ethernet, SDIO ).  
@@ -46,7 +46,7 @@ And finally compile the code
 # TODO : 
 
 Current major TODOs : 
- * Complete the three way comparison between 'old Smoothie - pre-major rewrite in June/July 2016' 'Smoothie V1 (current)' and 'SmoothieV2'
+ * Complete the three way comparison between 'old Smoothie - pre-major rewrite in June/July 2016' 'Smoothie V1 (current)' and 'SmoothieV2' *Mostly done as at 2016-10-31*
  * SD-Card, USB and Ethernet need to be implemented.
  * Move the step generation to the M0 co-processor instead of on the M4 main core.
 

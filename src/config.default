@@ -78,9 +78,9 @@ delta_mirror_xy                                 true           # true for firepi
 #    For a 0.9 degree stepper motor and an TMC2130 driver set for 256 microsteps = (400 * 256 * 9.52226215)/360 = 2708.554567
 #    For a 1.8 degree stepper motor and an TMC2130 driver set for 256 microsteps = (200 * 256 * 9.52226215)/360 = 1354.277284
 
-alpha_steps_per_mm                           338.0      # Steps per mm for alpha stepper
-beta_steps_per_mm                            338.0      # Steps per mm for beta stepper
-gamma_steps_per_mm                           338.0      # Steps per mm for gamma stepper
+alpha_steps_per_mm                           2708.554567      # Steps per mm for alpha stepper
+beta_steps_per_mm                            2708.554567      # Steps per mm for beta stepper
+gamma_steps_per_mm                           2708.554567      # Steps per mm for gamma stepper
 
 # Stepper module pins ( ports, and pin numbers, appending "!" to the number will invert a pin )
 alpha_step_pin                               5.0              # Pin for alpha stepper step signal
