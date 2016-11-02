@@ -24,6 +24,10 @@ using namespace std;
 class SlowTicker : public Module{
     public:
         SlowTicker();
+
+        void on_module_loaded(void);
+        void on_idle(void*);
+        void start();
         void set_frequency( int frequency );
         void tick();
         // For some reason this can't go in the .cpp, see :  http://mbed.org/forum/mbed/topic/2774/?page=1#comment-14221
@@ -45,11 +49,18 @@ class SlowTicker : public Module{
             return hook;
         }
 
-    // TOADDBACK: private:
+    private:
+        bool flag_1s();
+
         vector<Hook*> hooks;
-        double max_frequency;
-        double interval;
+        uint32_t max_frequency;
+        uint32_t interval;
         Ticker* ticker;
+
+        Pin ispbtn;
+protected:
+    int flag_1s_count;
+    volatile int flag_1s_flag;
 };
 
 
