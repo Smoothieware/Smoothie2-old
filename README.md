@@ -9,7 +9,7 @@ There are a lot of bugs in the code and it is very much a work in progress, the 
 #IF YOU ARE NOT A CODER / WORKING ON THIS CODE BASE DO NOT TRY TO USE THIS UNTIL THE CODE HAS BEEN FULLY PORTED AND TESTED
 
 Current status as at 2016-11-02:
-* * Moved open issues to issue tracker
+* Moved open issues to issue tracker
 * This code base is equivalent to Smoothie V1 as at 2016-10-18.
 * The code that relies on the priority setting of GPIO interrupts has not had this feature migrated (e.g. laser)
 * Some major lower level things need implementation ( USB, Ethernet, SDIO ).  
