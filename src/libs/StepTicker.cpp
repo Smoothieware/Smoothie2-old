@@ -78,7 +78,7 @@ StepTicker::StepTicker(){
     this->active_motor.reset();
     this->tick_cnt= 0;
 
-    NVIC_EnableIRQ(RITIMER_IRQn);
+    //NVIC_EnableIRQ(RITIMER_IRQn);
 
 }
 
@@ -87,11 +87,11 @@ StepTicker::~StepTicker() {
 
 //called when everythinf is setup and interrupts can start
 void StepTicker::start() {
-    /*
+
     NVIC_EnableIRQ(TIMER0_IRQn);     // Enable interrupt handler
     NVIC_EnableIRQ(TIMER1_IRQn);     // Enable interrupt handler
     NVIC_EnableIRQ(RITIMER_IRQn);
-    */
+
 }
 
 // Set the base stepping frequency
