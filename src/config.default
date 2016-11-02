@@ -258,15 +258,15 @@ rdelta_homing                                true             # forces all three
 alpha_min_endstop                            7.4!^            #
 alpha_max_endstop                            7.7^             # add ! to invert pullup if switch is NO to ground
 alpha_homing_direction                       home_to_max      # Home up
-alpha_max                                    300              #
+alpha_max                                    3000             #
 beta_min_endstop                             7.5!^            #
 beta_max_endstop                             4.3^             #
 beta_homing_direction                        home_to_max      #
-beta_max                                     300              #
+beta_max                                     30000            #
 gamma_min_endstop                            4.1!^            #
 gamma_max_endstop                            4.4^             #
 gamma_homing_direction                       home_to_max      #
-gamma_max                                    300              #
+gamma_max                                    30000            #
 
 # optional enable limit switches, actions will stop if any enabled limit switch is triggered
 alpha_limit_enable                          false            # set to true to enable X min and max limit switches

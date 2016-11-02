@@ -75,8 +75,6 @@ StepTicker::StepTicker()
     this->running = false;
     this->current_block = nullptr;
 
-    this->start();
-
     #ifdef STEPTICKER_DEBUG_PIN
     // setup debug pin if defined
     stepticker_debug_pin.output();
