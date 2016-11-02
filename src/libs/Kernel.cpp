@@ -56,19 +56,6 @@ Kernel::Kernel(){
     // All streams register to the Kernel so we can broadcast messages
     this->streams = new StreamOutputPool();
 
-#ifndef SMOOTHIE_UART_PRIMARY_ENABLE
-#define SMOOTHIE_UART_PRIMARY_ENABLE 0
-#endif
-
-#ifndef SMOOTHIE_UART_SECONDARY_ENABLE
-#define SMOOTHIE_UART_SECONDARY_ENABLE 0
-#endif
-
-#ifndef DEFAULT_SERIAL_BAUD_RATE
-#define DEFAULT_SERIAL_BAUD_RATE 9600
-#endif
-
-
     // Create the default UART Serial Console interface
     if (SMOOTHIE_UART_PRIMARY_ENABLE) {
         this->serial = new SerialConsole(SMOOTHIE_UART_PRIMARY_TX, SMOOTHIE_UART_PRIMARY_RX, DEFAULT_SERIAL_BAUD_RATE);

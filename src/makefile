@@ -41,7 +41,7 @@ MBED_LIBS           += USBHost
 # Use C++11 features for the checksums
 DEFINES += -DCHECKSUM_USE_CPP
 
-
+DEFINES += -DDEFAULT_SERIAL_BAUD_RATE=9600
 
 # Need to use a custom LPC4337 script for boards like the Smoothie2 hardware which use that chip instead of the LPC4330.
 ifeq "$(BOARD)" "Smoothie2Proto1"
