@@ -284,8 +284,7 @@ try_again:
                             }
 
                             case 500: // M500 save volatile settings to config-override
-                                THEKERNEL->conveyor->wait_for_empty_queue(); //just to be safe as it can take a while to run
-                                //remove(THEKERNEL->config_override_filename()); // seems to cause a hang every now and then
+                                THEKERNEL->conveyor->wait_for_idle(); //just to be safe as it can take a while to run
                                 // TOADDBACK : __disable_irq();
                                 {
                                     FileStream fs(THEKERNEL->config_override_filename());

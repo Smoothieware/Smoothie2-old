@@ -22,7 +22,6 @@
 #include "modules/communication/GcodeDispatch.h"
 #include "modules/robot/Planner.h"
 #include "modules/robot/Robot.h"
-#include "modules/robot/Stepper.h"
 #include "modules/robot/Conveyor.h"
 #include "StepperMotor.h"
 #include "BaseSolution.h"
@@ -77,6 +76,9 @@ Kernel::Kernel(){
     // ADC reading
     this->adc = new Adc();
 
+    // STEP TICKER
+    this->step_ticker = new StepTicker();
+
     // For slow repeteative tasks
     this->add_module( this->slow_ticker = new SlowTicker());
 
@@ -89,16 +91,12 @@ Kernel::Kernel(){
 
     // Configure the step ticker
     this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
-    float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(5)->as_number();
-    this->acceleration_ticks_per_second = THEKERNEL->config->value(acceleration_ticks_per_second_checksum)->by_default(1000)->as_number();
+    float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(1)->as_number();
 
-
-    this->step_ticker = new StepTicker();
-
-    // Configure the step ticker ( TODO : shouldnt this go into stepticker's code ? )
-    this->step_ticker->set_reset_delay( microseconds_per_step_pulse );
+    // Configure the step ticker
     this->step_ticker->set_frequency( this->base_stepping_frequency );
-    this->step_ticker->set_acceleration_ticks_per_second(acceleration_ticks_per_second); // must be set after set_frequency
+    this->step_ticker->set_unstep_time( microseconds_per_step_pulse );
+
 
     // TODO : These should go into platform-specific files
     // LPC17xx-specific
@@ -194,4 +192,14 @@ bool Kernel::kernel_has_event(_EVENT_ENUM id_event, Module *mod)
         if(m == mod) return true;
     }
     return false;
+}
+
+void Kernel::unregister_for_event(_EVENT_ENUM id_event, Module *mod)
+{
+    for (auto i = hooks[id_event].begin(); i != hooks[id_event].end(); ++i) {
+        if(*i == mod) {
+            hooks[id_event].erase(i);
+            return;
+        }
+    }
 }
