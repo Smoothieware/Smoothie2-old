@@ -1,14 +1,48 @@
-/* Test which brings default HelloWorld project from mbed online compiler
-   to be built under GCC.
- */
-#include "mbed.h"
-#include "Kernel.h"
-#include "SwitchPool.h"
-#include "TemperatureControlPool.h"
-#include "Endstops.h"
-#include "Laser.h"
+/*
+      This file is part of Smoothie (http://smoothieware.org/). The motion control part is heavily based on Grbl (https://github.com/simen/grbl).
+      Smoothie is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+      Smoothie is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+      You should have received a copy of the GNU General Public License along with Smoothie. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "libs/Kernel.h"
+
+#include "modules/tools/laser/Laser.h"
+#include "modules/tools/extruder/ExtruderMaker.h"
+#include "modules/tools/temperaturecontrol/TemperatureControlPool.h"
+#include "modules/tools/endstops/Endstops.h"
+#include "modules/tools/switch/SwitchPool.h"
+#include "modules/tools/drillingcycles/Drillingcycles.h"
+
+#include "modules/robot/Conveyor.h"
 #include "Config.h"
+#include "checksumm.h"
+#include "ConfigValue.h"
+#include "StepTicker.h"
+#include "SlowTicker.h"
+#include "Robot.h"
+
+// #include "libs/ChaNFSSD/SDFileSystem.h"
+#include "libs/nuts_bolts.h"
+#include "libs/utils.h"
+
+// Debug
+#include "libs/SerialMessage.h"
+/*
+#include "libs/USBDevice/USB.h"
+#include "libs/USBDevice/USBMSD/USBMSD.h"
+#include "libs/USBDevice/USBMSD/SDCard.h"
+#include "libs/USBDevice/USBSerial/USBSerial.h"
+#include "libs/USBDevice/DFU.h"
+#include "libs/SDFAT.h"
+*/
 #include "StreamOutputPool.h"
+#include "ToolManager.h"
+
+#include "system_LPC43xx.h"
+#include "platform_memory.h"
+
+#include "mbed.h"
 
 extern "C" void debugHardfault(uint32_t *sp);
 
@@ -60,6 +94,11 @@ int main() {
 
 	// Clear the configuration cache as it is no longer needed
 	kernel->config->config_cache_clear();
+
+	// start the timers and interrupts
+	kernel->conveyor->start(THEROBOT->get_number_registered_motors());
+	kernel->step_ticker->start();
+
 
 	// Main loop
 	while(1){
