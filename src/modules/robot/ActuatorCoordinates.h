@@ -10,7 +10,7 @@
 #include <array>
 
 #ifndef MAX_ROBOT_ACTUATORS
-#define MAX_ROBOT_ACTUATORS 3
+#define MAX_ROBOT_ACTUATORS 4
 #endif
 
 //The subset in use is determined by the arm solution's get_actuator_count().

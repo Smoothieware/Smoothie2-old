@@ -39,9 +39,9 @@ template<class kind, int length>  int RingBuffer<kind, length>::capacity(){
 }
 
 template<class kind, int length>  int RingBuffer<kind, length>::size(){
-        // TOADDBACK __disable_irq();
+        __asm volatile ("cpsid i"); // equivalent to CMSIS '__disable_irq()' function
         int i = head - tail + ((tail > head)?length:0);
-        // TOADDBACK __enable_irq();
+        __asm volatile ("cpsie i"); // equivalent to CMSIS '__enable_irq()' function
         return i;
 }
 

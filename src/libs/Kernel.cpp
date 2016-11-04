@@ -12,7 +12,7 @@
 #include "libs/SlowTicker.h"
 #include "libs/Adc.h"
 #include "libs/StreamOutputPool.h"
-//#include <mri.h>
+#include <mri.h>
 #include "checksumm.h"
 #include "ConfigValue.h"
 
@@ -29,7 +29,7 @@
 //#include "Configurator.h"
 //#include "SimpleShell.h"
 
-//#include "platform_memory.h"
+#include "platform_memory.h"
 
 #include <malloc.h>
 #include <array>
@@ -40,7 +40,6 @@
 
 #define base_stepping_frequency_checksum            CHECKSUM("base_stepping_frequency")
 #define microseconds_per_step_pulse_checksum        CHECKSUM("microseconds_per_step_pulse")
-#define acceleration_ticks_per_second_checksum      CHECKSUM("acceleration_ticks_per_second")
 #define disable_leds_checksum                       CHECKSUM("leds_disable")
 #define grbl_mode_checksum                          CHECKSUM("grbl_mode")
 #define ok_per_line_checksum                        CHECKSUM("ok_per_line")
@@ -76,9 +75,6 @@ Kernel::Kernel(){
     // ADC reading
     this->adc = new Adc();
 
-    // STEP TICKER
-    this->step_ticker = new StepTicker();
-
     // For slow repeteative tasks
     this->add_module( this->slow_ticker = new SlowTicker());
 
@@ -91,68 +87,98 @@ Kernel::Kernel(){
 
     // Configure the step ticker
     this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
-    float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(1)->as_number();
+    float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(5)->as_number();
+    // REMOVE this->acceleration_ticks_per_second = THEKERNEL->config->value(acceleration_ticks_per_second_checksum)->by_default(1000)->as_number();
 
-    // Configure the step ticker
-    this->step_ticker->set_frequency( this->base_stepping_frequency );
-    this->step_ticker->set_unstep_time( microseconds_per_step_pulse );
-
+    this->step_ticker = new StepTicker();
+    this->adc = new Adc();
 
     // TODO : These should go into platform-specific files
-    // LPC17xx-specific
     NVIC_SetPriorityGrouping(0);
     NVIC_SetPriority(TIMER0_IRQn, 2);
     NVIC_SetPriority(TIMER1_IRQn, 1);
     NVIC_SetPriority(TIMER2_IRQn, 4);
     NVIC_SetPriority(PendSV_IRQn, 3);
-    NVIC_SetPriority(RITIMER_IRQn, 3); // we make acceleration tick the same prio as pendsv so it can't be pre-empted by end of block
+
+    // Set other priorities lower than the timers
+    NVIC_SetPriority(ADC0_IRQn, 5);
+    NVIC_SetPriority(ADC1_IRQn, 5);
+
+    // Configure the step ticker
+    this->step_ticker->set_frequency( this->base_stepping_frequency );
+    this->step_ticker->set_unstep_time( microseconds_per_step_pulse );
 
     // Core modules
     this->add_module( this->conveyor       = new Conveyor()      );
     this->add_module( this->gcode_dispatch = new GcodeDispatch() );
     this->add_module( this->robot          = new Robot()         );
-    this->add_module( this->conveyor       = new Conveyor()      );
     // TOADDBACK this->add_module( this->simpleshell    = new SimpleShell()   );
 
     this->planner = new Planner();
-
-    // TOADDBACK this->configurator   = new Configurator();
+    // TOADDBACK this->configurator = new Configurator();
 }
 
 // return a GRBL-like query string for serial ?
 std::string Kernel::get_query_string()
 {
     std::string str;
+    bool homing;
+    bool ok = PublicData::get_value(endstops_checksum, get_homing_status_checksum, 0, &homing);
+    if(!ok) homing= false;
+    bool running= false;
+
     str.append("<");
     if(halted) {
         str.append("Alarm,");
-    }else if(this->conveyor->is_queue_empty()) {
+    }else if(homing) {
+        str.append("Home,");
+    }else if(feed_hold) {
+        str.append("Hold,");
+    }else if(this->conveyor->is_idle()) {
         str.append("Idle,");
     }else{
+        running= true;
         str.append("Run,");
     }
 
-    // get real time current actuator position in mm
-    ActuatorCoordinates current_position{
-        robot->actuators[X_AXIS]->get_current_position(),
-        robot->actuators[Y_AXIS]->get_current_position(),
-        robot->actuators[Z_AXIS]->get_current_position()
-    };
+    if(running) {
+        // get real time current actuator position in mm
+        ActuatorCoordinates current_position{
+            robot->actuators[X_AXIS]->get_current_position(),
+            robot->actuators[Y_AXIS]->get_current_position(),
+            robot->actuators[Z_AXIS]->get_current_position()
+        };
 
-    // get machine position from the actuator position using FK
-    float mpos[3];
-    robot->arm_solution->actuator_to_cartesian(current_position, mpos);
+        // get machine position from the actuator position using FK
+        float mpos[3];
+        robot->arm_solution->actuator_to_cartesian(current_position, mpos);
 
-    char buf[64];
-    // machine position
-    size_t n= snprintf(buf, sizeof(buf), "%f,%f,%f,", mpos[0], mpos[1], mpos[2]);
-    str.append("MPos:").append(buf, n);
+        char buf[128];
+        // machine position
+        size_t n= snprintf(buf, sizeof(buf), "%1.4f,%1.4f,%1.4f,", robot->from_millimeters(mpos[0]), robot->from_millimeters(mpos[1]), robot->from_millimeters(mpos[2]));
+        str.append("MPos:").append(buf, n);
 
-    // work space position
-    Robot::wcs_t pos= robot->mcs2wcs(mpos);
-    n= snprintf(buf, sizeof(buf), "%f,%f,%f", robot->from_millimeters(std::get<X_AXIS>(pos)), robot->from_millimeters(std::get<Y_AXIS>(pos)), robot->from_millimeters(std::get<Z_AXIS>(pos)));
-    str.append("WPos:").append(buf, n);
-    str.append(">\r\n");
+        // work space position
+        Robot::wcs_t pos= robot->mcs2wcs(mpos);
+        n= snprintf(buf, sizeof(buf), "%1.4f,%1.4f,%1.4f", robot->from_millimeters(std::get<X_AXIS>(pos)), robot->from_millimeters(std::get<Y_AXIS>(pos)), robot->from_millimeters(std::get<Z_AXIS>(pos)));
+        str.append("WPos:").append(buf, n);
+        str.append(">\r\n");
+
+    }else{
+        // return the last milestone if idle
+        char buf[128];
+        // machine position
+        Robot::wcs_t mpos= robot->get_axis_position();
+        size_t n= snprintf(buf, sizeof(buf), "%1.4f,%1.4f,%1.4f,", robot->from_millimeters(std::get<X_AXIS>(mpos)), robot->from_millimeters(std::get<Y_AXIS>(mpos)), robot->from_millimeters(std::get<Z_AXIS>(mpos)));
+        str.append("MPos:").append(buf, n);
+
+        // work space position
+        Robot::wcs_t pos= robot->mcs2wcs(mpos);
+        n= snprintf(buf, sizeof(buf), "%1.4f,%1.4f,%1.4f", robot->from_millimeters(std::get<X_AXIS>(pos)), robot->from_millimeters(std::get<Y_AXIS>(pos)), robot->from_millimeters(std::get<Z_AXIS>(pos)));
+        str.append("WPos:").append(buf, n);
+        str.append(">\r\n");
+
+    }
     return str;
 }
 
@@ -171,7 +197,7 @@ void Kernel::call_event(_EVENT_ENUM id_event, void * argument){
     bool was_idle= true;
     if(id_event == ON_HALT) {
         this->halted= (argument == nullptr);
-        was_idle= conveyor->is_queue_empty(); // see if we were doing anything like printing
+        was_idle= conveyor->is_idle(); // see if we were doing anything like printing
     }
 
     // send to all registered modules
@@ -203,3 +229,4 @@ void Kernel::unregister_for_event(_EVENT_ENUM id_event, Module *mod)
         }
     }
 }
+
