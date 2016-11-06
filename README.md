@@ -43,9 +43,18 @@ And finally compile the code
 # TODO : 
 
 Current major TODOs : 
+<<<<<<< HEAD
  * Complete the three way comparison between 'old Smoothie - pre-major rewrite in June/July 2016' 'Smoothie V1 (current)' and 'SmoothieV2' *Mostly done as at 2016-10-31*
  * SD-Card, USB and Ethernet need to be implemented.
  * Move the step generation to the M0 co-processor instead of on the M4 main core.
+=======
+ * Porting of existing functionality that hasn't been ported yet ( anything in https://github.com/Smoothieware/Smoothieware/tree/edge/src/modules that isn't ported yet )
+ * Some modules have been ported, but the underlying low-level/HAL stuff to talk to the peripherals isn't ( like SPI, or ADCs etc ), it's just dummy objects right now. So that needs porting too.
+ * USB and Ethernet need to be implemented.
+ * Doing the step generation on the M0 co-processor instead of on the M4 main core.
+ * This port was forked from Smoothie months ago, it should be updated to incoprorate changes to Smoothie done in the meantime.
+ * Explore using http://nuttx.org/ for a RTOS ( major rewrite )
+>>>>>>> 65fb13e36461556a69d4c824ccb3b4420f1f10af
 
 TODO functionality to port from v1 in more detail : 
  * libs/Adc.cpp : Port low level ADC functionality, then re-enable it in TemperatureControl ( note : there is some weird pin configuration surrounding this that makes it more complicated than it seems, but I don't remember what it is. Logxen@gmail.com probably remembers what it is ).
