@@ -234,7 +234,7 @@ bool sdok= false; //TODO remove once SD Card code is working
     // start the timers and interrupts
     THEKERNEL->conveyor->start(THEROBOT->get_number_registered_motors());
     THEKERNEL->step_ticker->start();
-//TODO IS this still required?    THEKERNEL->slow_ticker->start();
+    THEKERNEL->slow_ticker->start();
 }
 
 int main()
@@ -249,6 +249,7 @@ int main()
 		}
 		THEKERNEL->call_event(ON_MAIN_LOOP);
 		THEKERNEL->call_event(ON_IDLE);
+		THEKERNEL->streams->printf("0");
 	}
 
 }
