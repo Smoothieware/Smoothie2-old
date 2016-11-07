@@ -19,18 +19,21 @@ using namespace std;
 #include "libs/Pin.h"
 
 #include <math.h>
-#include "mbed.h"
 
 class SlowTicker : public Module{
     public:
         SlowTicker();
+
+        void on_module_loaded(void);
+        void on_idle(void*);
+        void start();
         void set_frequency( int frequency );
         void tick();
         // For some reason this can't go in the .cpp, see :  http://mbed.org/forum/mbed/topic/2774/?page=1#comment-14221
         // TODO replace this with std::function()
         template<typename T> Hook* attach( uint32_t frequency, T *optr, uint32_t ( T::*fptr )( uint32_t ) ){
             Hook* hook = new Hook();
-            hook->interval = ((float)1)/frequency;
+            hook->interval = floorf((SystemCoreClock)/frequency);
             hook->attach(optr, fptr);
             hook->countdown = hook->interval;
 
@@ -45,11 +48,17 @@ class SlowTicker : public Module{
             return hook;
         }
 
-    // TOADDBACK: private:
+    private:
+        bool flag_1s();
+
         vector<Hook*> hooks;
-        double max_frequency;
-        double interval;
-        Ticker* ticker;
+        uint32_t max_frequency;
+        uint32_t interval;
+
+        Pin ispbtn;
+protected:
+    int flag_1s_count;
+    volatile int flag_1s_flag;
 };
 
 

@@ -14,6 +14,7 @@ MRI_BREAK_ON_INIT ?= 1
 # slowly. It may run so slowly that it fails to execute properly since some routines (ie. step tickers) are
 # time sensitive.
 #OPTIMIZATION        :=  0
+OPTIMIZATION        :=  2
 
 
 

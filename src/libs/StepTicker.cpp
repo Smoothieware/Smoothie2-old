@@ -36,7 +36,7 @@ StepTicker::StepTicker(){
     instance = this; // setup the Singleton instance of the stepticker
 
     uint32_t PCLK = SystemCoreClock;
-    uint32_t prescale = PCLK / 10000000;
+    uint32_t prescale = PCLK / 1000000; //Increment MR each uSecond
 
     /* Enable timer 0 clock and reset it */
     LPC_CCU1->CLKCCU[CLK_MX_TIMER0].CFG |= 1;
@@ -48,7 +48,6 @@ StepTicker::StepTicker(){
     LPC_TIMER0->PR = prescale - 1;
     LPC_TIMER0->MR[0] = 10000000;    // Initial dummy value for Match Register
     LPC_TIMER0->MCR |= 3;    // Match on MR0, reset on MR0
-    NVIC_SetPriority(TIMER0_IRQn,0);
 
     /* Enable timer 1 clock and reset it */
     LPC_CCU1->CLKCCU[CLK_MX_TIMER1].CFG |= 1;
@@ -64,7 +63,7 @@ StepTicker::StepTicker(){
 
     // Default start values
     this->set_frequency(100000);
-    this->set_unstep_time(5);
+    this->set_unstep_time(10);
 
     this->unstep.reset();
     this->num_motors = 0;

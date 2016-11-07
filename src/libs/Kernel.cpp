@@ -72,9 +72,6 @@ Kernel::Kernel(){
     // Pre-load the config cache, do after setting up serial so we can report errors to serial
     this->config->config_cache_load();
 
-    // ADC reading
-    this->adc = new Adc();
-
     // For slow repeteative tasks
     this->add_module( this->slow_ticker = new SlowTicker());
 
@@ -89,6 +86,9 @@ Kernel::Kernel(){
     this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
     float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(5)->as_number();
     // REMOVE this->acceleration_ticks_per_second = THEKERNEL->config->value(acceleration_ticks_per_second_checksum)->by_default(1000)->as_number();
+
+    // HAL stuff
+    add_module( this->slow_ticker = new SlowTicker());
 
     this->step_ticker = new StepTicker();
     this->adc = new Adc();
