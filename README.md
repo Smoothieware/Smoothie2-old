@@ -8,9 +8,11 @@ There are a lot of bugs in the code and it is very much a work in progress, the 
 
 #IF YOU ARE NOT A CODER / WORKING ON THIS CODE BASE DO NOT TRY TO USE THIS UNTIL THE CODE HAS BEEN FULLY PORTED AND TESTED
 
-Current status as at 2016-11-02:
+Current status as at 2016-11-07:
+* SlowTicker code finally ported, but there are timing issues that need to be solved, including interrupt priorities to get it working properly (for end-stops for instance)
+* Merged changes 65fb13e and c3f254c to bring codebase current with SMoothie2 main repo 
 * Moved open issues to issue tracker
-* This code base is equivalent to Smoothie V1 as at 2016-10-18.
+* This code base is equivalent to Smoothie V1 as at 2016-10-18 and Smoothie V2 as at 2016-11-08
 * The code that relies on the priority setting of GPIO interrupts has not had this feature migrated (e.g. laser)
 * Some major lower level things need implementation ( USB, Ethernet, SDIO ).  
 * There some changes in `gcc4mbed/external/mbed/libraries/mbed/hal/sleep_api.h` which appear to be driven by Silicon Labs changes to support their EFM32 range of ARM processor's lower power modes.  This causes conflicts with `sleep` and I have had to slightly modify this file to get our code to compile and work properly.  I don't have time to go back and investigate this at this time.
