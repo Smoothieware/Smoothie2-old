@@ -17,6 +17,13 @@ Current status as at 2016-11-07:
 * Some major lower level things need implementation ( USB, Ethernet, SDIO ).  
 * There some changes in `gcc4mbed/external/mbed/libraries/mbed/hal/sleep_api.h` which appear to be driven by Silicon Labs changes to support their EFM32 range of ARM processor's lower power modes.  This causes conflicts with `sleep` and I have had to slightly modify this file to get our code to compile and work properly.  I don't have time to go back and investigate this at this time.
 
+There are a lot of bugs in the code and it is very much a work in progress, the reason it is published is to allow others to contriute before it is folded back into the Smoothie2 main repo.
+
+Current status : 
+* This code base is equivalent to Smoothie V1 as at 2016-10-18.
+* The Extruder code is being worked on and as of 2016-10-22 and does not yet compile.
+* Some major lower level things need implementation ( USB, Ethernet, SDIO ).  
+
 # Compiling
 
 First, go into gcc4mbed
@@ -45,9 +52,8 @@ And finally compile the code
 # TODO : 
 
 Current major TODOs : 
- * Complete the three way comparison between 'old Smoothie - pre-major rewrite in June/July 2016' 'Smoothie V1 (current)' and 'SmoothieV2' *Mostly done as at 2016-10-31*
- * SD-Card, USB and Ethernet need to be implemented.
- * Move the step generation to the M0 co-processor instead of on the M4 main core.
+ * SD-Card, USB and Ethernet need to be implemented, awaiting base libraries from Micromint.com.
+ * Move the step generation to the M0 co-processor instead of on the M4 main core OR into a FPGA.
 
 TODO functionality to port from v1 in more detail : 
  * libs/Adc.cpp : Port low level ADC functionality, then re-enable it in TemperatureControl ( note : there is some weird pin configuration surrounding this that makes it more complicated than it seems, but I don't remember what it is. Logxen@gmail.com probably remembers what it is ).
@@ -61,8 +67,15 @@ TODO functionality to port from v1 in more detail :
  * modules/tools/filamentdetector : Get PWM to work
  * modules/tools/spindle : Get PWM to work
  * modules/tools/temperaturecontrol : Finish porting, get the ADC to actually work, I cannot test the AD8495 temperature inputs as I don't have one of these!
- * modules/tools/zprobe : Test
- * modules/tools/simpleshell : Port
+ * modules/tools/zprobe : Ported Needs testing (2016-11-08)
+ * modules/tools/drillingcycles : Ported Needs testing (2016-11-08)
+ * modules/tools/extruder : Ported Needs testing (2016-11-08)
+ * modules/tools/filamentdetector : Port
+ * modules/tools/filamentdetector : Get PWM to work
+ * modules/tools/spindle : Get PWM to work
+ * modules/tools/temperaturecontrol : Finish porting, get the ADC to actually work, port the AD8495 temperature input
+ * modules/tools/zprobe : Ported Needs testing (2016-11-08)
+ * modules/tools/simpleshell : Port once USB ported
 
  * The FPGA requires a SGPIO spi library
  * The FPGA requires a way to flash a .bin to it over JTAG from the M4 
@@ -87,4 +100,4 @@ Planned refactors ( only to be done when the basic port is done ) : 
 * Try to read config directly from SD card without cache ( as smoothie used to do ) now that we have SDIO
 * Queue refactor ( see wiki )
 * Adding MTP and removing MSD for USB
-* Full rewrite based on a RTOS
+* Explore using http://nuttx.org/ for a RTOS ( major rewrite )
