@@ -36,7 +36,7 @@ StepTicker::StepTicker(){
     instance = this; // setup the Singleton instance of the stepticker
 
     uint32_t PCLK = SystemCoreClock;
-    uint32_t prescale = PCLK / 100000000;
+    uint32_t prescale = PCLK / 10000000;
 
     /* Enable timer 0 clock and reset it */
     LPC_CCU1->CLKCCU[CLK_MX_TIMER0].CFG |= 1;
@@ -64,7 +64,7 @@ StepTicker::StepTicker(){
 
     // Default start values
     this->set_frequency(100000);
-    this->set_unstep_time(100);
+    this->set_unstep_time(5);
 
     this->unstep.reset();
     this->num_motors = 0;
@@ -96,7 +96,8 @@ void StepTicker::start()
 void StepTicker::set_frequency( float frequency )
 {
     this->frequency = frequency;
-    this->period = floorf((SystemCoreClock) / frequency); // SystemCoreClock = Timer increments in a second
+    this->period = (int)lrint(1000000/frequency);
+
     LPC_TIMER0->MR[0] = this->period;
     LPC_TIMER0->TCR = 3;  // Reset
     LPC_TIMER0->TCR = 1;  // start
@@ -105,7 +106,7 @@ void StepTicker::set_frequency( float frequency )
 // Set the reset delay, must be called after set_frequency
 void StepTicker::set_unstep_time( float microseconds )
 {
-    uint32_t delay = floorf((SystemCoreClock) * (microseconds / 1000000.0F)); // SystemCoreClock = Timer increments in a second
+    uint32_t delay = (int)lrint(microseconds);
     LPC_TIMER1->MR[0] = delay;
 
     // TODO check that the unstep time is less than the step period, if not slow down step ticker
