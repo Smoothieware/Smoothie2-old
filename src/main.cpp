@@ -64,25 +64,10 @@
 #define watchdog_timeout_checksum  CHECKSUM("watchdog_timeout")
 
 DigitalOut leds[4] = {
-#ifdef TARGET_BAMBINO210E
-        DigitalOut(P6_11),
-        DigitalOut(P2_5),
-        DigitalOut(P6_1),
-        DigitalOut(P6_2)
-
-#elif defined(TARGET_BAMBINO200E)
-        DigitalOut(P6_11),
-        DigitalOut(P2_5),
-        DigitalOut(P6_11), // only has 2 leds
-        DigitalOut(P2_5)
-
-#elif defined(TARGET_SMOOTHIE2_PROTO1)
-        // smoothie 2 proto1
-        DigitalOut(P1_1),
-        DigitalOut(P1_2),
-        DigitalOut(P2_8),
-        DigitalOut(P2_9)
-#endif
+		DigitalOut(LED1),
+		DigitalOut(LED2),
+		DigitalOut(LED3),
+		DigitalOut(LED4)
 };
 
 void init() {
@@ -102,9 +87,9 @@ bool sdok= false; //TODO remove once SD Card code is working
 //    bool sdok= (sd.disk_initialize() == 0);
 //    if(!sdok) kernel->streams->printf("SDCard failed to initialize\r\n");
 
-//    #ifdef NONETWORK
-//        kernel->streams->printf("NETWORK is disabled\r\n");
-//    #endif
+    #ifdef NONETWORK
+        kernel->streams->printf("NETWORK is disabled\r\n");
+    #endif
 
 //#ifdef DISABLEMSD
 //    // attempt to be able to disable msd in config
@@ -264,7 +249,6 @@ int main()
 		}
 		THEKERNEL->call_event(ON_MAIN_LOOP);
 		THEKERNEL->call_event(ON_IDLE);
-		THEKERNEL->streams->printf("0");
 	}
 
 }

@@ -19,9 +19,6 @@ using namespace std;
 
 #include <mri.h>
 
-#include "SEGGER_SYSVIEW.h"
-#include "SEGGER_RTT_Conf.h"
-
 // This module uses a Timer to periodically call hooks
 // Modules register with a function ( callback ) and a frequency, and we then call that function at the given frequency.
 
@@ -29,7 +26,7 @@ SlowTicker* global_slow_ticker;
 
 SlowTicker::SlowTicker(){
     global_slow_ticker = this;
-    this->ticker = new Ticker();
+    //this->ticker = new Ticker();
 
     // ISP button FIXME: WHy is this here?
     ispbtn.from_string("2.10")->as_input()->pull_up();
@@ -58,8 +55,7 @@ void SlowTicker::on_module_loaded(){
 
 // Set the base frequency we use for all sub-frequencies
 void SlowTicker::set_frequency( int frequency ){
-	this->interval = (float)1 / frequency;
-    //this->interval = (float)1000000 / frequency;  //this->interval = (SystemCoreClock >> 2) / frequency;   // SystemCoreClock/4 = Timer increments in a second
+    this->interval = (float)1 / frequency;  //this->interval = (SystemCoreClock >> 2) / frequency;   // SystemCoreClock/4 = Timer increments in a second
     LPC_TIMER2->MR[0] = this->interval;
     LPC_TIMER2->TCR = 3;  // Reset
     LPC_TIMER2->TCR = 1;  // Reset
@@ -133,11 +129,9 @@ void SlowTicker::on_idle(void*)
 }
 
 extern "C" void TIMER2_IRQHandler (void){
-    SEGGER_SYSVIEW_RecordEnterISR();
     if((LPC_TIMER2->IR >> 0) & 1){  // If interrupt register set for MR0
         LPC_TIMER2->IR |= 1 << 0;   // Reset it
     }
     global_slow_ticker->tick();
-    SEGGER_SYSVIEW_RecordExitISR();
 }
 

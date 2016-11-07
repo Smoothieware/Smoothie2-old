@@ -41,7 +41,8 @@ MBED_LIBS           += USBHost
 # Use C++11 features for the checksums
 DEFINES += -DCHECKSUM_USE_CPP
 
-DEFINES += -DDEFAULT_SERIAL_BAUD_RATE=9600
+#Disable the network
+DEFINES += -DNONETWORK
 
 # Need to use a custom LPC4337 script for boards like the Smoothie2 hardware which use that chip instead of the LPC4330.
 ifeq "$(BOARD)" "Smoothie2Proto1"
@@ -64,7 +65,7 @@ ifeq "$(BOARD)" "Bambino210E"
 DEFINES += -DSMOOTHIE_UART_PRIMARY_ENABLE=1
 DEFINES += -DSMOOTHIE_UART_PRIMARY_TX=P2_10
 DEFINES += -DSMOOTHIE_UART_PRIMARY_RX=P2_11
-DEFINES += -DSMOOTHIE_UART_SECONDARY_ENABLE=0
+DEFINES += -DSMOOTHIE_UART_SECONDARY_ENABLE=1
 DEFINES += -DSMOOTHIE_UART_SECONDARY_TX=P6_4
 DEFINES += -DSMOOTHIE_UART_SECONDARY_RX=P6_5
 DEFINES += -DTARGET_BAMBINO210E
@@ -93,7 +94,7 @@ endif
 
 # this is the default UART baud rate used if it is not set in config
 # it is also the baud rate used to report any errors found while parsing the config file
-DEFAULT_SERIAL_BAUD_RATE?=9600
+DEFINES += -DDEFAULT_SERIAL_BAUD_RATE=9600
 
 # generate a git version string
 ifneq "$(OS)" "Windows_NT"

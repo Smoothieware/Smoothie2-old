@@ -73,11 +73,11 @@ Kernel::Kernel(){
     this->config->config_cache_load();
 
     // now config is loaded we can do normal setup for serial based on config
-//TODO TOADDBACK when USB is implemented
+//TOADDBACK when the USB libraries are ported
 //    delete this->serial;
 //    this->serial= NULL;
 //
-//     this->streams = new StreamOutputPool();
+//    this->streams = new StreamOutputPool();
 
     this->current_path   = "/";
 
@@ -128,30 +128,30 @@ Kernel::Kernel(){
 
     // TODO : These should go into platform-specific files
     // TODO THIS NEEDS TO BE UPDATED FOR LPC4330
+/*
+    NVIC_SetPriorityGrouping(0);
+    NVIC_SetPriority(TIMER0_IRQn, 2);
+    NVIC_SetPriority(TIMER1_IRQn, 1);
+    NVIC_SetPriority(TIMER2_IRQn, 4);
+    NVIC_SetPriority(PendSV_IRQn, 3);
 
-//    NVIC_SetPriorityGrouping(0);
-//    NVIC_SetPriority(TIMER0_IRQn, 2);
-//    NVIC_SetPriority(TIMER1_IRQn, 1);
-//    NVIC_SetPriority(TIMER2_IRQn, 4);
-//    NVIC_SetPriority(PendSV_IRQn, 3);
+    // Set other priorities lower than the timers
+    NVIC_SetPriority(ADC_IRQn, 5);
+    NVIC_SetPriority(USB_IRQn, 5);
 
-//    // Set other priorities lower than the timers
-//    NVIC_SetPriority(ADC_IRQn, 5);
-//    NVIC_SetPriority(USB_IRQn, 5);
-//
-//    // If MRI is enabled
-//    if( MRI_ENABLE ){
-//        if( NVIC_GetPriority(UART0_IRQn) > 0 ){ NVIC_SetPriority(UART0_IRQn, 5); }
-//        if( NVIC_GetPriority(UART1_IRQn) > 0 ){ NVIC_SetPriority(UART1_IRQn, 5); }
-//        if( NVIC_GetPriority(UART2_IRQn) > 0 ){ NVIC_SetPriority(UART2_IRQn, 5); }
-//        if( NVIC_GetPriority(UART3_IRQn) > 0 ){ NVIC_SetPriority(UART3_IRQn, 5); }
-//    }else{
-//        NVIC_SetPriority(UART0_IRQn, 5);
-//        NVIC_SetPriority(UART1_IRQn, 5);
-//        NVIC_SetPriority(UART2_IRQn, 5);
-//        NVIC_SetPriority(UART3_IRQn, 5);
-//    }
-
+    // If MRI is enabled
+    if( MRI_ENABLE ){
+        if( NVIC_GetPriority(UART0_IRQn) > 0 ){ NVIC_SetPriority(UART0_IRQn, 5); }
+        if( NVIC_GetPriority(UART1_IRQn) > 0 ){ NVIC_SetPriority(UART1_IRQn, 5); }
+        if( NVIC_GetPriority(UART2_IRQn) > 0 ){ NVIC_SetPriority(UART2_IRQn, 5); }
+        if( NVIC_GetPriority(UART3_IRQn) > 0 ){ NVIC_SetPriority(UART3_IRQn, 5); }
+    }else{
+        NVIC_SetPriority(UART0_IRQn, 5);
+        NVIC_SetPriority(UART1_IRQn, 5);
+        NVIC_SetPriority(UART2_IRQn, 5);
+        NVIC_SetPriority(UART3_IRQn, 5);
+    }
+*/
     // Configure the step ticker
     this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
     float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(1)->as_number();

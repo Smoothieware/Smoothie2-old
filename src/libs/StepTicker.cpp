@@ -50,7 +50,7 @@ StepTicker::StepTicker()
     LPC_TIMER0->TCR = 0;    // Disable interrupt
     LPC_TIMER0->PR = prescale - 1;
     LPC_TIMER0->MR[0] = 10000000;    // Initial dummy value for Match Register
-    LPC_TIMER0->MCR |= 3;    // Interrupt on MR0, reset on MR0
+    LPC_TIMER0->MCR |= 3;    // Match on MR0, reset on MR0
     NVIC_SetPriority(TIMER0_IRQn,0);
 
     /* Enable timer 1 clock and reset it */
@@ -63,7 +63,7 @@ StepTicker::StepTicker()
     LPC_TIMER1->TCR = 0;    // Disable interrupt
     LPC_TIMER1->PR = prescale - 1;
     LPC_TIMER1->MR[0] = 10000000;    // Initial dummy value for Match Register
-    LPC_TIMER1->MCR |= 5;    // Interrupt on MR0, stop on MR0
+    LPC_TIMER1->MCR |= 5;    // match on Mr0, stop on match
 
     // Default start values
     this->set_frequency(100000);
@@ -143,11 +143,11 @@ extern "C" void TIMER1_IRQHandler (void)
 extern "C" void TIMER0_IRQHandler (void)
 {
 //	SEGGER_RTT_LOCK();
-	SEGGER_SYSVIEW_RecordEnterISR();
+//	SEGGER_SYSVIEW_RecordEnterISR();
 	LPC_TIMER0->IR |= 1 << 0;
 	StepTicker::getInstance()->step_tick();
 	NVIC_ClearPendingIRQ(TIMER0_IRQn);
-	SEGGER_SYSVIEW_RecordExitISR();
+//	SEGGER_SYSVIEW_RecordExitISR();
 //	SEGGER_RTT_UNLOCK();
 }
 
