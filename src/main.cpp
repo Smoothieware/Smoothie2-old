@@ -83,6 +83,7 @@ DigitalOut leds[4] = {
         DigitalOut(P2_8),
         DigitalOut(P2_9)
 #endif
+
 };
 
 void init() {
@@ -102,9 +103,9 @@ bool sdok= false; //TODO remove once SD Card code is working
 //    bool sdok= (sd.disk_initialize() == 0);
 //    if(!sdok) kernel->streams->printf("SDCard failed to initialize\r\n");
 
-//    #ifdef NONETWORK
-//        kernel->streams->printf("NETWORK is disabled\r\n");
-//    #endif
+    #ifdef NONETWORK
+        kernel->streams->printf("NETWORK is disabled\r\n");
+    #endif
 
 //#ifdef DISABLEMSD
 //    // attempt to be able to disable msd in config
@@ -264,7 +265,6 @@ int main()
 		}
 		THEKERNEL->call_event(ON_MAIN_LOOP);
 		THEKERNEL->call_event(ON_IDLE);
-		THEKERNEL->streams->printf("0");
 	}
 
 }
