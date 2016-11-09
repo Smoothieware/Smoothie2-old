@@ -71,6 +71,13 @@ DEFINES += -DTARGET_BAMBINO200E
 MRI_UART ?= MRI_UART_TX_P5_6 MRI_UART_RX_P1_14 MRI_UART_BAUD=230400
 endif
 
+# generate a git version string
+ifneq "$(OS)" "Windows_NT"
+DEFINES += -D__GITVERSIONSTRING__=\"$(shell ./generate-version.sh)\"
+else
+DEFINES += -D__GITVERSIONSTRING__=\"$(shell generate-version.bat)\"
+endif
+
 # Disable the secondary console if the MRI debug monitor is enabled so that the secondary UART can be used by
 # MRI instead.
 ifeq "$(MRI_ENABLE)" "1"
