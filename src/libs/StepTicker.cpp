@@ -16,7 +16,6 @@
 #include "Block.h"
 #include "Conveyor.h"
 
-//#include "system_LPC17xx.h" // mbed.h lib
 #include <math.h>
 #include <mri.h>
 
@@ -32,18 +31,23 @@ GPIO stepticker_debug_pin(STEPTICKER_DEBUG_PIN);
 #define SET_STEPTICKER_DEBUG_PIN(n)
 #endif
 
+
+// StepTicker handles the base frequency ticking for the Stepper Motors / Actuators
+// It has a list of those, and calls their tick() functions at regular intervals
+// They then do Bresenham stuff themselves
+
 StepTicker *StepTicker::instance;
 
-StepTicker::StepTicker()
-{
+StepTicker::StepTicker(){
+
     instance = this; // setup the Singleton instance of the stepticker
 
     uint32_t PCLK = SystemCoreClock;
-    uint32_t prescale = PCLK / 10000000;
+    uint32_t prescale = PCLK / 1000000; //Increment MR each uSecond
 
     /* Enable timer 0 clock and reset it */
     LPC_CCU1->CLKCCU[CLK_MX_TIMER0].CFG |= 1;
-    LPC_RGU->RESET_CTRL1 = 1 << (RGU_TIMER0_RST & 31);	//Trigger a peripheral reset for the timer
+    LPC_RGU->RESET_CTRL1 = 1 << (RGU_TIMER0_RST & 31);  //Trigger a peripheral reset for the timer
     while (!(LPC_RGU->RESET_ACTIVE_STATUS1 & (1 << (RGU_TIMER0_RST & 31)))){}
     /* Configure Timer 0 */
     LPC_TIMER0->CTCR = 0x0;    // timer mode
@@ -51,13 +55,11 @@ StepTicker::StepTicker()
     LPC_TIMER0->PR = prescale - 1;
     LPC_TIMER0->MR[0] = 10000000;    // Initial dummy value for Match Register
     LPC_TIMER0->MCR |= 3;    // Match on MR0, reset on MR0
-    NVIC_SetPriority(TIMER0_IRQn,0);
 
     /* Enable timer 1 clock and reset it */
     LPC_CCU1->CLKCCU[CLK_MX_TIMER1].CFG |= 1;
-    LPC_RGU->RESET_CTRL1 = 1 << (RGU_TIMER1_RST & 31);	//Trigger a peripheral reset for the timer
+    LPC_RGU->RESET_CTRL1 = 1 << (RGU_TIMER1_RST & 31);  //Trigger a peripheral reset for the timer
     while (!(LPC_RGU->RESET_ACTIVE_STATUS1 & (1 << (RGU_TIMER1_RST & 31)))){}
-	
     /* Configure Timer 1 */
     LPC_TIMER1->CTCR = 0x0;    // timer mode
     LPC_TIMER1->TCR = 0;    // Disable interrupt
@@ -65,9 +67,10 @@ StepTicker::StepTicker()
     LPC_TIMER1->MR[0] = 10000000;    // Initial dummy value for Match Register
     LPC_TIMER1->MCR |= 5;    // match on Mr0, stop on match
 
+
     // Default start values
     this->set_frequency(100000);
-    this->set_unstep_time(100);
+    this->set_unstep_time(10);
 
     this->unstep.reset();
     this->num_motors = 0;
@@ -75,11 +78,12 @@ StepTicker::StepTicker()
     this->running = false;
     this->current_block = nullptr;
 
-    #ifdef STEPTICKER_DEBUG_PIN
+#ifdef STEPTICKER_DEBUG_PIN
     // setup debug pin if defined
     stepticker_debug_pin.output();
     stepticker_debug_pin= 0;
-    #endif
+#endif
+
 }
 
 StepTicker::~StepTicker()
@@ -98,19 +102,18 @@ void StepTicker::start()
 void StepTicker::set_frequency( float frequency )
 {
     this->frequency = frequency;
-    this->period_us = (int)lrint(1000000/frequency);
+    this->period = (int)lrint(1000000/frequency);
 
-    /* Update Timer 0 Match register and reset timer */
-    LPC_TIMER0->MR[0] = this->period_us;
-    LPC_TIMER0->TCR = 3; // Reset
-    LPC_TIMER0->TCR = 1; // start
+    LPC_TIMER0->MR[0] = this->period;
+    LPC_TIMER0->TCR = 3;  // Reset
+    LPC_TIMER0->TCR = 1;  // start
 }
 
-// Set the reset delay
-void StepTicker::set_unstep_time( float microseconds ){
-    this->reset_delay_us = (int)lrint(microseconds);
-    /* Update Timer 1 Match register */
-    LPC_TIMER1->MR[0] = this->reset_delay_us;
+// Set the reset delay, must be called after set_frequency
+void StepTicker::set_unstep_time( float microseconds )
+{
+    uint32_t delay = (int)lrint(microseconds);
+    LPC_TIMER1->MR[0] = delay;
 
     // TODO check that the unstep time is less than the step period, if not slow down step ticker
 }
@@ -132,21 +135,24 @@ extern "C" void TIMER1_IRQHandler (void)
 {
 //	SEGGER_RTT_LOCK();
 //	SEGGER_SYSVIEW_RecordEnterISR();
-	LPC_TIMER1->IR |= 1 << 0;
-	StepTicker::getInstance()->unstep_tick();
-	NVIC_ClearPendingIRQ(TIMER1_IRQn);
+
+    LPC_TIMER1->IR |= 1 << 0;
+    StepTicker::getInstance()->unstep_tick();
+
+//	NVIC_ClearPendingIRQ(TIMER1_IRQn);
 //	SEGGER_SYSVIEW_RecordExitISR();
 //	SEGGER_RTT_UNLOCK();
 }
 
-// Step timer interrupt handler
+// The actual interrupt handler where we do all the work
 extern "C" void TIMER0_IRQHandler (void)
 {
-//	SEGGER_RTT_LOCK();
-//	SEGGER_SYSVIEW_RecordEnterISR();
-	LPC_TIMER0->IR |= 1 << 0;
-	StepTicker::getInstance()->step_tick();
-	NVIC_ClearPendingIRQ(TIMER0_IRQn);
+//    SEGGER_RTT_LOCK();
+//    SEGGER_SYSVIEW_RecordEnterISR();
+    // Reset interrupt register
+    LPC_TIMER0->IR |= 1 << 0;
+    StepTicker::getInstance()->step_tick();
+//	NVIC_ClearPendingIRQ(TIMER0_IRQn);
 //	SEGGER_SYSVIEW_RecordExitISR();
 //	SEGGER_RTT_UNLOCK();
 }
@@ -245,10 +251,9 @@ void StepTicker::step_tick (void)
     // Note there could be a race here if we run another tick before the unsteps have happened,
     // right now it takes about 3-4us but if the unstep were near 10uS or greater it would be an issue
     // also it takes at least 2us to get here so even when set to 1us pulse width it will still be about 3us
-    if( this->unstep.any()){
-    	/* Start Unstep timer (Timer 1) */
-    	LPC_TIMER1->TCR = 0x3;  // reset
-    	LPC_TIMER1->TCR = 1; // enable = 1, reset = 0
+    if( unstep.any()) {
+        LPC_TIMER1->TCR = 3;
+        LPC_TIMER1->TCR = 1;
     }
 
 
