@@ -85,6 +85,7 @@ class Kernel {
             bool feed_hold:1;
             bool ok_per_line:1;
         };
+
 };
 
 #endif

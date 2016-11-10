@@ -46,8 +46,9 @@ Laser::Laser()
     manual_fire= false;
 }
 
-void Laser::on_module_loaded() {
-    if( !THEKERNEL->config->value( laser_module_enable_checksum )->by_default(false)->as_bool() ){
+void Laser::on_module_loaded()
+{
+    if( !THEKERNEL->config->value( laser_module_enable_checksum )->by_default(false)->as_bool() ) {
         // as not needed free up resource
         delete this;
         return;
@@ -63,8 +64,7 @@ void Laser::on_module_loaded() {
 
     pwm_pin = dummy_pin->hardware_pwm();
 
-    if (pwm_pin == nullptr)
-    {
+    if (pwm_pin == NULL) {
         // TOADDBACK THEKERNEL->streams->printf("Error: Laser cannot use P%d.%d (P2.0 - P2.5, P1.18, P1.20, P1.21, P1.23, P1.24, P1.26, P3.25, P3.26 only). Laser module disabled.\n", dummy_pin->port_number, dummy_pin->pin);
         delete dummy_pin;
         delete this;
@@ -107,10 +107,6 @@ void Laser::on_module_loaded() {
     set_laser_power(0);
 
     //register for events
-    this->register_for_event(ON_GCODE_EXECUTE);
-    this->register_for_event(ON_SPEED_CHANGE);
-    this->register_for_event(ON_BLOCK_BEGIN);
-    this->register_for_event(ON_BLOCK_END);
     this->register_for_event(ON_HALT);
     this->register_for_event(ON_GCODE_RECEIVED);
     this->register_for_event(ON_CONSOLE_LINE_RECEIVED);

@@ -269,7 +269,7 @@ try_again:
                                 while(is_whitespace(str.front())){ str= str.substr(1); } // strip leading whitespace
 
                                 delete gcode;
-				// TODO : TOADDBACK When Simpleshell is added back in
+				// TOADDBACK When Simpleshell is added back in
                                 /*
                                 if(str.empty()) {
                                     SimpleShell::parse_command("help", "", new_message.stream);
@@ -290,7 +290,6 @@ try_again:
 
                             case 500: // M500 save volatile settings to config-override
                                 THEKERNEL->conveyor->wait_for_idle(); //just to be safe as it can take a while to run
-                                //remove(THEKERNEL->config_override_filename()); // seems to cause a hang every now and then
                                 // TOADDBACK : __disable_irq();
                                 {
                                     FileStream fs(THEKERNEL->config_override_filename());
@@ -313,8 +312,8 @@ try_again:
                                     string arg= get_arguments(single_command + possible_command); // rest of line is filename
                                     if(arg.empty()) arg= "/sd/config-override";
                                     else arg= "/sd/config-override." + arg;
-                                    //new_message.stream->printf("args: <%s>\n", arg.c_str());
-                                    //TODO ADDBACK SimpleShell::parse_command((gcode->m == 501) ? "load_command" : "save_command", arg, new_message.stream);
+                                    new_message.stream->printf("args: <%s>\n", arg.c_str());
+                                    //TOADDBACK : SimpleShell::parse_command((gcode->m == 501) ? "load_command" : "save_command", arg, new_message.stream);
                                 }
                                 delete gcode;
                                 new_message.stream->printf("ok\r\n");

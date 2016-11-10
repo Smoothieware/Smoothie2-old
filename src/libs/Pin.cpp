@@ -47,7 +47,7 @@ Pin* Pin::from_string(std::string value){
 
 
     // grab first integer as port. pointer to first non-digit goes in cn
-    port_number = strtol(cs, &cn, 16); //allow hexadecimal port numbers
+    port_number = strtol(cs, &cn, 16); //allow hexadecimal portnumbes
 
     // if cn > cs then strtol read at least one digit
     if ((cn > cs) && (port_number <= 15)){

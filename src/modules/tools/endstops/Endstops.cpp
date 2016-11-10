@@ -844,10 +844,8 @@ void Endstops::on_gcode_received(void *argument)
                 if(gcode->subcode == 0 || gcode->subcode == 2) {
                     // Enable the motors
                     THEKERNEL->stepper->turn_enable_pins_on();
-
                     int32_t x = 0, y = 0, z = 0, f = 200 * 16;
                     if (gcode->has_letter('F')) f = gcode->get_value('F');
-
                     if (gcode->has_letter('X')) {
                         float v = gcode->get_value('X');
                         if(gcode->subcode == 2) x = lroundf(v * STEPS_PER_MM(X_AXIS));
@@ -867,7 +865,6 @@ void Endstops::on_gcode_received(void *argument)
                         STEPPER[Z_AXIS]->move(z < 0, abs(z), f);
                     }
                     gcode->stream->printf("Moving X %ld Y %ld Z %ld steps at F %ld steps/sec\n", x, y, z, f);
-
                 } else if(gcode->subcode == 1) {
                     // stop any that are moving
                     for (int i = 0; i < 3; ++i) {

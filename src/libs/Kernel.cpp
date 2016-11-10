@@ -12,7 +12,7 @@
 #include "libs/SlowTicker.h"
 #include "libs/Adc.h"
 #include "libs/StreamOutputPool.h"
-//#include <mri.h>
+#include <mri.h>
 #include "checksumm.h"
 #include "ConfigValue.h"
 
@@ -29,7 +29,7 @@
 #include "Configurator.h"
 //#include "SimpleShell.h"
 
-//#include "platform_memory.h"
+#include "platform_memory.h"
 
 #include <malloc.h>
 #include <array>
@@ -72,6 +72,8 @@ Kernel::Kernel(){
     // Pre-load the config cache, do after setting up serial so we can report errors to serial
     this->config->config_cache_load();
 
+    // For slow repeteative tasks
+    this->add_module( this->slow_ticker = new SlowTicker());
     // now config is loaded we can do normal setup for serial based on config
 //TODO TOADDBACK when USB is implemented
 //    delete this->serial;
@@ -118,16 +120,25 @@ Kernel::Kernel(){
     // we exepct ok per line now not per G code, setting this to false will return to the old (incorrect) way of ok per G code
     this->ok_per_line= this->config->value( ok_per_line_checksum )->by_default(true)->as_bool();
 
+    // Configure the step ticker
+    this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
+    float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(5)->as_number();
+    // REMOVE this->acceleration_ticks_per_second = THEKERNEL->config->value(acceleration_ticks_per_second_checksum)->by_default(1000)->as_number();
+
     this->add_module( this->serial );
 
     // HAL stuff
     add_module( this->slow_ticker = new SlowTicker());
 
     this->step_ticker = new StepTicker();
-//TODO ADDBACK    this->adc = new Adc();
+    this->adc = new Adc();
 
     // TODO : These should go into platform-specific files
-    // TODO THIS NEEDS TO BE UPDATED FOR LPC4330
+    NVIC_SetPriorityGrouping(0);
+    NVIC_SetPriority(TIMER0_IRQn, 2);
+    NVIC_SetPriority(TIMER1_IRQn, 1);
+    NVIC_SetPriority(TIMER2_IRQn, 4);
+    NVIC_SetPriority(PendSV_IRQn, 3);
 
 //    NVIC_SetPriorityGrouping(0);
 //    NVIC_SetPriority(TIMER0_IRQn, 2);
@@ -135,8 +146,9 @@ Kernel::Kernel(){
 //    NVIC_SetPriority(TIMER2_IRQn, 4);
 //    NVIC_SetPriority(PendSV_IRQn, 3);
 
-//    // Set other priorities lower than the timers
-//    NVIC_SetPriority(ADC_IRQn, 5);
+    // Set other priorities lower than the timers
+    NVIC_SetPriority(ADC0_IRQn, 5);
+    NVIC_SetPriority(ADC1_IRQn, 5);
 //    NVIC_SetPriority(USB_IRQn, 5);
 //
 //    // If MRI is enabled
@@ -151,10 +163,6 @@ Kernel::Kernel(){
 //        NVIC_SetPriority(UART2_IRQn, 5);
 //        NVIC_SetPriority(UART3_IRQn, 5);
 //    }
-
-    // Configure the step ticker
-    this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
-    float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(1)->as_number();
 
     // Configure the step ticker
     this->step_ticker->set_frequency( this->base_stepping_frequency );
@@ -249,7 +257,7 @@ void Kernel::call_event(_EVENT_ENUM id_event, void * argument){
     bool was_idle= true;
     if(id_event == ON_HALT) {
         this->halted= (argument == nullptr);
-        was_idle= conveyor->is_queue_empty(); // see if we were doing anything like printing
+        was_idle= conveyor->is_idle(); // see if we were doing anything like printing
     }
 
     // send to all registered modules

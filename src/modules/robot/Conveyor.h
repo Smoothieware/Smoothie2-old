@@ -5,7 +5,8 @@
       You should have received a copy of the GNU General Public License along with Smoothie. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#ifndef CONVEYOR_H
+#define CONVEYOR_H
 
 #include "libs/Module.h"
 #include "HeapRing.h"
@@ -63,3 +64,6 @@ private:
     };
 
 };
+
+
+#endif // CONVEYOR_H

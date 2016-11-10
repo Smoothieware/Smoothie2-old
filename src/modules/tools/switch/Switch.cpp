@@ -24,7 +24,7 @@
 
 #include "PwmOut.h"
 
-//TODO ADDBACK #include "MRI_Hooks.h"
+// TOADDBACK #include "MRI_Hooks.h"
 
 #include <algorithm>
 
@@ -106,9 +106,9 @@ void Switch::on_config_reload(void *argument)
         this->sigmadelta_pin->from_string(THEKERNEL->config->value(switch_checksum, this->name_checksum, output_pin_checksum )->by_default("nc")->as_string())->as_output();
         if(this->sigmadelta_pin->connected()) {
             if(failsafe == 1) {
-                //TODO ADDBACK set_high_on_debug(sigmadelta_pin->port_number, sigmadelta_pin->pin);
+                // TOADDBACK set_high_on_debug(sigmadelta_pin->port_number, sigmadelta_pin->pin);
             }else{
-                //TODO ADDBACK set_low_on_debug(sigmadelta_pin->port_number, sigmadelta_pin->pin);
+                // TOADDBACK set_low_on_debug(sigmadelta_pin->port_number, sigmadelta_pin->pin);
             }
         }else{
             this->output_type= NONE;
@@ -122,9 +122,9 @@ void Switch::on_config_reload(void *argument)
         this->digital_pin->from_string(THEKERNEL->config->value(switch_checksum, this->name_checksum, output_pin_checksum )->by_default("nc")->as_string())->as_output();
         if(this->digital_pin->connected()) {
             if(failsafe == 1) {
-                //TODO ADDBACK set_high_on_debug(digital_pin->port_number, digital_pin->pin);
+                // TOADDBACK set_high_on_debug(digital_pin->port_number, digital_pin->pin);
             }else{
-                //TODO ADDBACK set_low_on_debug(digital_pin->port_number, digital_pin->pin);
+                // TOADDBACK set_low_on_debug(digital_pin->port_number, digital_pin->pin);
             }
         }else{
             this->output_type= NONE;
@@ -138,9 +138,9 @@ void Switch::on_config_reload(void *argument)
         pin->from_string(THEKERNEL->config->value(switch_checksum, this->name_checksum, output_pin_checksum )->by_default("nc")->as_string())->as_output();
         this->pwm_pin= pin->hardware_pwm();
         if(failsafe == 1) {
-            //TODO ADDBACK set_high_on_debug(pin->port_number, pin->pin);
+            // TOADDBACK set_high_on_debug(pin->port_number, pin->pin);
         }else{
-            //TODO ADDBACK set_low_on_debug(pin->port_number, pin->pin);
+            // TOADDBACK set_low_on_debug(pin->port_number, pin->pin);
         }
         delete pin;
         if(this->pwm_pin == nullptr) {

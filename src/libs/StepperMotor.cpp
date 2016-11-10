@@ -15,7 +15,7 @@
 
 StepperMotor::StepperMotor(Pin &step, Pin &dir, Pin &en) : step_pin(step), dir_pin(dir), en_pin(en)
 {
-    //TODO ADDBACK set_high_on_debug(en.port_number, en.pin_number);
+    //TOADDBACK set_high_on_debug(en.port_number, en.pin);
 
     steps_per_mm         = 1.0F;
     max_rate             = 50.0F;

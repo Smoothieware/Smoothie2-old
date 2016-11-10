@@ -19,7 +19,6 @@ using namespace std;
 #include "libs/Pin.h"
 
 #include <math.h>
-#include "mbed.h"
 
 class SlowTicker : public Module{
     public:
@@ -34,7 +33,7 @@ class SlowTicker : public Module{
         // TODO replace this with std::function()
         template<typename T> Hook* attach( uint32_t frequency, T *optr, uint32_t ( T::*fptr )( uint32_t ) ){
             Hook* hook = new Hook();
-            hook->interval = ((float)1)/frequency;
+            hook->interval = floorf((SystemCoreClock)/frequency);
             hook->attach(optr, fptr);
             hook->countdown = hook->interval;
 
@@ -55,7 +54,6 @@ class SlowTicker : public Module{
         vector<Hook*> hooks;
         uint32_t max_frequency;
         uint32_t interval;
-        Ticker* ticker;
 
         Pin ispbtn;
 protected:
