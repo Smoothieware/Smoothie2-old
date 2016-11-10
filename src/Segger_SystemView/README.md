@@ -1,12 +1,7 @@
 #Segger JTrace SystemView debugging and integration 
 
-<<<<<<< 77b5e49bbab0689b93bb1d0d180c5f8fdb1d4612
 Go to http://www.segger.com and download their SystemView free tool and copy only some of the source code files so you end up with the following files:
 ```
-=======
-Go to http://www.segger.com and download their Systemview free tool and place the source code in this folder, you should end up with the following files:
-
->>>>>>> 	deleted:    src/Segger_SystemView/Global.h
 src/Segger_SystemView/SEGGER_SYSVIEW_Int.h
 src/Segger_SystemView/Global.h
 src/Segger_SystemView/SEGGER.h
@@ -18,7 +13,6 @@ src/Segger_SystemView/SEGGER_SYSVIEW.h
 src/Segger_SystemView/SEGGER_SYSVIEW_Conf.h
 src/Segger_SystemView/SEGGER_SYSVIEW_ConfDefaults.h
 src/Segger_SystemView/SEGGER_SYSVIEW_Config_NoOS.c
-<<<<<<< 77b5e49bbab0689b93bb1d0d180c5f8fdb1d4612
 ```
 
 You will need to make the following changes in src/Segger_SystemView/SEGGER_SYSVIEW_Config_NoOS.c
@@ -54,7 +48,3 @@ Note: 4096 is the largest buffer size supported; you can also increase the speed
 JLinkGDBServer -if jtag -device LPC4330 -speed 15000
 
 Note: I run my JLinkGDBServer on a separate Ubuntu machine onto which my Firepick is attached and use TCP/IP to connect to it.
-
-
-=======
->>>>>>> 	deleted:    src/Segger_SystemView/Global.h
