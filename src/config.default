@@ -21,28 +21,28 @@ microseconds_per_step_pulse                  5                # Duration of step
 base_stepping_frequency                      100000           # Base frequency for stepping
 
 # Cartesian axis speed limits
-x_axis_max_speed                             30000            # mm/min
-y_axis_max_speed                             30000            # mm/min
-z_axis_max_speed                             30000            # mm/min
+x_axis_max_speed                             60000            # mm/min
+y_axis_max_speed                             60000            # mm/min
+z_axis_max_speed                             60000            # mm/min
 
 # Stepper module pins ( ports, and pin numbers, appending "!" to the number will invert a pin )
 alpha_step_pin                               3.2              # Pin for alpha stepper step signal
 alpha_dir_pin                                7.3              # Pin for alpha stepper direction
 alpha_en_pin                                 7.2              # Pin for alpha enable pin
 alpha_current                                1.5              # X stepper motor current
-alpha_max_rate                               30000.0          # mm/min
+alpha_max_rate                               60000.0          # mm/min
 
 beta_step_pin                                4.2              # Pin for beta stepper step signal
 beta_dir_pin                                 7.0              # Pin for beta stepper direction
 beta_en_pin                                  4.5              # Pin for beta enable
 beta_current                                 1.5              # Y stepper motor current
-beta_max_rate                                30000.0          # mm/min
+beta_max_rate                                60000.0          # mm/min
 
 gamma_step_pin                               5.7              # Pin for gamma stepper step signal
 gamma_dir_pin                                5.5              # Pin for gamma stepper direction
 gamma_en_pin                                 7.6              # Pin for gamma enable
 gamma_current                                1.5              # Z stepper motor current
-gamma_max_rate                               30000.0          # mm/min
+gamma_max_rate                               60000.0          # mm/min
 
 ## System configuration
 # Serial communications configuration ( baud rate defaults to 9600 if undefined )
@@ -192,4 +192,3 @@ beta_homing_retract_mm                       5                # "
 gamma_homing_retract_mm                      1                # "
 
 #endstop_debounce_count                       100              # uncomment if you get noise on your endstops, default is 100
-

@@ -7,8 +7,8 @@
 class Hook : public FPointer {
     public:
         Hook();
-        double     interval;
-        double     countdown;
-}; // TOADDBACK : doubles were ints
+        int     interval;
+        int     countdown;
+};
 
 #endif
