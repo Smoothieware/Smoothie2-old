@@ -7,10 +7,11 @@
 
 
 
-#pragma once
+#ifndef STEPTICKER_H
+#define STEPTICKER_H
 
 #include <stdint.h>
-#include <array>
+#include <vector>
 #include <bitset>
 #include <functional>
 #include <atomic>
@@ -46,10 +47,6 @@ class StepTicker{
 
         static StepTicker *getInstance() { return instance; }
 
-        // TOADDBACK was private
-        volatile uint32_t tick_cnt;
-        uint32_t period_us;
-        uint32_t reset_delay_us;
     private:
         static StepTicker *instance;
 
@@ -68,3 +65,6 @@ class StepTicker{
             uint8_t num_motors:4;
         };
 };
+
+
+#endif

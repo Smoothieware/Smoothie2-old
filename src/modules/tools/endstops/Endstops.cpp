@@ -414,6 +414,7 @@ uint32_t Endstops::read_endstops(uint32_t dummy)
                         // we signal the motor to stop, which will preempt any moves on that axis
                         STEPPER[m]->stop_moving();
                     }
+
                 } else {
                     // The endstop was not hit yet
                     debounce[m] = 0;

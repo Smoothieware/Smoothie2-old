@@ -5,7 +5,8 @@
       You should have received a copy of the GNU General Public License along with Smoothie. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#ifndef ENDSTOPS_MODULE_H
+#define ENDSTOPS_MODULE_H
 
 #include "libs/Module.h"
 #include "libs/Pin.h"
@@ -66,3 +67,6 @@ class Endstops : public Module{
             bool move_to_origin_after_home:1;
         };
 };
+
+
+#endif

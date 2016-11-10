@@ -18,6 +18,7 @@
     #endif
 #endif
 
-// Keep MAX_ROBOT_ACTUATORS as small as practical it impacts block size and therefore free memory.
+//The subset in use is determined by the arm solution's get_actuator_count().
+//Keep MAX_ROBOT_ACTUATORS as small as practical it impacts block size and therefore free memory.
 const size_t k_max_actuators = MAX_ROBOT_ACTUATORS;
 typedef struct std::array<float, k_max_actuators> ActuatorCoordinates;

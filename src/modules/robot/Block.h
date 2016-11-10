@@ -5,7 +5,8 @@
       You should have received a copy of the GNU General Public License along with Smoothie. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#ifndef BLOCK_H
+#define BLOCK_H
 
 #include <vector>
 #include <bitset>
@@ -77,3 +78,6 @@ class Block {
             uint16_t s_value:12;                 // for laser 1.11 Fixed point
         };
 };
+
+
+#endif

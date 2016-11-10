@@ -15,7 +15,6 @@ using namespace std;
 #include "libs/Hook.h"
 #include "modules/robot/Conveyor.h"
 #include "Gcode.h"
-#include "mbed.h"
 
 #include <mri.h>
 
@@ -26,17 +25,23 @@ SlowTicker* global_slow_ticker;
 
 SlowTicker::SlowTicker(){
     global_slow_ticker = this;
-    //this->ticker = new Ticker();
 
     // ISP button FIXME: WHy is this here?
-    ispbtn.from_string("2.10")->as_input()->pull_up();
+    // TOADDBACK ispbtn.from_string("2.10")->as_input()->pull_up();
 
-    //LPC_SC->PCONP |= (1 << 22);     // Power Ticker ON
-    /* Enable timer 0 clock and reset it */
+    uint32_t PCLK = SystemCoreClock;
+    uint32_t prescale = PCLK / 1000000; //Increment MR each uSecond
+
+    /* Enable timer 1 clock and reset it */
     LPC_CCU1->CLKCCU[CLK_MX_TIMER2].CFG |= 1;
-    LPC_TIMER2->MCR = 3;              // Match on MR0, reset on MR0
-    // do not enable interrupt until setup is complete
-    LPC_TIMER2->TCR = 0;              // Disable interrupt
+    LPC_RGU->RESET_CTRL1 = 1 << (RGU_TIMER2_RST & 31);  //Trigger a peripheral reset for the timer
+    while (!(LPC_RGU->RESET_ACTIVE_STATUS1 & (1 << (RGU_TIMER2_RST & 31)))){}
+    /* Configure Timer 0 */
+    LPC_TIMER2->CTCR = 0x0;    // timer mode
+    LPC_TIMER2->TCR = 0;    // Disable interrupt
+    LPC_TIMER2->PR = prescale - 1;
+    LPC_TIMER2->MR[0] = 10000000;    // Initial dummy value for Match Register
+    LPC_TIMER2->MCR |= 3;    // match on Mr0, stop on match
 
     max_frequency = 5;  // initial max frequency is set to 5Hz
     set_frequency(max_frequency);
@@ -55,12 +60,11 @@ void SlowTicker::on_module_loaded(){
 
 // Set the base frequency we use for all sub-frequencies
 void SlowTicker::set_frequency( int frequency ){
-    this->interval = (float)1 / frequency;  //this->interval = (SystemCoreClock >> 2) / frequency;   // SystemCoreClock/4 = Timer increments in a second
+    this->interval = SystemCoreClock / frequency;   // SystemCoreClock = Timer increments in a second
     LPC_TIMER2->MR[0] = this->interval;
     LPC_TIMER2->TCR = 3;  // Reset
     LPC_TIMER2->TCR = 1;  // Reset
     flag_1s_count= SystemCoreClock>>2;
-//    this->ticker->attach_us(this, &SlowTicker::tick,(int)( this->interval * (float)1000000) ); 
 }
 
 // The actual interrupt being called by the timer, this is where work is done
@@ -89,8 +93,10 @@ void SlowTicker::tick(){
 
     // Enter MRI mode if the ISP button is pressed
     // TODO: This should have it's own module
+    /* TOADDBACK
     if (ispbtn.get() == 0)
         __debugbreak();
+       */
 
 }
 
@@ -112,7 +118,7 @@ bool SlowTicker::flag_1s(){
     __enable_irq();
     return false;
 }
-
+#include "mbed.h"
 extern DigitalOut leds[];
 void SlowTicker::on_idle(void*)
 {
@@ -134,4 +140,3 @@ extern "C" void TIMER2_IRQHandler (void){
     }
     global_slow_ticker->tick();
 }
-

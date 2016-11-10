@@ -14,6 +14,7 @@ MRI_BREAK_ON_INIT ?= 1
 # slowly. It may run so slowly that it fails to execute properly since some routines (ie. step tickers) are
 # time sensitive.
 #OPTIMIZATION        :=  0
+OPTIMIZATION        :=  2
 
 # Set to non zero value if you want checks to be enabled which reserve a
 # specific amount of space for the stack.  The heap's growth will be
@@ -35,7 +36,7 @@ NO_FLOAT_SCANF      := 1
 NO_FLOAT_PRINTF     := 0
 LIBS_PREFIX         := configdefault.o
 MRI_SEMIHOST_STDIO  := 0
-MBED_LIBS           += USBHost
+#MBED_LIBS           += USBHost
 #MBED_LIBS           += USBDevice
 
 # Use C++11 features for the checksums
@@ -83,14 +84,6 @@ DEFINES += -DTARGET_BAMBINO200E
 MRI_UART ?= MRI_UART_TX_P5_6 MRI_UART_RX_P1_14 MRI_UART_BAUD=230400
 endif
 
-# Disable the secondary console if the MRI debug monitor is enabled so that the secondary UART can be used by
-# MRI instead.
-ifeq "$(MRI_ENABLE)" "1"
-DEFINES       := $(subst -DSMOOTHIE_UART_SECONDARY_ENABLE=1,-DSMOOTHIE_UART_SECONDARY_ENABLE=0,$(DEFINES))
-GCC4MBED_TYPE := Checked
-else
-GCC4MBED_TYPE := Release
-endif
 
 # this is the default UART baud rate used if it is not set in config
 # it is also the baud rate used to report any errors found while parsing the config file
@@ -102,6 +95,16 @@ DEFINES += -D__GITVERSIONSTRING__=\"$(shell ./generate-version.sh)\"
 else
 DEFINES += -D__GITVERSIONSTRING__=\"$(shell generate-version.bat)\"
 endif
+
+# Disable the secondary console if the MRI debug monitor is enabled so that the secondary UART can be used by
+# MRI instead.
+ifeq "$(MRI_ENABLE)" "1"
+DEFINES       := $(subst -DSMOOTHIE_UART_SECONDARY_ENABLE=1,-DSMOOTHIE_UART_SECONDARY_ENABLE=0,$(DEFINES))
+GCC4MBED_TYPE := Checked
+else
+GCC4MBED_TYPE := Release
+endif
+
 
 include $(GCC4MBED_DIR)/build/gcc4mbed.mk
 

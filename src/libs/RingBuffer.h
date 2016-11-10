@@ -3,7 +3,6 @@
       Smoothie is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
       Smoothie is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
       You should have received a copy of the GNU General Public License along with Smoothie. If not, see <http://www.gnu.org/licenses/>.
-
       With chucks taken from http://en.wikipedia.org/wiki/Circular_buffer, see licence there also
 */
 
@@ -40,9 +39,9 @@ template<class kind, int length>  int RingBuffer<kind, length>::capacity(){
 }
 
 template<class kind, int length>  int RingBuffer<kind, length>::size(){
-        // TOADDBACK __disable_irq();
+        __asm volatile ("cpsid i"); // equivalent to CMSIS '__disable_irq()' function
         int i = head - tail + ((tail > head)?length:0);
-        // TOADDBACK __enable_irq();
+        __asm volatile ("cpsie i"); // equivalent to CMSIS '__enable_irq()' function
         return i;
 }
 
