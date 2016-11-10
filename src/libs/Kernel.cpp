@@ -75,11 +75,11 @@ Kernel::Kernel(){
     // For slow repeteative tasks
     this->add_module( this->slow_ticker = new SlowTicker());
     // now config is loaded we can do normal setup for serial based on config
-//TODO TOADDBACK when USB is implemented
+//TOADDBACK when the USB libraries are ported
 //    delete this->serial;
 //    this->serial= NULL;
 //
-//     this->streams = new StreamOutputPool();
+//    this->streams = new StreamOutputPool();
 
     this->current_path   = "/";
 
@@ -123,7 +123,6 @@ Kernel::Kernel(){
     // Configure the step ticker
     this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
     float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(5)->as_number();
-    // REMOVE this->acceleration_ticks_per_second = THEKERNEL->config->value(acceleration_ticks_per_second_checksum)->by_default(1000)->as_number();
 
     this->add_module( this->serial );
 
@@ -139,12 +138,6 @@ Kernel::Kernel(){
     NVIC_SetPriority(TIMER1_IRQn, 1);
     NVIC_SetPriority(TIMER2_IRQn, 4);
     NVIC_SetPriority(PendSV_IRQn, 3);
-
-//    NVIC_SetPriorityGrouping(0);
-//    NVIC_SetPriority(TIMER0_IRQn, 2);
-//    NVIC_SetPriority(TIMER1_IRQn, 1);
-//    NVIC_SetPriority(TIMER2_IRQn, 4);
-//    NVIC_SetPriority(PendSV_IRQn, 3);
 
     // Set other priorities lower than the timers
     NVIC_SetPriority(ADC0_IRQn, 5);

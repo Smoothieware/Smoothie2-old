@@ -60,7 +60,7 @@ StepTicker::StepTicker(){
     LPC_CCU1->CLKCCU[CLK_MX_TIMER1].CFG |= 1;
     LPC_RGU->RESET_CTRL1 = 1 << (RGU_TIMER1_RST & 31);  //Trigger a peripheral reset for the timer
     while (!(LPC_RGU->RESET_ACTIVE_STATUS1 & (1 << (RGU_TIMER1_RST & 31)))){}
-    /* Configure Timer 0 */
+    /* Configure Timer 1 */
     LPC_TIMER1->CTCR = 0x0;    // timer mode
     LPC_TIMER1->TCR = 0;    // Disable interrupt
     LPC_TIMER1->PR = prescale - 1;
@@ -134,11 +134,10 @@ extern "C" void TIMER1_IRQHandler (void)
 {
 //	SEGGER_RTT_LOCK();
 //	SEGGER_SYSVIEW_RecordEnterISR();
-
     LPC_TIMER1->IR |= 1 << 0;
     StepTicker::getInstance()->unstep_tick();
 
-	NVIC_ClearPendingIRQ(TIMER1_IRQn);
+//	NVIC_ClearPendingIRQ(TIMER1_IRQn);
 //	SEGGER_SYSVIEW_RecordExitISR();
 //	SEGGER_RTT_UNLOCK();
 }
@@ -147,13 +146,18 @@ extern "C" void TIMER1_IRQHandler (void)
 extern "C" void TIMER0_IRQHandler (void)
 {
 //	SEGGER_RTT_LOCK();
-	SEGGER_SYSVIEW_RecordEnterISR();
+//	SEGGER_SYSVIEW_RecordEnterISR();
 
     // Reset interrupt register
     LPC_TIMER0->IR |= 1 << 0;
     StepTicker::getInstance()->step_tick();
-	NVIC_ClearPendingIRQ(TIMER0_IRQn);
-	SEGGER_SYSVIEW_RecordExitISR();
+
+    // Reset interrupt register
+    LPC_TIMER0->IR |= 1 << 0;
+    StepTicker::getInstance()->step_tick();
+//	NVIC_ClearPendingIRQ(TIMER0_IRQn);
+
+//	SEGGER_SYSVIEW_RecordExitISR();
 //	SEGGER_RTT_UNLOCK();
 }
 

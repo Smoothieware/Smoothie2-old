@@ -14,6 +14,7 @@ MRI_BREAK_ON_INIT ?= 1
 # slowly. It may run so slowly that it fails to execute properly since some routines (ie. step tickers) are
 # time sensitive.
 #OPTIMIZATION        :=  0
+OPTIMIZATION        :=  2
 
 # Set to non zero value if you want checks to be enabled which reserve a
 # specific amount of space for the stack.  The heap's growth will be
@@ -35,13 +36,14 @@ NO_FLOAT_SCANF      := 1
 NO_FLOAT_PRINTF     := 0
 LIBS_PREFIX         := configdefault.o
 MRI_SEMIHOST_STDIO  := 0
-MBED_LIBS           += USBHost
+#MBED_LIBS           += USBHost
 #MBED_LIBS           += USBDevice
 
 # Use C++11 features for the checksums
 DEFINES += -DCHECKSUM_USE_CPP
 
-DEFINES += -DDEFAULT_SERIAL_BAUD_RATE=9600
+#Disable the network
+DEFINES += -DNONETWORK
 
 # Need to use a custom LPC4337 script for boards like the Smoothie2 hardware which use that chip instead of the LPC4330.
 ifeq "$(BOARD)" "Smoothie2Proto1"
@@ -64,7 +66,7 @@ ifeq "$(BOARD)" "Bambino210E"
 DEFINES += -DSMOOTHIE_UART_PRIMARY_ENABLE=1
 DEFINES += -DSMOOTHIE_UART_PRIMARY_TX=P2_10
 DEFINES += -DSMOOTHIE_UART_PRIMARY_RX=P2_11
-DEFINES += -DSMOOTHIE_UART_SECONDARY_ENABLE=0
+DEFINES += -DSMOOTHIE_UART_SECONDARY_ENABLE=1
 DEFINES += -DSMOOTHIE_UART_SECONDARY_TX=P6_4
 DEFINES += -DSMOOTHIE_UART_SECONDARY_RX=P6_5
 DEFINES += -DTARGET_BAMBINO210E
@@ -82,6 +84,18 @@ DEFINES += -DTARGET_BAMBINO200E
 MRI_UART ?= MRI_UART_TX_P5_6 MRI_UART_RX_P1_14 MRI_UART_BAUD=230400
 endif
 
+
+# this is the default UART baud rate used if it is not set in config
+# it is also the baud rate used to report any errors found while parsing the config file
+DEFINES += -DDEFAULT_SERIAL_BAUD_RATE=9600
+
+# generate a git version string
+ifneq "$(OS)" "Windows_NT"
+DEFINES += -D__GITVERSIONSTRING__=\"$(shell ./generate-version.sh)\"
+else
+DEFINES += -D__GITVERSIONSTRING__=\"$(shell generate-version.bat)\"
+endif
+
 # Disable the secondary console if the MRI debug monitor is enabled so that the secondary UART can be used by
 # MRI instead.
 ifeq "$(MRI_ENABLE)" "1"
@@ -91,16 +105,6 @@ else
 GCC4MBED_TYPE := Release
 endif
 
-# this is the default UART baud rate used if it is not set in config
-# it is also the baud rate used to report any errors found while parsing the config file
-DEFAULT_SERIAL_BAUD_RATE?=9600
-
-# generate a git version string
-ifneq "$(OS)" "Windows_NT"
-DEFINES += -D__GITVERSIONSTRING__=\"$(shell ./generate-version.sh)\"
-else
-DEFINES += -D__GITVERSIONSTRING__=\"$(shell generate-version.bat)\"
-endif
 
 include $(GCC4MBED_DIR)/build/gcc4mbed.mk
 

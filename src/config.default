@@ -31,12 +31,12 @@ junction_deviation                           0.05             # Similar to the o
 
 # Stepper module configuration
 microseconds_per_step_pulse                  5                # Duration of step pulses to stepper drivers, in microseconds
-base_stepping_frequency                      10000 #100000           # Base frequency for stepping
+base_stepping_frequency                      100000           # Base frequency for stepping
 
 # Cartesian axis speed limits
-x_axis_max_speed                             30000            # mm/min
-y_axis_max_speed                             30000            # mm/min
-z_axis_max_speed                             30000            # mm/min
+x_axis_max_speed                             60000            # mm/min
+y_axis_max_speed                             60000            # mm/min
+z_axis_max_speed                             60000            # mm/min
 
 # Arm solution configuration : Rotatable Delta robot. Translates mm positions into stepper positions
 arm_solution                                    rotary_delta   # selects the delta arm solution
@@ -87,19 +87,20 @@ alpha_step_pin                               5.0              # Pin for alpha st
 alpha_dir_pin                                6.12             # Pin for alpha stepper direction
 alpha_en_pin                                 4.10             # Pin for alpha enable pin
 alpha_current                                1.5              # X stepper motor current
-alpha_max_rate                               30000.0          # mm/min
+alpha_max_rate                               60000.0          # mm/min
 
 beta_step_pin                                5.7              # Pin for beta stepper step signal
 beta_dir_pin                                 5.5              # Pin for beta stepper direction
 beta_en_pin                                  7.6              # Pin for beta enable
 beta_current                                 1.5              # Y stepper motor current
-beta_max_rate                                30000.0          # mm/min
+beta_max_rate                                60000.0          # mm/min
 
 gamma_step_pin                               4.0              # Pin for gamma stepper step signal
 gamma_dir_pin                                1.7              # Pin for gamma stepper direction
 gamma_en_pin                                 6.9              # Pin for gamma enable
 gamma_current                                1.5              # Z stepper motor current
-gamma_max_rate                               30000.0          # mm/min
+gamma_max_rate                               60000.0          # mm/min
+<<<<<<< HEAD
 
 #SilentStepStick TMC2130 setup
 motor_driver_control.alpha.enable            true             # alpha (X) is a TMC2130
@@ -138,6 +139,8 @@ motor_driver_control.gamma.spi_channel       0                # SPI channel 1 is
 motor_driver_control.gamma.spi_cs_pin        1.0              # SPI CS pin
 #motor_driver_control.gamma.spi_frequency     1000000          # SPI frequency
 
+=======
+>>>>>>> master
 
 ## System configuration
 # Serial communications configuration ( baud rate defaults to 9600 if undefined )
@@ -258,33 +261,51 @@ rdelta_homing                                true             # forces all three
 alpha_min_endstop                            7.4!^            #
 alpha_max_endstop                            7.7^             # add ! to invert pullup if switch is NO to ground
 alpha_homing_direction                       home_to_max      # Home up
-alpha_max                                    3000             #
+<<<<<<< HEAD
+alpha_max                                    300              #
 beta_min_endstop                             7.5!^            #
 beta_max_endstop                             4.3^             #
 beta_homing_direction                        home_to_max      #
-beta_max                                     30000            #
+beta_max                                     300              #
 gamma_min_endstop                            4.1!^            #
 gamma_max_endstop                            4.4^             #
 gamma_homing_direction                       home_to_max      #
-gamma_max                                    30000            #
+gamma_max                                    300              #
+=======
+alpha_max                                    200              #
+beta_min_endstop                             7.5!^            #
+beta_max_endstop                             4.3^             #
+beta_homing_direction                        home_to_max      #
+beta_max                                     200              #
+gamma_min_endstop                            4.1!^            #
+gamma_max_endstop                            4.4^             #
+gamma_homing_direction                       home_to_max      #
+gamma_max                                    200              #
+>>>>>>> master
 
 # optional enable limit switches, actions will stop if any enabled limit switch is triggered
-alpha_limit_enable                          false            # set to true to enable X min and max limit switches
-beta_limit_enable                           false            # set to true to enable Y min and max limit switches
-gamma_limit_enable                          false            # set to true to enable Z min and max limit switches
+alpha_limit_enable                           false            # set to true to enable X min and max limit switches
+beta_limit_enable                            false            # set to true to enable Y min and max limit switches
+gamma_limit_enable                           false            # set to true to enable Z min and max limit switches
 
 alpha_fast_homing_rate_mm_s                  500              # feedrates in mm/second
 beta_fast_homing_rate_mm_s                   500              # "
 gamma_fast_homing_rate_mm_s                  500              # "
-alpha_slow_homing_rate_mm_s                  20               # "
-beta_slow_homing_rate_mm_s                   20               # "
-gamma_slow_homing_rate_mm_s                  20               # "
+<<<<<<< HEAD
+alpha_slow_homing_rate_mm_s                  500              # "
+beta_slow_homing_rate_mm_s                   500              # "
+gamma_slow_homing_rate_mm_s                  500              # "
+=======
+alpha_slow_homing_rate_mm_s                  250              # "
+beta_slow_homing_rate_mm_s                   250              # "
+gamma_slow_homing_rate_mm_s                  250              # "
+>>>>>>> master
 
 alpha_homing_retract_mm                      5                # distance in mm
 beta_homing_retract_mm                       5                # "
 gamma_homing_retract_mm                      5                # "
 
-endstop_debounce_count                      10              # uncomment if you get noise on your endstops, default is 100
+endstop_debounce_count                       100              # uncomment if you get noise on your endstops, default is 100
 
 alpha_trim                                   0                # software trim for alpha stepper endstop (in mm)
 beta_trim                                    0                # software trim for beta stepper endstop (in mm)

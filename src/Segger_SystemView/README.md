@@ -48,5 +48,3 @@ Note: 4096 is the largest buffer size supported; you can also increase the speed
 JLinkGDBServer -if jtag -device LPC4330 -speed 15000
 
 Note: I run my JLinkGDBServer on a separate Ubuntu machine onto which my Firepick is attached and use TCP/IP to connect to it.
-
-

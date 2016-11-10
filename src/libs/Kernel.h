@@ -26,6 +26,7 @@ class SerialConsole;
 class StreamOutputPool;
 class GcodeDispatch;
 class Robot;
+class Stepper;
 class Planner;
 class StepTicker;
 class Adc;
