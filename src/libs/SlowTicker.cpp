@@ -32,6 +32,12 @@ SlowTicker::SlowTicker(){
     uint32_t PCLK = SystemCoreClock;
     uint32_t prescale = PCLK / 1000000; //Increment MR each uSecond
 
+<<<<<<< HEAD
+=======
+    uint32_t PCLK = SystemCoreClock;
+    uint32_t prescale = PCLK / 1000000; //Increment MR each uSecond
+
+>>>>>>> master
     /* Enable timer 1 clock and reset it */
     LPC_CCU1->CLKCCU[CLK_MX_TIMER2].CFG |= 1;
     LPC_RGU->RESET_CTRL1 = 1 << (RGU_TIMER2_RST & 31);  //Trigger a peripheral reset for the timer

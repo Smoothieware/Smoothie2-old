@@ -134,7 +134,11 @@ extern "C" void TIMER1_IRQHandler (void)
 {
 //	SEGGER_RTT_LOCK();
 //	SEGGER_SYSVIEW_RecordEnterISR();
+<<<<<<< HEAD
 //
+=======
+
+>>>>>>> master
     LPC_TIMER1->IR |= 1 << 0;
     StepTicker::getInstance()->unstep_tick();
 
@@ -148,11 +152,17 @@ extern "C" void TIMER0_IRQHandler (void)
 {
 //    SEGGER_RTT_LOCK();
 //    SEGGER_SYSVIEW_RecordEnterISR();
+<<<<<<< HEAD
 //
     // Reset interrupt register
     LPC_TIMER0->IR |= 1 << 0;
     StepTicker::getInstance()->step_tick();
 
+=======
+    // Reset interrupt register
+    LPC_TIMER0->IR |= 1 << 0;
+    StepTicker::getInstance()->step_tick();
+>>>>>>> master
 //	NVIC_ClearPendingIRQ(TIMER0_IRQn);
 //	SEGGER_SYSVIEW_RecordExitISR();
 //	SEGGER_RTT_UNLOCK();

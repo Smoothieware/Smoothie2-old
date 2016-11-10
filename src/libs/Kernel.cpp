@@ -29,7 +29,7 @@
 #include "Configurator.h"
 //#include "SimpleShell.h"
 
-//#include "platform_memory.h"
+#include "platform_memory.h"
 
 #include <malloc.h>
 #include <array>
@@ -120,6 +120,11 @@ Kernel::Kernel(){
     // we exepct ok per line now not per G code, setting this to false will return to the old (incorrect) way of ok per G code
     this->ok_per_line= this->config->value( ok_per_line_checksum )->by_default(true)->as_bool();
 
+    // Configure the step ticker
+    this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
+    float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(5)->as_number();
+    // REMOVE this->acceleration_ticks_per_second = THEKERNEL->config->value(acceleration_ticks_per_second_checksum)->by_default(1000)->as_number();
+
     this->add_module( this->serial );
 
     // Configure the step ticker
@@ -143,7 +148,11 @@ Kernel::Kernel(){
     // Set other priorities lower than the timers
     NVIC_SetPriority(ADC0_IRQn, 5);
     NVIC_SetPriority(ADC1_IRQn, 5);
+<<<<<<< HEAD
     // TODO THIS NEEDS TO BE UPDATED FOR LPC4330
+=======
+
+>>>>>>> master
 /*
     NVIC_SetPriority(USB_IRQn, 5);
 
@@ -160,7 +169,10 @@ Kernel::Kernel(){
         NVIC_SetPriority(UART3_IRQn, 5);
     }
 */
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
     // Configure the step ticker
     this->step_ticker->set_frequency( this->base_stepping_frequency );
     this->step_ticker->set_unstep_time( microseconds_per_step_pulse );
