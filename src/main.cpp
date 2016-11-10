@@ -56,8 +56,6 @@
 #include "SEGGER_SYSVIEW.h"
 
 #include "version.h"
-#include "system_LPC43xx.h"
-//#include "platform_memory.h"
 
 #include "mbed.h"
 
@@ -110,28 +108,28 @@ void init() {
 #ifdef CNC
     kernel->streams->printf("  CNC Build\r\n");
 #endif
-#ifdef DISABLEMSD
-    kernel->streams->printf("  NOMSD Build\r\n");
-#endif
 
 bool sdok= false; //TODO remove once SD Card code is working
 //    bool sdok= (sd.disk_initialize() == 0);
 //    if(!sdok) kernel->streams->printf("SDCard failed to initialize\r\n");
 
+//    #ifdef NONETWORK
+//        kernel->streams->printf("NETWORK is disabled\r\n");
+//    #endif
 
-#ifdef DISABLEMSD
-    // attempt to be able to disable msd in config
-    if(sdok && !kernel->config->value( disable_msd_checksum )->by_default(false)->as_bool()){
-        // HACK to zero the memory USBMSD uses as it and its objects seem to not initialize properly in the ctor
-        size_t n= sizeof(USBMSD);
-        void *v = AHB0.alloc(n);
-        memset(v, 0, n); // clear the allocated memory
-        msc= new(v) USBMSD(&u, &sd); // allocate object using zeroed memory
-    }else{
-        msc= NULL;
-        kernel->streams->printf("MSD is disabled\r\n");
-    }
-#endif
+//#ifdef DISABLEMSD
+//    // attempt to be able to disable msd in config
+//    if(sdok && !kernel->config->value( disable_msd_checksum )->by_default(false)->as_bool()){
+//        // HACK to zero the memory USBMSD uses as it and its objects seem to not initialize properly in the ctor
+//        size_t n= sizeof(USBMSD);
+//        void *v = AHB0.alloc(n);
+//        memset(v, 0, n); // clear the allocated memory
+//        msc= new(v) USBMSD(&u, &sd); // allocate object using zeroed memory
+//    }else{
+//        msc= NULL;
+//        kernel->streams->printf("MSD is disabled\r\n");
+//    }
+//#endif
 
 	// Create and add main modules
 //      kernel->add_module( new Player() );
@@ -146,7 +144,6 @@ bool sdok= false; //TODO remove once SD Card code is working
     #endif
 
     #ifndef NO_TOOLS_SWITCH
-    // Create all Switch modules
     SwitchPool *sp= new SwitchPool();
     sp->load_tools();
     delete sp;
@@ -233,12 +230,12 @@ bool sdok= false; //TODO remove once SD Card code is working
     // memory before cache is cleared
     //SimpleShell::print_mem(kernel->streams);
 
-    // Clear the configuration cache as it is no longer needed
+    // clear up the config cache to save some memory
     kernel->config->config_cache_clear();
 
     if(kernel->is_using_leds()) {
         // set some leds to indicate status... led0 init done, led1 mainloop running, led2 idle loop running, led3 sdcard ok
-        leds[0]= 0; // indicate we are done with init
+        leds[0]= 1; // indicate we are done with init
         leds[3]= sdok?1:0; // 4th led indicates sdcard is available (TODO maye should indicate config was found)
     }
 
@@ -261,26 +258,24 @@ bool sdok= false; //TODO remove once SD Card code is working
     }
 
     // start the timers and interrupts
-    kernel->conveyor->start(THEROBOT->get_number_registered_motors());
-    kernel->step_ticker->start();
+    THEKERNEL->conveyor->start(THEROBOT->get_number_registered_motors());
+    THEKERNEL->step_ticker->start();
     THEKERNEL->slow_ticker->start();
 }
 
-int main() {
-
+int main()
+{
     init();
-
-	uint16_t cnt = 0;
-
+	int cnt = 0;
 	// Main loop
 	while(1){
 		if(THEKERNEL->is_using_leds()) {
 			// flash led 2 to show we are alive
-			leds[1]= (cnt++ & 0x1000) ? 1 : 0;
+			leds[0]= (cnt++ & 0x1000) ? 1 : 0;
 		}
 		THEKERNEL->call_event(ON_MAIN_LOOP);
 		THEKERNEL->call_event(ON_IDLE);
+		THEKERNEL->streams->printf("0");
 	}
 
 }
-
