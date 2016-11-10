@@ -18,6 +18,9 @@ using namespace std;
 
 #include <mri.h>
 
+#include "SEGGER_SYSVIEW.h"
+#include "SEGGER_RTT_Conf.h"
+
 // This module uses a Timer to periodically call hooks
 // Modules register with a function ( callback ) and a frequency, and we then call that function at the given frequency.
 
@@ -31,11 +34,12 @@ SlowTicker::SlowTicker(){
 
     uint32_t PCLK = SystemCoreClock;
     uint32_t prescale = PCLK / 1000000; //Increment MR each uSecond
+
     /* Enable timer 1 clock and reset it */
     LPC_CCU1->CLKCCU[CLK_MX_TIMER2].CFG |= 1;
     LPC_RGU->RESET_CTRL1 = 1 << (RGU_TIMER2_RST & 31);  //Trigger a peripheral reset for the timer
     while (!(LPC_RGU->RESET_ACTIVE_STATUS1 & (1 << (RGU_TIMER2_RST & 31)))){}
-    /* Configure Timer 0 */
+    /* Configure Timer 2 */
     LPC_TIMER2->CTCR = 0x0;    // timer mode
     LPC_TIMER2->TCR = 0;    // Disable interrupt
     LPC_TIMER2->PR = prescale - 1;
@@ -134,8 +138,14 @@ void SlowTicker::on_idle(void*)
 }
 
 extern "C" void TIMER2_IRQHandler (void){
+	//	SEGGER_RTT_LOCK();
+		SEGGER_SYSVIEW_RecordEnterISR();
+
     if((LPC_TIMER2->IR >> 0) & 1){  // If interrupt register set for MR0
         LPC_TIMER2->IR |= 1 << 0;   // Reset it
     }
     global_slow_ticker->tick();
+    //	NVIC_ClearPendingIRQ(TIMER2_IRQn);
+    	SEGGER_SYSVIEW_RecordExitISR();
+    //	SEGGER_RTT_UNLOCK();
 }
