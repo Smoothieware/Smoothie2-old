@@ -275,7 +275,6 @@ int main()
 		}
 		THEKERNEL->call_event(ON_MAIN_LOOP);
 		THEKERNEL->call_event(ON_IDLE);
-		THEKERNEL->streams->printf("0");
 	}
 
 }
