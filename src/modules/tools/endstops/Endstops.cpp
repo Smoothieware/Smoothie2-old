@@ -140,6 +140,7 @@ void Endstops::on_module_loaded()
         return;
     }
 
+    register_for_event(ON_IDLE);
     register_for_event(ON_GCODE_RECEIVED);
     register_for_event(ON_GET_PUBLIC_DATA);
     register_for_event(ON_SET_PUBLIC_DATA);
@@ -431,7 +432,7 @@ uint32_t Endstops::read_endstops(uint32_t dummy)
                     if(debounce[m] < debounce_ms) {
                         debounce[m]++;
                     } else {
-                        // we signal all the motors to stop, as on corexy X and Y motors will move for X and Y axis homing and we only hom eone axis at a time
+                        // we signal all the motors to stop, as on corexy X and Y motors will move for X and Y axis homing and we only home one axis at a time
                         STEPPER[X_AXIS]->stop_moving();
                         STEPPER[Y_AXIS]->stop_moving();
                         STEPPER[Z_AXIS]->stop_moving();

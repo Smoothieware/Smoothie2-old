@@ -123,14 +123,9 @@ Kernel::Kernel(){
     // Configure the step ticker
     this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();
     float microseconds_per_step_pulse = this->config->value(microseconds_per_step_pulse_checksum)->by_default(5)->as_number();
-<<<<<<< HEAD
 
     this->add_module( this->serial );
 
-=======
-    // REMOVE this->acceleration_ticks_per_second = THEKERNEL->config->value(acceleration_ticks_per_second_checksum)->by_default(1000)->as_number();
-
->>>>>>> daeb176e8c9c0ece9343444dad27a02445d3c6c2
     // HAL stuff
     add_module( this->slow_ticker = new SlowTicker());
 
@@ -147,7 +142,6 @@ Kernel::Kernel(){
     // Set other priorities lower than the timers
     NVIC_SetPriority(ADC0_IRQn, 5);
     NVIC_SetPriority(ADC1_IRQn, 5);
-<<<<<<< HEAD
 //    NVIC_SetPriority(USB_IRQn, 5);
 //
 //    // If MRI is enabled
@@ -162,8 +156,6 @@ Kernel::Kernel(){
 //        NVIC_SetPriority(UART2_IRQn, 5);
 //        NVIC_SetPriority(UART3_IRQn, 5);
 //    }
-=======
->>>>>>> daeb176e8c9c0ece9343444dad27a02445d3c6c2
 
     // Configure the step ticker
     this->step_ticker->set_frequency( this->base_stepping_frequency );
@@ -176,11 +168,7 @@ Kernel::Kernel(){
     // TOADDBACK this->add_module( this->simpleshell    = new SimpleShell()   );
 
     this->planner = new Planner();
-<<<<<<< HEAD
     this->configurator = new Configurator();
-=======
-    // TOADDBACK this->configurator = new Configurator();
->>>>>>> daeb176e8c9c0ece9343444dad27a02445d3c6c2
 }
 
 // return a GRBL-like query string for serial ?

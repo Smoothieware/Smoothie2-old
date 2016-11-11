@@ -8,7 +8,6 @@
 #include "libs/Kernel.h"
 
 #include "modules/tools/laser/Laser.h"
-<<<<<<< HEAD
 #include "modules/tools/spindle/Spindle.h"
 #include "modules/tools/extruder/ExtruderMaker.h"
 #include "modules/tools/temperaturecontrol/TemperatureControlPool.h"
@@ -31,15 +30,6 @@
 #include "modules/utils/PlayLed/PlayLed.h"
 //#include "modules/utils/panel/Panel.h"
 //#include "libs/Network/uip/Network.h"
-=======
-#include "modules/tools/extruder/ExtruderMaker.h"
-#include "modules/tools/temperaturecontrol/TemperatureControlPool.h"
-#include "modules/tools/endstops/Endstops.h"
-#include "modules/tools/switch/SwitchPool.h"
-#include "modules/tools/drillingcycles/Drillingcycles.h"
-
-#include "modules/robot/Conveyor.h"
->>>>>>> daeb176e8c9c0ece9343444dad27a02445d3c6c2
 #include "Config.h"
 #include "checksumm.h"
 #include "ConfigValue.h"
@@ -63,7 +53,6 @@
 */
 #include "StreamOutputPool.h"
 #include "ToolManager.h"
-<<<<<<< HEAD
 #include "SEGGER_SYSVIEW.h"
 
 #include "version.h"
@@ -74,14 +63,6 @@
 #define disable_msd_checksum  CHECKSUM("msd_disable")
 #define dfu_enable_checksum  CHECKSUM("dfu_enable")
 #define watchdog_timeout_checksum  CHECKSUM("watchdog_timeout")
-=======
-
-#include "version.h"
-#include "system_LPC43xx.h"
-#include "platform_memory.h"
-
-#include "mbed.h"
->>>>>>> daeb176e8c9c0ece9343444dad27a02445d3c6c2
 
 DigitalOut leds[4] = {
 #ifdef TARGET_BAMBINO210E
@@ -116,7 +97,6 @@ USBMSD *msc= NULL;
 */
 
 void init() {
-<<<<<<< HEAD
 	SEGGER_SYSVIEW_Conf();
 
     // Kernel creates modules, and receives and dispatches events between them
@@ -246,59 +226,6 @@ bool sdok= false; //TODO remove once SD Card code is working
 
 
 //    kernel->add_module( &u );
-=======
-    // Kernel creates modules, and receives and dispatches events between them
-    Kernel* kernel = new Kernel();
-
-    kernel->streams->printf("Smoothie Running @%ldMHz\r\n", SystemCoreClock / 1000000);
-    Version version;
-    kernel->streams->printf("  Build version %s, Build date %s\r\n", version.get_build(), version.get_build_date());
-#ifdef CNC
-    kernel->streams->printf("  CNC Build\r\n");
-#endif
-#ifdef DISABLEMSD
-    kernel->streams->printf("  NOMSD Build\r\n");
-#endif
-
-    // Create and add main modules
-    kernel->add_module( new Endstops() );
-    kernel->add_module( new Laser() );
-
-    // Create all Switch modules
-    SwitchPool *sp= new SwitchPool();
-    sp->load_tools();
-    delete sp;
-
-    // Create all TemperatureControl modules. Note order is important here must be after extruder so Tn as a parameter will get executed first
-    TemperatureControlPool *tp= new TemperatureControlPool();
-    tp->load_tools();
-    delete tp;
-
-
-    // TOADDBACK kernel->add_module( &u );
-
-
-    // Clear the configuration cache as it is no longer needed
-    kernel->config->config_cache_clear();
-
-    if(kernel->is_using_leds()) {
-        // set some leds to indicate status... led0 init done, led1 mainloop running, led2 idle loop running, led3 sdcard ok
-        leds[0]= 0; // indicate we are done with init
-        // TOADDBACK leds[3]= sdok?1:0; // 4th led indicates sdcard is available (TODO maye should indicate config was found)
-    }
-
-    // start the timers and interrupts
-    kernel->conveyor->start(THEROBOT->get_number_registered_motors());
-    kernel->step_ticker->start();
-    THEKERNEL->slow_ticker->start();
-}
-
-int main() {
-
-    init();
-
-	uint16_t cnt = 0;
->>>>>>> daeb176e8c9c0ece9343444dad27a02445d3c6c2
 
     // memory before cache is cleared
     //SimpleShell::print_mem(kernel->streams);
@@ -344,11 +271,10 @@ int main()
 	while(1){
 		if(THEKERNEL->is_using_leds()) {
 			// flash led 2 to show we are alive
-			leds[1]= (cnt++ & 0x1000) ? 1 : 0;
+			leds[0]= (cnt++ & 0x1000) ? 1 : 0;
 		}
 		THEKERNEL->call_event(ON_MAIN_LOOP);
 		THEKERNEL->call_event(ON_IDLE);
 	}
 
 }
-
