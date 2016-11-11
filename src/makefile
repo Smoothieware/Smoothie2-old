@@ -84,11 +84,14 @@ DEFINES += -DTARGET_BAMBINO200E
 MRI_UART ?= MRI_UART_TX_P5_6 MRI_UART_RX_P1_14 MRI_UART_BAUD=230400
 endif
 
+<<<<<<< HEAD
 
 # this is the default UART baud rate used if it is not set in config
 # it is also the baud rate used to report any errors found while parsing the config file
 DEFINES += -DDEFAULT_SERIAL_BAUD_RATE=9600
 
+=======
+>>>>>>> daeb176e8c9c0ece9343444dad27a02445d3c6c2
 # generate a git version string
 ifneq "$(OS)" "Windows_NT"
 DEFINES += -D__GITVERSIONSTRING__=\"$(shell ./generate-version.sh)\"
