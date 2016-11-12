@@ -31,3 +31,4 @@ src/Segger_SystemView/SEGGER_SYSVIEW_Conf.h
 src/Segger_SystemView/SEGGER_SYSVIEW_ConfDefaults.h
 src/Segger_SystemView/SEGGER_SYSVIEW_Config_NoOS.c
 src/Segger_SystemView/SEGGER_SYSVIEW_Int.h
+README.md
