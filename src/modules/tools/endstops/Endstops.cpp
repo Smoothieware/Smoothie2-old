@@ -140,7 +140,6 @@ void Endstops::on_module_loaded()
         return;
     }
 
-    register_for_event(ON_IDLE);
     register_for_event(ON_GCODE_RECEIVED);
     register_for_event(ON_GET_PUBLIC_DATA);
     register_for_event(ON_SET_PUBLIC_DATA);
