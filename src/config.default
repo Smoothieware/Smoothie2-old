@@ -100,7 +100,6 @@ gamma_dir_pin                                1.7              # Pin for gamma st
 gamma_en_pin                                 6.9              # Pin for gamma enable
 gamma_current                                1.5              # Z stepper motor current
 gamma_max_rate                               60000.0          # mm/min
-<<<<<<< HEAD
 
 #SilentStepStick TMC2130 setup
 motor_driver_control.alpha.enable            true             # alpha (X) is a TMC2130
@@ -113,7 +112,7 @@ motor_driver_control.alpha.alarm             true             # set to true mean
 motor_driver_control.alpha.halt_on_alarm     false            # if set to true means ON_HALT is entered on any error bits being set
 motor_driver_control.alpha.spi_channel       0                # SPI channel 1 is sdcard channel
 motor_driver_control.alpha.spi_cs_pin        7.4              # SPI CS pin
-#motor_driver_control.alpha.spi_frequency     1000000          # SPI frequency
+#motor_driver_control.alpha.spi_frequency    1000000          # SPI frequency
 
 motor_driver_control.beta.enable             true             # beta (Y) is a TMC2130
 motor_driver_control.beta.designator         B                # B to set the settings
@@ -125,7 +124,7 @@ motor_driver_control.beta.alarm              true             # set to true mean
 motor_driver_control.beta.halt_on_alarm      false            # if set to true means ON_HALT is entered on any error bits being set
 motor_driver_control.beta.spi_channel        0                # SPI channel 1 is sdcard channel
 motor_driver_control.beta.spi_cs_pin         7.5              # SPI CS pin
-#motor_driver_control.beta.spi_frequency      1000000          # SPI frequency
+#motor_driver_control.beta.spi_frequency     1000000          # SPI frequency
 
 motor_driver_control.gamma.enable            true             # gamma (Z) is a TMC2130
 motor_driver_control.gamma.designator        C                # C to set the settings
@@ -137,10 +136,7 @@ motor_driver_control.gamma.alarm             true             # set to true mean
 motor_driver_control.gamma.halt_on_alarm     false            # if set to true means ON_HALT is entered on any error bits being set
 motor_driver_control.gamma.spi_channel       0                # SPI channel 1 is sdcard channel ???
 motor_driver_control.gamma.spi_cs_pin        1.0              # SPI CS pin
-#motor_driver_control.gamma.spi_frequency     1000000          # SPI frequency
-
-=======
->>>>>>> master
+#motor_driver_control.gamma.spi_frequency    1000000          # SPI frequency
 
 ## System configuration
 # Serial communications configuration ( baud rate defaults to 9600 if undefined )
@@ -261,7 +257,7 @@ rdelta_homing                                true             # forces all three
 alpha_min_endstop                            7.4!^            #
 alpha_max_endstop                            7.7^             # add ! to invert pullup if switch is NO to ground
 alpha_homing_direction                       home_to_max      # Home up
-<<<<<<< HEAD
+
 alpha_max                                    300              #
 beta_min_endstop                             7.5!^            #
 beta_max_endstop                             4.3^             #
@@ -271,35 +267,19 @@ gamma_min_endstop                            4.1!^            #
 gamma_max_endstop                            4.4^             #
 gamma_homing_direction                       home_to_max      #
 gamma_max                                    300              #
-=======
-alpha_max                                    200              #
-beta_min_endstop                             7.5!^            #
-beta_max_endstop                             4.3^             #
-beta_homing_direction                        home_to_max      #
-beta_max                                     200              #
-gamma_min_endstop                            4.1!^            #
-gamma_max_endstop                            4.4^             #
-gamma_homing_direction                       home_to_max      #
-gamma_max                                    200              #
->>>>>>> master
 
 # optional enable limit switches, actions will stop if any enabled limit switch is triggered
-alpha_limit_enable                           false            # set to true to enable X min and max limit switches
-beta_limit_enable                            false            # set to true to enable Y min and max limit switches
-gamma_limit_enable                           false            # set to true to enable Z min and max limit switches
+alpha_limit_enable                           true            # set to true to enable X min and max limit switches
+beta_limit_enable                            true            # set to true to enable Y min and max limit switches
+gamma_limit_enable                           true            # set to true to enable Z min and max limit switches
 
 alpha_fast_homing_rate_mm_s                  500              # feedrates in mm/second
 beta_fast_homing_rate_mm_s                   500              # "
 gamma_fast_homing_rate_mm_s                  500              # "
-<<<<<<< HEAD
-alpha_slow_homing_rate_mm_s                  500              # "
-beta_slow_homing_rate_mm_s                   500              # "
-gamma_slow_homing_rate_mm_s                  500              # "
-=======
+
 alpha_slow_homing_rate_mm_s                  250              # "
 beta_slow_homing_rate_mm_s                   250              # "
 gamma_slow_homing_rate_mm_s                  250              # "
->>>>>>> master
 
 alpha_homing_retract_mm                      5                # distance in mm
 beta_homing_retract_mm                       5                # "
@@ -321,5 +301,5 @@ zprobe.probe_height                          15               # how much above b
 
 # DistanceProbes
 distanceprobes_enable	                     true
-rdelta_homing                                true             # forces all three axis to home a the same time regardless of
+#rdelta_homing                                true             # forces all three axis to home a the same time regardless of
 
