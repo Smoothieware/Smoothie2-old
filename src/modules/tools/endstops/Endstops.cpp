@@ -125,6 +125,12 @@ enum {
     LIMIT_TRIGGERED
 };
 
+//TODO remove debug
+DigitalOut LED_1     = DigitalOut(P4_5) = 0; //aka D27
+DigitalOut LED_alpha = DigitalOut(P4_2) = 0; //aka D26 Alpha Endstop
+DigitalOut LED_beta  = DigitalOut(P7_0) = 0; //aka D25 Beta Endstop
+DigitalOut LED_gamma = DigitalOut(P7_1) = 0; //aka D24 Gamma Endstop
+
 Endstops::Endstops()
 {
     this->status = NOT_HOMING;
@@ -147,7 +153,7 @@ void Endstops::on_module_loaded()
     // Settings
     this->load_config();
 
-    THEKERNEL->slow_ticker->attach(1000, this, &Endstops::read_endstops);
+    THEKERNEL->slow_ticker->attach(10000, this, &Endstops::read_endstops);
 }
 
 // Get config
@@ -400,14 +406,26 @@ void Endstops::move_to_origin(std::bitset<3> axis)
 // Called every millisecond in an ISR
 uint32_t Endstops::read_endstops(uint32_t dummy)
 {
-    if(this->status != MOVING_TO_ENDSTOP_SLOW && this->status != MOVING_TO_ENDSTOP_FAST) return 0; // not doing anything we need to monitor for
+	LED_1 = 1; //TODO remove debug
+	bool endstop_triggered = false;
+    if(this->status != MOVING_TO_ENDSTOP_SLOW && this->status != MOVING_TO_ENDSTOP_FAST)
+    	{
+    	    LED_1 = 0; //TODO remove debug
+    	    return 0; // not doing anything we need to monitor for
+    	}
 
     if(!is_corexy) {
         // check each axis
         for ( int m = X_AXIS; m <= Z_AXIS; m++ ) {
             if(STEPPER[m]->is_moving()) {
                 // if it is moving then we check the associated endstop, and debounce it
-                if(this->pins[m + (this->home_direction[m] ? 0 : 3)].get()) {
+                //if(this->pins[m + (this->home_direction[m] ? 0 : 3)].get()) {
+            	int n = m + (this->home_direction[m] ? 0 : 3);
+                endstop_triggered = this->pins[n].get();
+                if(endstop_triggered) {
+                	if (m==0) LED_alpha = 1; //TODO remove debug
+                	if (m==1) LED_beta = 1; //TODO remove debug
+                	if (m==2) LED_gamma = 1; //TODO remove debug
                     if(debounce[m] < debounce_ms) {
                         debounce[m]++;
                     } else {
@@ -416,6 +434,9 @@ uint32_t Endstops::read_endstops(uint32_t dummy)
                     }
 
                 } else {
+                	if (m==0) LED_alpha = 0;  //TODO remove debug
+                	if (m==1) LED_beta = 0;  //TODO remove debug
+                	if (m==2) LED_gamma = 0;  //TODO remove debug
                     // The endstop was not hit yet
                     debounce[m] = 0;
                 }
@@ -444,7 +465,7 @@ uint32_t Endstops::read_endstops(uint32_t dummy)
             }
         }
     }
-
+    LED_1 = 0; //TODO remove debug
     return 0;
 }
 
@@ -480,6 +501,10 @@ void Endstops::home(std::bitset<3> a)
     // reset debounce counts
     debounce.fill(0);
 
+    LED_alpha = 0;  //TODO remove debug
+    LED_beta = 0;   //TODO remove debug
+    LED_gamma = 0;  //TODO remove debug
+
     // turn off any compensation transform
     auto savect= THEROBOT->compensationTransform;
     THEROBOT->compensationTransform= nullptr;
@@ -492,7 +517,9 @@ void Endstops::home(std::bitset<3> a)
     THEROBOT->disable_segmentation= true; // we must disable segmentation as this won't work with it enabled
 
     if(!home_z_first) home_xy();
-
+    LED_alpha = 0;  //TODO remove debug
+    LED_beta = 0;   //TODO remove debug
+    LED_gamma = 0;  //TODO remove debug
     if(axis_to_home[Z_AXIS]) {
         // now home z
         float delta[3] {0, 0, gamma_max}; // we go the max z
@@ -501,9 +528,13 @@ void Endstops::home(std::bitset<3> a)
         // wait for Z
         THECONVEYOR->wait_for_idle();
     }
-
+    LED_alpha = 0;  //TODO remove debug
+    LED_beta = 0;   //TODO remove debug
+    LED_gamma = 0;  //TODO remove debug
     if(home_z_first) home_xy();
-
+    LED_alpha = 0;  //TODO remove debug
+    LED_beta = 0;   //TODO remove debug
+    LED_gamma = 0;  //TODO remove debug
     // TODO should check that the endstops were hit and it did not stop short for some reason
     // we did not complete movement the full distance if we hit the endstops
     THEROBOT->reset_position_from_current_actuator_position();
@@ -524,7 +555,9 @@ void Endstops::home(std::bitset<3> a)
     THEROBOT->delta_move(delta, feed_rate, 3);
     // wait until finished
     THECONVEYOR->wait_for_idle();
-
+    LED_alpha = 0;  //TODO remove debug
+    LED_beta = 0;   //TODO remove debug
+    LED_gamma = 0;  //TODO remove debug
     // Start moving the axes towards the endstops slowly
     this->status = MOVING_TO_ENDSTOP_SLOW;
     for ( int c = X_AXIS; c <= Z_AXIS; c++ ) {
@@ -538,7 +571,9 @@ void Endstops::home(std::bitset<3> a)
     THEROBOT->delta_move(delta, feed_rate, 3);
     // wait until finished
     THECONVEYOR->wait_for_idle();
-
+    LED_alpha = 0;  //TODO remove debug
+    LED_beta = 0;   //TODO remove debug
+    LED_gamma = 0;  //TODO remove debug
     // TODO should check that the endstops were hit and it did not stop short for some reason
     // we did not complete movement the full distance if we hit the endstops
     THEROBOT->reset_position_from_current_actuator_position();
@@ -731,7 +766,7 @@ void Endstops::process_home_command(Gcode* gcode)
         // NOTE a rotary delta usually has optical or hall-effect endstops so it is safe to go past them a little bit
         if(this->move_to_origin_after_home) move_to_origin(haxis);
         // if limit switches are enabled we must back off endstop after setting home
-        back_off_home(haxis);
+        back_off_home(haxis); //TODO figure out why this goes in the wrong direction DHP
 
     } else if(this->move_to_origin_after_home || this->limit_enable[X_AXIS]) {
         // deltas are not left at 0,0 because of the trim settings, so move to 0,0 if requested, but we need to back off endstops first

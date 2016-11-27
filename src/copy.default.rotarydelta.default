@@ -84,22 +84,22 @@ gamma_steps_per_mm                           2708.554567      # Steps per mm for
 
 # Stepper module pins ( ports, and pin numbers, appending "!" to the number will invert a pin )
 alpha_step_pin                               5.0              # Pin for alpha stepper step signal
-alpha_dir_pin                                6.12!             # Pin for alpha stepper direction
+alpha_dir_pin                                6.12             # Pin for alpha stepper direction
 alpha_en_pin                                 4.10             # Pin for alpha enable pin
 alpha_current                                1.5              # X stepper motor current
-alpha_max_rate                               600.0          # mm/min
+alpha_max_rate                               60000.0          # mm/min
 
 beta_step_pin                                5.7              # Pin for beta stepper step signal
-beta_dir_pin                                 5.5!              # Pin for beta stepper direction
+beta_dir_pin                                 5.5              # Pin for beta stepper direction
 beta_en_pin                                  7.6              # Pin for beta enable
 beta_current                                 1.5              # Y stepper motor current
-beta_max_rate                                600.0          # mm/min
+beta_max_rate                                60000.0          # mm/min
 
 gamma_step_pin                               4.0              # Pin for gamma stepper step signal
-gamma_dir_pin                                1.7!              # Pin for gamma stepper direction
+gamma_dir_pin                                1.7              # Pin for gamma stepper direction
 gamma_en_pin                                 6.9              # Pin for gamma enable
 gamma_current                                1.5              # Z stepper motor current
-gamma_max_rate                               600.0          # mm/min
+gamma_max_rate                               60000.0          # mm/min
 
 #SilentStepStick TMC2130 setup
 motor_driver_control.alpha.enable            true             # alpha (X) is a TMC2130
@@ -293,10 +293,10 @@ gamma_trim                                   0                # software trim fo
 
 # optional Z probe
 zprobe.enable                                true             # set to true to enable a zprobe
-zprobe.probe_pin                             7.3^             # pin probe is attached to if NC remove the !
-zprobe.slow_feedrate                         50   #5               # mm/sec probe feed rate
+#zprobe.probe_pin                            4.4!^            # pin probe is attached to if NC remove the !
+zprobe.slow_feedrate                         5                # mm/sec probe feed rate
 #zprobe.debounce_count                       100              # set if noisy
-zprobe.fast_feedrate                         5000              # move feedrate mm/sec
+zprobe.fast_feedrate                         100              # move feedrate mm/sec
 zprobe.probe_height                          15               # how much above bed to start probe
 
 # DistanceProbes

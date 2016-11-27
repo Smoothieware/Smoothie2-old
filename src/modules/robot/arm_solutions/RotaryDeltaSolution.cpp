@@ -154,9 +154,12 @@ void RotaryDeltaSolution::cartesian_to_actuator(const float cartesian_mm[], Actu
 
     if (status == -1) { //something went wrong,
         //force to actuator FPD home position as we know this is a valid position
-        actuator_mm[ALPHA_STEPPER] = 0;
-        actuator_mm[BETA_STEPPER ] = 0;
-        actuator_mm[GAMMA_STEPPER] = 0;
+    	//TODO REwork this as forcing home is bad if the mechanics are not calibrate; we could crash into something
+    	//ideally we should return a bad return-code so the calling logic knows it has asked this arm solution
+    	//to do something it cannot achieve - Douglas Pearless 2016-11-27
+//        actuator_mm[ALPHA_STEPPER] = 0;
+//        actuator_mm[BETA_STEPPER ] = 0;
+//        actuator_mm[GAMMA_STEPPER] = 0;
 
         //DEBUG CODE, uncomment the following to help determine what may be happening if you are trying to adapt this to your own different roational delta.
         if(debug_flag) {
