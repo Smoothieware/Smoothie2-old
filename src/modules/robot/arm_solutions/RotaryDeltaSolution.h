@@ -1,5 +1,5 @@
-#ifndef RotaryDeltaSolution_H
-#define RotaryDeltaSolution_H
+#pragma once
+
 #include "libs/Module.h"
 #include "BaseSolution.h"
 
@@ -30,6 +30,8 @@ class RotaryDeltaSolution : public BaseSolution {
         float tool_offset;		// Distance between end effector ball joint plane and tip of tool
         float z_calc_offset;
 
-        bool debug_flag{false};
+        struct {
+            bool debug_flag:1;
+            bool mirror_xy:1;
+        };
 };
-#endif // RotaryDeltaSolution_H

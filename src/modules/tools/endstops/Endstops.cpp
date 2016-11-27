@@ -766,7 +766,7 @@ void Endstops::process_home_command(Gcode* gcode)
         // NOTE a rotary delta usually has optical or hall-effect endstops so it is safe to go past them a little bit
         if(this->move_to_origin_after_home) move_to_origin(haxis);
         // if limit switches are enabled we must back off endstop after setting home
-        back_off_home(haxis); //TODO figure out why this goes in the wrong direction DHP
+        back_off_home(haxis);
 
     } else if(this->move_to_origin_after_home || this->limit_enable[X_AXIS]) {
         // deltas are not left at 0,0 because of the trim settings, so move to 0,0 if requested, but we need to back off endstops first
