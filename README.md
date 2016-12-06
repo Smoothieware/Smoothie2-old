@@ -4,6 +4,14 @@ A Smoothie firmware port to the Smoothieboard v2 boards.
 
 Current status : Gcode processing, motion planning, and step generation work. Many secondary features need porting, and some major lower level things need implementation ( USB, Ethernet, SDIO ).
 
+# Update, 05/12/2016
+
+Jim Morris ( lead Smoothie1 dev ) and Alan Carvalho de Assis ( NuttX dev ) are working on a port of Smoothie v1 to the LPC43XX by rebuilding Smoothie on top of the NuttX RTOS ( nuttx.org ) and completing the LPC43XX port of NuttX. That work is expected to take several months, but is now the "official" route to a v2 firmware.
+
+This "mBed" version of the v2 firmware currently in this repository is expected to be left aside, even though it has advanced to the point of being capable of moving motors. We want to apologize to those who have put effort into this version of the port so far. Hopefully the many advantages of moving Smoothie to a RTOS will outweigh the wasting of this codebase, and you will be as exited as we are about the new direction.
+
+If you want to help with the NuttX version of the v2 firmware, please note there will be a period of construction during which only Jim and Alan will work on it, but after that help will be extremely welcome.
+
 # Compiling
 
 First, go into gcc4mbed
