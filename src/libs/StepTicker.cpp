@@ -19,9 +19,16 @@
 #include <math.h>
 #include <mri.h>
 
+#include "SEGGER_SYSVIEW.h"
+#include "SEGGER_RTT_Conf.h"
+
 #ifdef STEPTICKER_DEBUG_PIN
+// debug pins, only used if defined in src/makefile
 #include "gpio.h"
-extern GPIO stepticker_debug_pin;
+GPIO stepticker_debug_pin(STEPTICKER_DEBUG_PIN);
+#define SET_STEPTICKER_DEBUG_PIN(n) {if(n) stepticker_debug_pin.set(); else stepticker_debug_pin.clear(); }
+#else
+#define SET_STEPTICKER_DEBUG_PIN(n)
 #endif
 
 
@@ -53,7 +60,7 @@ StepTicker::StepTicker(){
     LPC_CCU1->CLKCCU[CLK_MX_TIMER1].CFG |= 1;
     LPC_RGU->RESET_CTRL1 = 1 << (RGU_TIMER1_RST & 31);  //Trigger a peripheral reset for the timer
     while (!(LPC_RGU->RESET_ACTIVE_STATUS1 & (1 << (RGU_TIMER1_RST & 31)))){}
-    /* Configure Timer 0 */
+    /* Configure Timer 1 */
     LPC_TIMER1->CTCR = 0x0;    // timer mode
     LPC_TIMER1->TCR = 0;    // Disable interrupt
     LPC_TIMER1->PR = prescale - 1;
@@ -122,18 +129,36 @@ void StepTicker::unstep_tick()
     this->unstep.reset();
 }
 
+// Unstep timer interrupt handler
 extern "C" void TIMER1_IRQHandler (void)
 {
+//	SEGGER_RTT_LOCK();
+//	SEGGER_SYSVIEW_RecordEnterISR();
     LPC_TIMER1->IR |= 1 << 0;
     StepTicker::getInstance()->unstep_tick();
+
+//	NVIC_ClearPendingIRQ(TIMER1_IRQn);
+//	SEGGER_SYSVIEW_RecordExitISR();
+//	SEGGER_RTT_UNLOCK();
 }
 
 // The actual interrupt handler where we do all the work
 extern "C" void TIMER0_IRQHandler (void)
 {
+//	SEGGER_RTT_LOCK();
+//	SEGGER_SYSVIEW_RecordEnterISR();
+
     // Reset interrupt register
     LPC_TIMER0->IR |= 1 << 0;
     StepTicker::getInstance()->step_tick();
+
+    // Reset interrupt register
+    LPC_TIMER0->IR |= 1 << 0;
+    StepTicker::getInstance()->step_tick();
+//	NVIC_ClearPendingIRQ(TIMER0_IRQn);
+
+//	SEGGER_SYSVIEW_RecordExitISR();
+//	SEGGER_RTT_UNLOCK();
 }
 
 extern "C" void PendSV_Handler(void)

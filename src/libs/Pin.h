@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <string>
 
-//#include "libs/LPC17xx/sLPC17xx.h" // smoothed mbed.h lib
 #include "PinNames.h"
 
 namespace mbed {
@@ -26,7 +25,7 @@ public:
 	}
 
 	inline bool equals(const Pin& other) const {
-		//return (this->pin == other.pin) && (this->port == other.port);
+		return (this->pin_number == other.pin_number) && (this->port_number == other.port_number);
 		return false;
 	}
 
@@ -86,6 +85,9 @@ public:
 
 	//getter to access to mbed pinName
 	PinName getPinName() {return pinName; }
+
+	int port_number;
+        int pin_number;
 
 private:
 	//Added pinName

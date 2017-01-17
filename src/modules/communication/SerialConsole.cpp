@@ -20,8 +20,8 @@ using std::string;
 // Serial reading module
 // Treats every received line as a command and passes it ( via event call ) to the command dispatcher.
 // The command dispatcher will then ask other modules if they can do something with it
-SerialConsole::SerialConsole( PinName tx_pin, PinName rx_pin, int baud_rate ){
-    this->serial = new mbed::Serial( tx_pin, rx_pin );
+SerialConsole::SerialConsole( PinName rx_pin, PinName tx_pin, int baud_rate ){
+    this->serial = new mbed::Serial( rx_pin, tx_pin );
     this->serial->baud(baud_rate);
 }
 

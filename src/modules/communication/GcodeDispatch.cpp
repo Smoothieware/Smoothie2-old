@@ -151,9 +151,13 @@ try_again:
                     if(THEKERNEL->is_halted()) {
                         // we ignore all commands until M999, unless it is in the exceptions list (like M105 get temp)
                         if(gcode->has_m && gcode->m == 999) {
-                            THEKERNEL->call_event(ON_HALT, (void *)1); // clears on_halt
-
-                            // fall through and pass onto other modules
+                            if(THEKERNEL->is_halted()) {
+                                THEKERNEL->call_event(ON_HALT, (void *)1); // clears on_halt
+                                new_message.stream->printf("WARNING: After HALT you should HOME as position is currently unknown\n");
+                            }
+                            new_message.stream->printf("ok\n");
+                            delete gcode;
+                            continue;
 
                         }else if(!is_allowed_mcode(gcode->m)) {
                             // ignore everything, return error string to host
@@ -196,7 +200,7 @@ try_again:
                                 }
                             }
                             // makes it handle the parameters as a machine position
-                            THEKERNEL->robot->next_command_is_MCS= true;
+                            THEROBOT->next_command_is_MCS= true;
 
                         }
 
@@ -265,8 +269,9 @@ try_again:
                                 while(is_whitespace(str.front())){ str= str.substr(1); } // strip leading whitespace
 
                                 delete gcode;
-				// TODO : TOADDBACK When Simpleshell is added back in
-                                /*if(str.empty()) {
+				// TOADDBACK When Simpleshell is added back in
+                                /*
+                                if(str.empty()) {
                                     SimpleShell::parse_command("help", "", new_message.stream);
 
                                 }else{
@@ -332,7 +337,6 @@ try_again:
                                 gcode->add_nl= true;
                                 break; // fall through to process by modules
                             }
-
                         }
                     }
 
@@ -355,6 +359,10 @@ try_again:
                         }else{
                             new_message.stream->printf("unknown\r\n");
                         }
+
+                        // we cannot continue safely after an error so we enter HALT state
+                        new_message.stream->printf("Entering Alarm/Halt state\n");
+                        THEKERNEL->call_event(ON_HALT, nullptr);
 
                     }else{
 

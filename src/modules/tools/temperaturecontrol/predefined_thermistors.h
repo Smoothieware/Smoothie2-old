@@ -5,6 +5,8 @@ typedef struct {
         float beta, r0, t0;
 } const thermistor_beta_table_t;
 
+// NOTE the order of these tables must NOT be changed as the index can be used in M305 to set the prefined thermistor to use
+
 static const thermistor_beta_table_t predefined_thermistors_beta[] {
     // name,            r1,  r2,   beta,    r0,        t0
     {"EPCOS100K",       0,   4700, 4066.0F, 100000.0F, 25.0F}, // B57540G0104F000
@@ -22,7 +24,7 @@ typedef struct {
         float c1, c2, c3;
 } const thermistor_table_t;
 
-// Use one of the following scripts to calcuate the coefficients:
+// Use one of the following scripts to calculate the coefficients:
 // - http://www.thinksrs.com/downloads/programs/Therm%20Calc/NTCCalibrator/NTCcalculator.htm
 // - https://github.com/MarlinFirmware/Marlin/blob/Development/Marlin/scripts/createTemperatureLookupMarlin.py
 static const thermistor_table_t predefined_thermistors[] {

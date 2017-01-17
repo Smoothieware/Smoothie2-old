@@ -31,8 +31,8 @@ class Planner;
 class StepTicker;
 class Adc;
 class PublicData;
-//TOADDBACK class SimpleShell;
-//TOADDBACK class Configurator;
+//TOADDBACK class SimpleShell;
+class Configurator;
 
 class Kernel {
     public:
@@ -63,12 +63,11 @@ class Kernel {
         StreamOutputPool* streams;
         GcodeDispatch*    gcode_dispatch;
         Robot*            robot;
-        Stepper*          stepper;
         Planner*          planner;
         Config*           config;
         Conveyor*         conveyor;
-        // TOADDBACK Configurator*     configurator;
-        // TOADDBACK SimpleShell*      simpleshell;
+        Configurator*     configurator;
+        // TOADDBACK SimpleShell*      simpleshell;
 
         int debug;
         SlowTicker*       slow_ticker;
@@ -76,7 +75,6 @@ class Kernel {
         Adc*              adc;
         std::string       current_path;
         uint32_t          base_stepping_frequency;
-        uint32_t          acceleration_ticks_per_second;
 
     private:
         // When a module asks to be called for a specific event ( a hook ), this is where that request is remembered

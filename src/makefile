@@ -16,7 +16,17 @@ MRI_BREAK_ON_INIT ?= 1
 #OPTIMIZATION        :=  0
 OPTIMIZATION        :=  2
 
+# Set to non zero value if you want checks to be enabled which reserve a
+# specific amount of space for the stack.  The heap's growth will be
+# constrained to reserve this much space for the stack and the stack won't be
+# able to grow larger than this amount.
+#STACK_SIZE=3072
 
+# Set to 1 to allow MRI debug monitor to take full control of UART0 and use it
+# as a dedicated debug channel.  If you are using the USB based serial port for
+# the console then this should cause you no problems.  Set MRI_BREAK_ON_INIT to
+# 0 if you don't want to break into GDB at startup.
+ENABLE_DEBUG_MONITOR?=0
 
 ########################################################################################################################
 PROJECT             := Smoothie2
@@ -26,11 +36,14 @@ NO_FLOAT_SCANF      := 1
 NO_FLOAT_PRINTF     := 0
 LIBS_PREFIX         := configdefault.o
 MRI_SEMIHOST_STDIO  := 0
+#MBED_LIBS           += USBHost
+#MBED_LIBS           += USBDevice
 
 # Use C++11 features for the checksums
 DEFINES += -DCHECKSUM_USE_CPP
 
-
+#Disable the network
+DEFINES += -DNONETWORK
 
 # Need to use a custom LPC4337 script for boards like the Smoothie2 hardware which use that chip instead of the LPC4330.
 ifeq "$(BOARD)" "Smoothie2Proto1"
@@ -71,6 +84,11 @@ DEFINES += -DTARGET_BAMBINO200E
 MRI_UART ?= MRI_UART_TX_P5_6 MRI_UART_RX_P1_14 MRI_UART_BAUD=230400
 endif
 
+
+# this is the default UART baud rate used if it is not set in config
+# it is also the baud rate used to report any errors found while parsing the config file
+DEFINES += -DDEFAULT_SERIAL_BAUD_RATE=9600
+
 # generate a git version string
 ifneq "$(OS)" "Windows_NT"
 DEFINES += -D__GITVERSIONSTRING__=\"$(shell ./generate-version.sh)\"
@@ -90,6 +108,8 @@ endif
 
 include $(GCC4MBED_DIR)/build/gcc4mbed.mk
 
+# set to not compile in any network support
+#export NONETWORK = 1
 
 configdefault.o : config.default
 	@echo Packing $<

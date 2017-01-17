@@ -8,13 +8,28 @@
 #include "libs/Kernel.h"
 
 #include "modules/tools/laser/Laser.h"
+#include "modules/tools/spindle/Spindle.h"
 #include "modules/tools/extruder/ExtruderMaker.h"
 #include "modules/tools/temperaturecontrol/TemperatureControlPool.h"
 #include "modules/tools/endstops/Endstops.h"
+#include "modules/tools/zprobe/ZProbe.h"
+#include "modules/tools/scaracal/SCARAcal.h"
+#include "RotaryDeltaCalibration.h"
 #include "modules/tools/switch/SwitchPool.h"
+#include "modules/tools/temperatureswitch/TemperatureSwitch.h"
 #include "modules/tools/drillingcycles/Drillingcycles.h"
+#include "FilamentDetector.h"
+#include "MotorDriverControl.h"
 
 #include "modules/robot/Conveyor.h"
+//#include "modules/utils/simpleshell/SimpleShell.h"
+#include "modules/utils/configurator/Configurator.h"
+#include "modules/utils/currentcontrol/CurrentControl.h"
+//#include "modules/utils/player/Player.h"
+#include "modules/utils/killbutton/KillButton.h"
+#include "modules/utils/PlayLed/PlayLed.h"
+//#include "modules/utils/panel/Panel.h"
+//#include "libs/Network/uip/Network.h"
 #include "Config.h"
 #include "checksumm.h"
 #include "ConfigValue.h"
@@ -38,12 +53,16 @@
 */
 #include "StreamOutputPool.h"
 #include "ToolManager.h"
+#include "SEGGER_SYSVIEW.h"
 
 #include "version.h"
-#include "system_LPC43xx.h"
-#include "platform_memory.h"
 
 #include "mbed.h"
+
+#define second_usb_serial_enable_checksum  CHECKSUM("second_usb_serial_enable")
+#define disable_msd_checksum  CHECKSUM("msd_disable")
+#define dfu_enable_checksum  CHECKSUM("dfu_enable")
+#define watchdog_timeout_checksum  CHECKSUM("watchdog_timeout")
 
 DigitalOut leds[4] = {
 #ifdef TARGET_BAMBINO210E
@@ -78,6 +97,8 @@ USBMSD *msc= NULL;
 */
 
 void init() {
+	SEGGER_SYSVIEW_Conf();
+
     // Kernel creates modules, and receives and dispatches events between them
     Kernel* kernel = new Kernel();
 
@@ -87,58 +108,173 @@ void init() {
 #ifdef CNC
     kernel->streams->printf("  CNC Build\r\n");
 #endif
-#ifdef DISABLEMSD
-    kernel->streams->printf("  NOMSD Build\r\n");
-#endif
 
-    // Create and add main modules
+bool sdok= false; //TODO remove once SD Card code is working
+//    bool sdok= (sd.disk_initialize() == 0);
+//    if(!sdok) kernel->streams->printf("SDCard failed to initialize\r\n");
+
+//    #ifdef NONETWORK
+//        kernel->streams->printf("NETWORK is disabled\r\n");
+//    #endif
+
+//#ifdef DISABLEMSD
+//    // attempt to be able to disable msd in config
+//    if(sdok && !kernel->config->value( disable_msd_checksum )->by_default(false)->as_bool()){
+//        // HACK to zero the memory USBMSD uses as it and its objects seem to not initialize properly in the ctor
+//        size_t n= sizeof(USBMSD);
+//        void *v = AHB0.alloc(n);
+//        memset(v, 0, n); // clear the allocated memory
+//        msc= new(v) USBMSD(&u, &sd); // allocate object using zeroed memory
+//    }else{
+//        msc= NULL;
+//        kernel->streams->printf("MSD is disabled\r\n");
+//    }
+//#endif
+
+	// Create and add main modules
+//      kernel->add_module( new Player() );
+
+//    kernel->add_module( new CurrentControl() );
+//    kernel->add_module( new KillButton() );
+//    kernel->add_module( new PlayLed() );
+
+    // these modules can be completely disabled in the Makefile by adding to EXCLUDE_MODULES
+    #ifndef NO_TOOLS_ENDSTOPS
     kernel->add_module( new Endstops() );
-    kernel->add_module( new Laser() );
+    #endif
 
-    // Create all Switch modules
+    #ifndef NO_TOOLS_SWITCH
     SwitchPool *sp= new SwitchPool();
     sp->load_tools();
     delete sp;
-
-    // Create all TemperatureControl modules. Note order is important here must be after extruder so Tn as a parameter will get executed first
+    #endif
+    #ifndef NO_TOOLS_EXTRUDER
+    // NOTE this must be done first before Temperature control so ToolManager can handle Tn before temperaturecontrol module does
+    ExtruderMaker *em= new ExtruderMaker();
+    em->load_tools();
+    delete em;
+    #endif
+    #ifndef NO_TOOLS_TEMPERATURECONTROL
+    // Note order is important here must be after extruder so Tn as a parameter will get executed first
     TemperatureControlPool *tp= new TemperatureControlPool();
     tp->load_tools();
     delete tp;
+    #endif
+    #ifndef NO_TOOLS_LASER
+    kernel->add_module( new Laser() );
+    #endif
+    #ifndef NO_TOOLS_SPINDLE
+    kernel->add_module( new Spindle() );
+    #endif
+    #ifndef NO_UTILS_PANEL
+//    kernel->add_module( new Panel() );
+    #endif
+    #ifndef NO_TOOLS_ZPROBE
+    kernel->add_module( new ZProbe() );
+    #endif
+    #ifndef NO_TOOLS_SCARACAL
+//    kernel->add_module( newSCARAcal() );
+    #endif
+    #ifndef NO_TOOLS_ROTARYDELTACALIBRATION
+    kernel->add_module( new RotaryDeltaCalibration() );
+    #endif
+    #ifndef NONETWORK
+//    kernel->add_module( new Network() );
+    #endif
+    #ifndef NO_TOOLS_TEMPERATURESWITCH
+    // Must be loaded after TemperatureControl
+    kernel->add_module( new TemperatureSwitch() );
+    #endif
+    #ifndef NO_TOOLS_DRILLINGCYCLES
+    kernel->add_module( new Drillingcycles() );
+    #endif
+    #ifndef NO_TOOLS_FILAMENTDETECTOR
+    kernel->add_module( new FilamentDetector() );
+    #endif
+    #ifndef NO_UTILS_MOTORDRIVERCONTROL
+    kernel->add_module( new MotorDriverControl(0) );
+    #endif
+//    // Create and initialize USB stuff
+//    u.init();
+
+//#ifdef DISABLEMSD
+//    if(sdok && msc != NULL){
+//        kernel->add_module( msc );
+//    }
+//#else
+//    kernel->add_module( &msc );
+//#endif
+
+//    kernel->add_module( &usbserial );
+//    if( kernel->config->value( second_usb_serial_enable_checksum )->by_default(false)->as_bool() ){
+//        kernel->add_module( new USBSerial(&u) );
+//    }
+
+//    if( kernel->config->value( dfu_enable_checksum )->by_default(false)->as_bool() ){
+//        kernel->add_module( new DFU(&u));
+//    }
+
+//    // 10 second watchdog timeout (or config as seconds)
+//    float t= kernel->config->value( watchdog_timeout_checksum )->by_default(10.0F)->as_number();
+//    if(t > 0.1F) {
+//        // NOTE setting WDT_RESET with the current bootloader would leave it in DFU mode which would be suboptimal
+//        kernel->add_module( new Watchdog(t*1000000, WDT_MRI)); // WDT_RESET));
+//        kernel->streams->printf("Watchdog enabled for %f seconds\n", t);
+//    }else{
+        kernel->streams->printf("WARNING Watchdog is disabled\n");
+//    }
 
 
-    // TOADDBACK kernel->add_module( &u );
+//    kernel->add_module( &u );
 
+    // memory before cache is cleared
+    //SimpleShell::print_mem(kernel->streams);
 
-    // Clear the configuration cache as it is no longer needed
+    // clear up the config cache to save some memory
     kernel->config->config_cache_clear();
 
     if(kernel->is_using_leds()) {
         // set some leds to indicate status... led0 init done, led1 mainloop running, led2 idle loop running, led3 sdcard ok
-        leds[0]= 0; // indicate we are done with init
-        // TOADDBACK leds[3]= sdok?1:0; // 4th led indicates sdcard is available (TODO maye should indicate config was found)
+        leds[0]= 1; // indicate we are done with init
+        leds[3]= sdok?1:0; // 4th led indicates sdcard is available (TODO maye should indicate config was found)
+    }
+
+    if(sdok) {
+        // load config override file if present
+        // NOTE only Mxxx commands that set values should be put in this file. The file is generated by M500
+        FILE *fp= fopen(kernel->config_override_filename(), "r");
+        if(fp != NULL) {
+            char buf[132];
+            kernel->streams->printf("Loading config override file: %s...\n", kernel->config_override_filename());
+            while(fgets(buf, sizeof buf, fp) != NULL) {
+                kernel->streams->printf("  %s", buf);
+                if(buf[0] == ';') continue; // skip the comments
+                struct SerialMessage message= {&(StreamOutput::NullStream), buf};
+                kernel->call_event(ON_CONSOLE_LINE_RECEIVED, &message);
+            }
+            kernel->streams->printf("config override file executed\n");
+            fclose(fp);
+        }
     }
 
     // start the timers and interrupts
-    kernel->conveyor->start(THEROBOT->get_number_registered_motors());
-    kernel->step_ticker->start();
+    THEKERNEL->conveyor->start(THEROBOT->get_number_registered_motors());
+    THEKERNEL->step_ticker->start();
     THEKERNEL->slow_ticker->start();
 }
 
-int main() {
-
+int main()
+{
     init();
-
-	uint16_t cnt = 0;
-
+	int cnt = 0;
 	// Main loop
 	while(1){
 		if(THEKERNEL->is_using_leds()) {
 			// flash led 2 to show we are alive
-			leds[1]= (cnt++ & 0x1000) ? 1 : 0;
+			leds[0]= (cnt++ & 0x1000) ? 1 : 0;
 		}
 		THEKERNEL->call_event(ON_MAIN_LOOP);
 		THEKERNEL->call_event(ON_IDLE);
 	}
 
 }
-
