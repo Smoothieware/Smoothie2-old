@@ -1,8 +1,10 @@
 # Select the board that you want to build Smoothie to run upon.
-# Can be one of: Smoothie2Proto1 (**current default**)
+# Can be one of: Smoothie2Proto1
 #                Bambino210E
 #                Bambino200E
-BOARD ?= Bambino200E
+#                Smoothie2MiniProto1
+
+BOARD ?= Smoothie2MiniProto1
 
 # Set MRI_ENABLE to a value of 1 to enable the MRI debug monitor on the secondary UART.
 MRI_ENABLE ?= 0
@@ -70,6 +72,18 @@ DEFINES += -DSMOOTHIE_UART_SECONDARY_RX=P6_5
 DEFINES += -DTARGET_BAMBINO200E
 MRI_UART ?= MRI_UART_TX_P5_6 MRI_UART_RX_P1_14 MRI_UART_BAUD=230400
 endif
+
+ifeq "$(BOARD)" "Smoothie2MiniProto1"
+DEFINES += -DSMOOTHIE_UART_PRIMARY_ENABLE=1
+DEFINES += -DSMOOTHIE_UART_PRIMARY_TX=P5_6
+DEFINES += -DSMOOTHIE_UART_PRIMARY_RX=P1_14
+DEFINES += -DSMOOTHIE_UART_SECONDARY_ENABLE=1
+DEFINES += -DSMOOTHIE_UART_SECONDARY_TX=P6_4
+DEFINES += -DSMOOTHIE_UART_SECONDARY_RX=P6_5
+DEFINES += -DTARGET_SMOOTHIE2_MINI_PROTO1
+MRI_UART ?= MRI_UART_TX_P5_6 MRI_UART_RX_P1_14 MRI_UART_BAUD=230400
+endif
+
 
 # generate a git version string
 ifneq "$(OS)" "Windows_NT"

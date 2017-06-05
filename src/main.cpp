@@ -64,6 +64,12 @@ DigitalOut leds[4] = {
         DigitalOut(P1_2),
         DigitalOut(P2_8),
         DigitalOut(P2_9)
+#elif defined(TARGET_SMOOTHIE2_MINI_PROTO1)
+		// smoothie 2 mini proto1
+		DigitalOut(P5_1),
+		DigitalOut(P5_0),
+		DigitalOut(PC_14),
+		DigitalOut(PC_13)
 #endif
 };
 
